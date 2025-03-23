@@ -5,19 +5,11 @@ export function HomeTemplate() {
   return (
     <Main>
       <Container>
-        <Box>
-          <Carousel />
-        </Box>
         <Title>
           Bienvenido a Cerdyn <br /> 🐷
         </Title>
-        <SubText>
-          Cerdyn nace por las pocas aplicaciones gratis que existen para
-          controlar gastos e ingresos.
-          <br />
-          ❤️Está surgiendo como curso para lograr presupuestarlo,
-          <br /> MUCHAS GRACIAS POR APOYAR ESTE PROYECTO
-        </SubText>
+        <SubText>Cerdyn nace por las pocas aplicaciones gratis que existen para controlar gastos e ingresos.</SubText>
+
         <ContainerAutor>
           <div className="contentImg">
             <img src="https://i.ibb.co/6Nw0B9p/yjtityutyu.png" />
@@ -27,18 +19,6 @@ export function HomeTemplate() {
             <span>"cualquiera puede programar"</span>
           </div>
         </ContainerAutor>
-        <ButtonContainer>
-          <Btnsave url="https://t.me/htmlycss369"
-            titulo="UNIRSE A Telegram"
-            bgcolor="#BF94FF"
-            icono={<v.iconoreact />}
-          />
-          <Btnsave url="https://www.udemy.com/course/sistema-para-el-control-de-gastos-con-reactjs-y-postgresql/?couponCode=CERDYNREACT"
-            titulo="Ver curso"
-            bgcolor="#fb37b7"
-            icono={<v.iconocorona />}
-          />
-        </ButtonContainer>
       </Container>
     </Main>
   );
@@ -52,7 +32,6 @@ const Main = styled.main`
   align-items: center;
   position: relative;
   overflow: hidden;
-  
 `;
 const Container = styled.div`
   width: 75%;
@@ -61,8 +40,7 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  text-align:center;
-  
+  text-align: center;
 `;
 const Box = styled.div`
   width: 50%;
@@ -133,7 +111,7 @@ const ContainerAutor = styled.div`
   .contentDescripcion {
     display: flex;
     flex-direction: column;
-    b{
+    b {
       color: ${(props) => props.theme.text};
     }
     span {
@@ -145,7 +123,7 @@ const ButtonContainer = styled.div`
   width: 80%;
   margin: 1rem auto;
   align-self: center;
-  justify-content:center;
+  justify-content: center;
   display: flex;
   gap: 20px;
   @media (max-width: 64em) {
