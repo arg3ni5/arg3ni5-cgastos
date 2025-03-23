@@ -1,22 +1,11 @@
-import {
-  MyRoutes,
-  Sidebar,
-  Device,
-  Light,
-  Dark,
-  AuthContextProvider,
-  Menuambur,
-  useUsuariosStore,
-  Login,
-  SpinnerLoader,
-  Fondo1,
-} from "./index";
+import { MyRoutes, Sidebar, Device, Light, Dark, AuthContextProvider, Menuambur, useUsuariosStore, Login, SpinnerLoader, Fondo1 } from "./index";
 import { useLocation } from "react-router-dom";
 import { createContext, useState } from "react";
 import { ThemeProvider } from "styled-components";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { styled } from "styled-components";
 import { useQuery } from "@tanstack/react-query";
+
 export const ThemeContext = createContext(null);
 function App() {
   const { mostrarUsuarios, datausuarios } = useUsuariosStore();
@@ -26,9 +15,8 @@ function App() {
   const theme = datausuarios?.tema === "0" ? "light" : "dark";
   const themeStyle = theme === "light" ? Light : Dark;
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { isLoading, error } = useQuery({queryKey:["mostrar usuarios"],queryFn: () =>
-    mostrarUsuarios()}
-  );
+
+  const { isLoading, error } = useQuery({ queryKey: ["mostrar usuarios"], queryFn: () => mostrarUsuarios() });
 
   if (isLoading) {
     return <SpinnerLoader />;
@@ -39,16 +27,13 @@ function App() {
 
   return (
     <>
-      <ThemeContext.Provider value={{ theme }}>
+      <ThemeContext.Provider value={Dark}>
         <ThemeProvider theme={themeStyle}>
           <AuthContextProvider>
             {pathname != "/login" ? (
               <Container className={sidebarOpen ? "active" : ""}>
                 <div className="ContentSidebar">
-                  <Sidebar
-                    state={sidebarOpen}
-                    setState={() => setSidebarOpen(!sidebarOpen)}
-                  />
+                  <Sidebar state={sidebarOpen} setState={() => setSidebarOpen(!sidebarOpen)} />
                 </div>
                 <div className="ContentMenuambur">
                   <Menuambur />
