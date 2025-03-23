@@ -26,7 +26,7 @@ export const AuthContextProvider = ({ children }) => {
       foto: dataProvider.picture,
       idauth_supabase: idAuthSupabase,
     };
-    await InsertarUsuarios(p)
+    await InsertarUsuarios(p, idAuthSupabase)
 
   };
   return (
