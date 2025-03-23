@@ -5,20 +5,13 @@ export function HomeTemplate() {
   return (
     <Main>
       <Container>
+        <Box>
+          <Carousel />
+        </Box>
         <Title>
           Bienvenido a Cerdyn <br /> 🐷
         </Title>
         <SubText>Cerdyn nace por las pocas aplicaciones gratis que existen para controlar gastos e ingresos.</SubText>
-
-        <ContainerAutor>
-          <div className="contentImg">
-            <img src="https://i.ibb.co/6Nw0B9p/yjtityutyu.png" />
-          </div>
-          <div className="contentDescripcion">
-            <b>Ing. Franklin Bustamante</b>
-            <span>"cualquiera puede programar"</span>
-          </div>
-        </ContainerAutor>
       </Container>
     </Main>
   );
