@@ -16,19 +16,22 @@ export function ListaPaises({ setSelect, setState }) {
     setState();
   }
   function buscar(e) {
+
     let filtrado = isocodigos.filter((item) => {
-      return item.countryName == ConvertirCapitalize(e.target.value);
+      return item.countryName.toLowerCase().includes(e.target.value.toLowerCase());
     });
+    console.log({isocodigos,filtrado, value: ConvertirCapitalize(e.target.value)});
     setDataresult(filtrado);
   }
   return (
     <Container>
       <section className="titulo">
         <span>Busca tu país</span>
-      
+
         <BtnCerrar funcion={setState} />
       </section>
       <InputBuscadorLista onChange={buscar} placeholder="buscar..." />
+      Paises: {dataresult.length}
       {dataresult.length > 0 &&
         dataresult.map((item, index) => {
           return (
@@ -50,7 +53,7 @@ const Container = styled.div`
   flex-direction: column;
   background: ${({ theme }) => theme.body};
   border-radius: 10px;
- 
+
   padding: 10px;
   gap: 10px;
   color: ${({ theme }) => theme.text};
