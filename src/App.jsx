@@ -47,7 +47,7 @@ function App() {
               <Login />
             )}
 
-            <ReactQueryDevtools initialIsOpen={true} />
+            {/* <ReactQueryDevtools initialIsOpen={true} /> */}
           </AuthContextProvider>
         </ThemeProvider>
       </ThemeContext.Provider>
