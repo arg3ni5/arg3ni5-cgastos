@@ -39,7 +39,7 @@ export function CardEliminarData() {
         funcion={eliminar}
       />
       <div className="contentImg">
-        <img src={v.logo} />
+        <img src={v.logo2} />
       </div>
     </Container>
   );
