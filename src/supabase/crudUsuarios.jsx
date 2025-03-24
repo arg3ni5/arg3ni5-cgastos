@@ -27,6 +27,9 @@ export const InsertarUsuarios = async (p, idAuthSupabase) => {
 
     console.log("El usuario ya existe en la base de datos");
     return existingUser;
+
+    // const { data: newUser, error: insertError } = await supabase.from("usuarios").insert(p).select().single();
+    return newUser;
   } catch (error) {
     console.log("InsertarUsuarios", error.error_description || error.message);
     return null;
