@@ -13,6 +13,7 @@ import { FaReact } from "react-icons/fa";
 import { BsArrowDown, BsArrowUpShort } from "react-icons/bs";
 import { FaBalanceScale } from "react-icons/fa";
 import logo from "../assets/logocerdo.png";
+import logo2 from "../assets/pato-caminando.gif";
 import { BsGoogle } from "react-icons/bs";
 import { RiCloseLine } from "react-icons/ri";
 import { BiSave } from "react-icons/bi";
@@ -40,6 +41,8 @@ export const v = {
   emoji: BsEmojiLaughing,
   iconeditarTabla: RiEditLine,
   iconeliminarTabla: RiDeleteBin2Line,
+  colorBalance: `#3E43D6`,
+  colorbgBalance: `#B3B5FF`,
   colorIngresos: `#53B257`,
   colorbgingresos: `#e6ffe7`,
   colorGastos: `#fe6156`,
@@ -68,6 +71,7 @@ export const v = {
   flechaarribalarga: BsArrowUpShort,
   balance: FaBalanceScale,
   logo: logo,
+  logo2: logo2,
   iconogoogle: BsGoogle,
   iconocerrar: RiCloseLine,
   iconoguardar: BiSave,
