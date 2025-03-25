@@ -22,7 +22,7 @@ import img5 from "../../assets/Ruleta/ruleta7.png";
 import Arrow from "../../assets/Arrow.svg";
 export function Carousel() {
   return (
-    <Container>
+    <CarouselContainer>
       <Swiper
         // install Swiper modules
         autoplay={{ delay: 1500, disableOnInteraction: false }}
@@ -56,10 +56,10 @@ export function Carousel() {
           <img src={img5} />
         </SwiperSlide>
       </Swiper>
-    </Container>
+    </CarouselContainer>
   );
 }
-const Container = styled.div`
+const CarouselContainer = styled.div`
   width: 20vw;
   height: 50vh;
   @media (max-width: 70em) {
