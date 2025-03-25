@@ -53,6 +53,12 @@ export const DataDesplegableMovimientos = [
     tipo: "i",
     bgcolor:  v.colorbgingresos,
   },
+  {
+    text: "Balance",
+    color: v.colorBalance,
+    tipo: "b",
+    bgcolor:  v.colorbgBalance,
+  },
 ];
 
 //data SIDEBAR
@@ -100,11 +106,11 @@ export const TemasData = [
   {
     icono: "🌞",
     descripcion: "light",
-   
+
   },
   {
     icono: "🌚",
     descripcion: "dark",
-    
+
   },
 ];
