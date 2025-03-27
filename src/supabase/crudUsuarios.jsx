@@ -44,6 +44,8 @@ export const InsertarUsuarios = async (p, idAuthSupabase) => {
 
 export const MostrarUsuarios = async () => {
   try {
+    console.log("MostrarUsuarios");
+
     const idAuthSupabase = await ObtenerIdAuthSupabase();
     if (idAuthSupabase === null || idAuthSupabase === undefined) {
       return [];
