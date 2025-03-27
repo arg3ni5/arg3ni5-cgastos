@@ -2,9 +2,9 @@ import styled from "styled-components";
 import { Btnsave, v,useAuthStore } from "../../index";
 export function LoginTemplate() {
   const {signInWithGoogle} = useAuthStore();
-  
+
   return (
-    <Container imgfondo={v.imagenfondo}>
+    <Container $imgfondo={v.imagenfondo}>
       <div className="contentCard">
         <span className="version">versión 1.0</span>
         <div className="contentImg">
@@ -20,7 +20,7 @@ export function LoginTemplate() {
   );
 }
 const Container = styled.div`
-  background-image: url(${(props) => props.imgfondo});
+  background-image: url(${(props) => props.$imgfondo});
   background-repeat: no-repeat;
   background-size: cover;
   height: 100vh;
@@ -49,10 +49,10 @@ const Container = styled.div`
       width: 100%;
       display:flex;
       justify-content:center;
-    
+
       img{
         width: 40%;
-     
+
         animation:flotar 1.5s ease-in-out infinite alternate;
       }
     }
