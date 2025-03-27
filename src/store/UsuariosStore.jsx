@@ -4,7 +4,7 @@ import { EditarTemaMonedaUser, MostrarUsuarios } from "../index";
 export const useUsuariosStore = create((set, get) => ({
   idusuario:0,
   datausuarios: [],
-  
+
   mostrarUsuarios: async () => {
     const response = await MostrarUsuarios();
     set({ datausuarios: response });
@@ -14,7 +14,7 @@ export const useUsuariosStore = create((set, get) => ({
     }else{
        return [];
     }
-   
+
   },
   editartemamonedauser: async (p) => {
     await EditarTemaMonedaUser(p);

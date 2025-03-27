@@ -3,6 +3,12 @@ import { supabase, ObtenerIdAuthSupabase } from "../index";
 
 export const ConsultarUsuario = async (idAuthSupabase) => {
   try {
+    if (idAuthSupabase === undefined) {
+      idAuthSupabase = await ObtenerIdAuthSupabase();
+    }
+    if (idAuthSupabase === null) {
+      return { data: null, error: "No se pudo obtener el idAuthSupabase" };
+    }
     return supabase.from("usuarios").select().eq("idauth_supabase", idAuthSupabase).single();
   } catch (error) {
     console.log("ConsultarUsuario", error.error_description || error.message);
@@ -39,8 +45,9 @@ export const InsertarUsuarios = async (p, idAuthSupabase) => {
 export const MostrarUsuarios = async () => {
   try {
     const idAuthSupabase = await ObtenerIdAuthSupabase();
-    console.log("MostrarUsuarios", idAuthSupabase);
-
+    if (idAuthSupabase === null || idAuthSupabase === undefined) {
+      return [];
+    }
     const { error, data } = await supabase.from("usuarios").select().eq("idauth_supabase", idAuthSupabase).maybeSingle();
     if (error) {
       console.error("MostrarUsuarios", error);
