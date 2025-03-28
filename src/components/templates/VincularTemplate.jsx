@@ -2,12 +2,14 @@ import styled from "styled-components";
 import { useEffect, useState } from "react";
 import { Header, supabase, useConexionesStore, useUsuariosStore } from "../../index";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 export function VincularTemplate() {
   const { datausuarios } = useUsuariosStore();
   const { conexiones, insertarConexion, mostrarConexiones, eliminarConexion } = useConexionesStore();
   const [status, setStatus] = useState("loading");
   const [msgError, setMsgError] = useState("");
+  const navigate = useNavigate();
 
   const urlParams = new URLSearchParams(window.location.search);
   const canal = urlParams.get("canal") || "telegram";
@@ -19,27 +21,6 @@ export function VincularTemplate() {
     queryFn: () => mostrarConexiones({ usuario_id: datausuarios.id }),
     enabled: !!datausuarios, // solo ejecuta si hay usuario
   });
-  const confirmarEliminacion = async (conexion) => {
-    const result = await Swal.fire({
-      title: "¿Eliminar esta conexión?",
-      text: `Eliminar @${conexion.canal_username || "sin username"} (${conexion.canal})`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Sí, eliminar",
-      cancelButtonText: "Cancelar",
-    });
-
-    if (result.isConfirmed) {
-      try {
-        await eliminarConexion({ id: conexion.id });
-        Swal.fire("✅ Eliminado", "La conexión fue eliminada correctamente", "success");
-      } catch (err) {
-        Swal.fire("❌ Error", "No se pudo eliminar la conexión", "error");
-      }
-    }
-  };
 
   useEffect(() => {
     const vincular = async () => {
@@ -72,9 +53,13 @@ export function VincularTemplate() {
         return;
       }
       try {
-        await insertarConexion(p);
+        const data = await insertarConexion(p);
+        console.log("data", data);
+
         setStatus("success");
       } catch (err) {
+        console.log("error", err);
+
         if (err.message.includes("duplicate")) {
           setStatus("already");
         } else {
@@ -100,7 +85,11 @@ export function VincularTemplate() {
         {status === "already" && <p>⚠️ Esta cuenta de {canal} ya está vinculada.</p>}
         {status === "error" && <p>❌ Ocurrió un error al vincular tu cuenta.</p>}
       </section>
-      <section className="area1">{msgError && <p>{msgError}</p>}</section>
+      <section className="area1">
+        {(status === "success" || status === "already") && <IrAConexiones onClick={() => navigate("/conexiones")}>🔗 Ver mis cuentas vinculadas</IrAConexiones>}
+
+        {msgError && <p>{msgError}</p>}
+      </section>
       <section className="main">
         {conexiones?.length > 0 && (
           <ListaCuentas>
@@ -110,9 +99,6 @@ export function VincularTemplate() {
                 <li key={conexion.canal + conexion.canal_user_id}>
                   <span className="icono">🔗</span>
                   <strong>{conexion.canal}</strong> – @{conexion.canal_username || "sin username"} (ID: {conexion.canal_user_id})
-                  <button className="btn-eliminar" onClick={() => eliminarConexion(conexion.canal_user_id)} title="Eliminar">
-                    🗑️
-                  </button>
                 </li>
               ))}
             </ul>
@@ -210,5 +196,18 @@ const ListaCuentas = styled.div`
     &:hover {
       color: red;
     }
+  }
+`;
+const IrAConexiones = styled.button`
+  margin-top: 10px;
+  background: transparent;
+  border: none;
+  color: ${({ theme }) => theme.primary || "#4fa3f7"};
+  cursor: pointer;
+  font-size: 1rem;
+  text-decoration: underline;
+
+  &:hover {
+    color: ${({ theme }) => theme.text};
   }
 `;

@@ -17,6 +17,7 @@ import logo2 from "../assets/pato-caminando.gif";
 import { BsGoogle } from "react-icons/bs";
 import { RiCloseLine } from "react-icons/ri";
 import { BiSave } from "react-icons/bi";
+import { BiLink } from "react-icons/bi";
 import { BsQuestionCircle } from "react-icons/bs";
 import { HiOutlineChartPie } from "react-icons/hi";
 import { SlGraph } from "react-icons/sl";
@@ -74,7 +75,8 @@ export const v = {
   logo2: logo2,
   iconogoogle: BsGoogle,
   iconocerrar: RiCloseLine,
-  iconoguardar: BiSave,
+  iconoguardar: BiSave ,
+  iconovercuenta: BiLink,
   iconoayuda: BsQuestionCircle,
   iconopie: HiOutlineChartPie,
   iconolineal: SlGraph,

@@ -22,6 +22,7 @@ export async function InsertarConexion(p) {
         timer: 1500,
       });
     }
+    return data;
   } catch (error) {
     alert(error.error_description || error.message + " insertar conexion");
   }
@@ -38,6 +39,8 @@ export async function MostrarConexiones(p) {
 }
 export async function EliminarConexiones(p) {
   try {
+    console.log("EliminarConexiones", p);
+
     const { error } = await supabase.from("conexiones_usuarios").delete().eq("id", p.id);
 
     if (error) throw error;
