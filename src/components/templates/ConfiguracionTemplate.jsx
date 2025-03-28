@@ -8,7 +8,7 @@ import {
   ListaGenerica,
   TemasData,
   Btnsave,CardEliminarData
-  
+
 } from "../../index";
 import { useState } from "react";
 
@@ -42,7 +42,7 @@ export function ConfiguracionTemplate() {
   };
   return (
     <Container>
-    
+
       <header className="header">
         <Header
           stateConfig={{ state: state, setState: () => setState(!state) }}
@@ -51,6 +51,14 @@ export function ConfiguracionTemplate() {
 
       <section className="area2">
         <h1>AJUSTES</h1>
+
+        <Btnsave
+          titulo="Conexiones"
+          icono={<v.iconovercuenta />} // el ícono que quieras
+          bgcolor={v.colorselector}
+          url="/conexiones"
+        />
+
         <ContentCard>
           <span>Moneda:</span>
           <Selector
@@ -119,7 +127,7 @@ const Container = styled.div`
     flex-direction: column;
     justify-content: start;
     gap: 30px;
-   
+
     h1 {
       font-size: 3rem;
     }
