@@ -1,21 +1,28 @@
 import styled from "styled-components";
 import {Icono} from "../../index"
-export function Btnsave({ funcion, titulo, bgcolor, icono,url }) {
-  return (
-    <Container type="submit" $bgcolor={bgcolor}>
-   
-     <Icono>{icono}</Icono>
-     
+import { useNavigate } from "react-router-dom";
 
-      <span className="btn" onClick={funcion}>
-        <a href={url} target="_blank">
-           {titulo}
-        </a>
-       
+export function Btnsave({ funcion, titulo, bgcolor, icono, url }) {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (url) {
+      navigate(url);
+    } else if (funcion) {
+      funcion();
+    }
+  };
+
+  return (
+    <Container type="button" $bgcolor={bgcolor}>
+      <Icono>{icono}</Icono>
+      <span className="btn" onClick={handleClick}>
+        {titulo}
       </span>
     </Container>
   );
 }
+
 const Container = styled.button`
   display: flex;
   justify-content: center;
@@ -50,5 +57,5 @@ const Container = styled.button`
       box-shadow: 0.05em 0.05em #000;
     }
   }
-  
+
 `;
