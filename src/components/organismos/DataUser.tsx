@@ -1,49 +1,65 @@
 import styled from "styled-components";
 import {
-  UserAuth,
   BtnCircular,
   v,
   ListaMenuDesplegable,
   DesplegableUser,
   useAuthStore,
+  useUserAuth,
 } from "../../index";
-export function DataUser({ stateConfig }) {
-  const { user } = UserAuth();
+import { MouseEventHandler } from "react";
+
+// Tipar el estado de visibilidad del menú
+interface StateConfig {
+  state: boolean;
+  setState: MouseEventHandler<HTMLDivElement>;
+}
+
+// Tipar el tipo esperado por la función del menú
+interface MenuOption {
+  tipo: string;
+  [key: string]: any; // Por si hay otros campos
+}
+
+export function DataUser({ stateConfig }: { stateConfig: StateConfig }) {
+  const { user } = useUserAuth(); // user: { name: string; picture: string } | null
   const { signout } = useAuthStore();
-  const funcionXtipo = async (p) => {
-   
+
+  const funcionXtipo = async (p: MenuOption) => {
     if (p.tipo === "cerrarsesion") {
-     
       await signout();
     }
   };
+
   return (
     <Container onClick={stateConfig.setState}>
       <div className="imgContainer">
-        <img src={user.picture} />
+        <img src={user?.picture} alt="Foto de perfil" />
       </div>
 
       <BtnCircular
         icono={<v.iconocorona />}
         width="25px"
         height="25px"
-        bgcolor={`linear-gradient(15deg, rgba(255, 88, 58, 0.86) 9%, #f8bf5b 100%);`}
+        bgcolor={`linear-gradient(15deg, rgba(255, 88, 58, 0.86) 9%, #f8bf5b 100%)`}
         textcolor="#ffffff"
         fontsize="11px"
         translatex="-50px"
         translatey="-12px"
       />
-      <span className="nombre">{user.name}</span>
+      <span className="nombre">{user?.name}</span>
+
       {stateConfig.state && (
         <ListaMenuDesplegable
           data={DesplegableUser}
           top="62px"
-          funcion={(p)=>funcionXtipo(p)}
+          funcion={funcionXtipo}
         />
       )}
     </Container>
   );
 }
+
 const Container = styled.div`
   position: relative;
   top: 0;
