@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Carousel, Btnsave, v } from "../../index";
+import { Carousel } from "../../index";
 
 export function HomeTemplate() {
   return (
