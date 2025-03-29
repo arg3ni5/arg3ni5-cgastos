@@ -34,12 +34,19 @@ export const ConsultarUsuario = async (
 };
 
 
-export const InsertarUsuarios = async (p: any, idAuthSupabase: string | undefined) => {
+export const InsertarUsuarios = async (
+  p: UsuarioInsert,
+  idAuthSupabase: string | undefined
+): Promise<Usuario | null> => {
   try {
     const { data: existingUser, error } = await ConsultarUsuario(idAuthSupabase);
 
     if (!existingUser && !error) {
-      const { data: newUser, error: insertError } = await supabase.from("usuarios").insert(p).select().single();
+      const { data: newUser, error: insertError } = await supabase
+        .from("usuarios")
+        .insert(p)
+        .select()
+        .single();
 
       if (insertError) {
         console.error("Error inserting user:", insertError);
@@ -51,42 +58,54 @@ export const InsertarUsuarios = async (p: any, idAuthSupabase: string | undefine
 
     console.log("El usuario ya existe en la base de datos");
     return existingUser;
-
-    // const { data: newUser, error: insertError } = await supabase.from("usuarios").insert(p).select().single();
-    // return newUser;
   } catch (error) {
-    console.log("InsertarUsuarios", (error as any).error_description || (error as Error).message || "An unknown error occurred");
+    console.log(
+      "InsertarUsuarios",
+      (error as any).error_description ||
+        (error as Error).message ||
+        "An unknown error occurred"
+    );
     return null;
   }
 };
 
-export const MostrarUsuarios = async () => {
-  try {
-    console.log("MostrarUsuarios");
 
+export const MostrarUsuarios = async (): Promise<Usuario | null> => {
+  try {
     const idAuthSupabase = await ObtenerIdAuthSupabase();
-    if (idAuthSupabase === null || idAuthSupabase === undefined) {
-      return [];
+    if (!idAuthSupabase) {
+      return null;
     }
-    const { error, data } = await supabase.from("usuarios").select().eq("idauth_supabase", idAuthSupabase).maybeSingle();
+
+    const { error, data } = await supabase
+      .from("usuarios")
+      .select()
+      .eq("idauth_supabase", idAuthSupabase)
+      .maybeSingle();
+
     if (error) {
       console.error("MostrarUsuarios", error);
     }
-    if (data) {
-      return data;
-    }
+
+    return data || null;
   } catch (error) {
-    alert(((error as any).error_description || (error as Error).message) + "MostrarUsuarios");
+    alert(
+      ((error as any).error_description || (error as Error).message) +
+        " MostrarUsuarios"
+    );
+    return null;
   }
 };
-export async function EditarTemaMonedaUser(p) {
-  try {
-    console.log("EditarTemaMonedaUser", p);
 
+
+export async function EditarTemaMonedaUser(p: Partial<Usuario> & { id: number }): Promise<void> {
+  try {
     const { error } = await supabase.from("usuarios").update(p).eq("id", p.id);
     if (error) {
       alert(`Error al editar usuarios: ${error.message}`);
+      return;
     }
+
     Swal.fire({
       icon: "success",
       title: "Datos modificados",
@@ -94,6 +113,9 @@ export async function EditarTemaMonedaUser(p) {
       timer: 1500,
     });
   } catch (error) {
-    alert(((error as any).error_description || (error as Error).message) + "EditarTemaMonedaUser");
+    alert(
+      ((error as any).error_description || (error as Error).message) +
+        " EditarTemaMonedaUser"
+    );
   }
 }
