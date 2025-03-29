@@ -20,6 +20,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
       });
       if (error) throw new Error("Ocurrió un error durante la autenticación");
       set({ isAuth: true });
+      console.log("data", data);
+      
       return data;
     } catch (error) {
       console.error("signInWithGoogle:", (error as Error).message);

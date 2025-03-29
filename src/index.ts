@@ -1,4 +1,3 @@
-export * from './App';
 export * from './components/atomos/BtnCerrar';
 export * from './components/atomos/Colorcontent';
 export * from './components/atomos/ContentFiltros';
@@ -51,7 +50,6 @@ export * from './components/templates/PlantillaBase';
 export * from './components/templates/VincularTemplate';
 export * from './context/AuthContent';
 export * from './hooks/ProtectedRoute';
-export * from './main';
 export * from './pages/Categorias';
 export * from './pages/Conexiones';
 export * from './pages/Configuracion';
@@ -81,4 +79,3 @@ export * from './supabase/supabase.config';
 export * from './types/supabase';
 export * from './utils/Conversiones';
 export * from './utils/dataEstatica';
-// export * from './vite-env.d';
