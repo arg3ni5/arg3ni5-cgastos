@@ -1,4 +1,4 @@
-import { Routes, Route, BrowserRouter } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { Login, Home, ProtectedRoute, UserAuth, Configuracion, Categorias, Movimientos, Informes, Vincular, Conexiones } from "../index";
 export function MyRoutes() {
   const { user } = UserAuth();

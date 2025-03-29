@@ -24,10 +24,10 @@ import { SlGraph } from "react-icons/sl";
 import { BsBarChartLine } from "react-icons/bs";
 import { AiOutlineCalculator } from "react-icons/ai";
 import { BsCalendarCheck } from "react-icons/bs";
-import {IoIosArrowForward} from "react-icons/io"
+import { IoIosArrowForward } from "react-icons/io"
 import fondo from "../assets/fondo1.svg";
-import {GrFormPrevious,GrCaretNext} from "react-icons/gr"
-import {MdOutlineBorderAll} from "react-icons/md"
+import { GrFormPrevious, GrCaretNext } from "react-icons/gr"
+import { MdOutlineBorderAll } from "react-icons/md"
 export const v = {
   sidebarWidth: `300px`,
   sidebarWidthInitial: `10vw`,
@@ -75,7 +75,7 @@ export const v = {
   logo2: logo2,
   iconogoogle: BsGoogle,
   iconocerrar: RiCloseLine,
-  iconoguardar: BiSave ,
+  iconoguardar: BiSave,
   iconovercuenta: BiLink,
   iconoayuda: BsQuestionCircle,
   iconopie: HiOutlineChartPie,
@@ -85,10 +85,10 @@ export const v = {
   iconocheck: BsCalendarCheck,
   imagenfondo: fondo,
   colorSecundario: `#DAC1FF`,
-  iconoflechaderecha:IoIosArrowForward,
-  colorselector:"#BF94FF",
-  rgbafondos:"rgba(210, 110, 249, 0.1)",
-  iconoprev:GrFormPrevious,
-  icononext:GrCaretNext,
-  iconotodos:MdOutlineBorderAll
+  iconoflechaderecha: IoIosArrowForward,
+  colorselector: "#BF94FF",
+  rgbafondos: "rgba(210, 110, 249, 0.1)",
+  iconoprev: GrFormPrevious,
+  icononext: GrCaretNext,
+  iconotodos: MdOutlineBorderAll
 };
