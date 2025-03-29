@@ -78,6 +78,7 @@ export * from './supabase/crudMovimientos';
 export * from './supabase/crudUsuarios';
 export * from './supabase/globalSupabase';
 export * from './supabase/supabase.config';
+export * from './types/supabase';
 export * from './utils/Conversiones';
 export * from './utils/dataEstatica';
 // export * from './vite-env.d';
