@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { JSX, useState } from "react";
 import { v } from "../../styles/variables";
 import styled from "styled-components";
-import { LinksArray,SecondarylinksArray } from "../../index";
+import { LinksArray, SecondarylinksArray } from "../../index";
 import { NavLink } from "react-router-dom";
-export function Menuambur() {
+
+export function Menuambur(): JSX.Element {
   const [click, setClick] = useState(false);
   return (
     <Container>
@@ -26,8 +27,8 @@ export function Menuambur() {
               </NavLink>
             </div>
           ))}
-           <Divider/>
-           {SecondarylinksArray.map(({ icon, label, to }) => (
+          <Divider />
+          {SecondarylinksArray.map(({ icon, label, to }) => (
             <div
               key={label}
               className="LinkContainer"
@@ -40,12 +41,16 @@ export function Menuambur() {
             </div>
           ))}
         </Menu>
-       
+
       </NavBar>
     </Container>
   );
 }
-const Container = styled.div`
+interface StyledProps {
+  $click: string;
+  theme: any; // You might want to properly type your theme
+}
+const Container = styled.div<Partial<StyledProps>>`
   background-color: ${(props) => props.theme.body};
   cursor: pointer;
 `;
@@ -57,15 +62,15 @@ const NavBar = styled.nav`
   height: 100vh;
   margin: 0 auto;
 `;
-const HamburgerMenu = styled.span`
-  width: ${(props) => (props.$click=="true" ? "4rem" : "3.5rem")};
-  height: ${(props) => (props.$click=="true" ? "2px" : "5px")};
+const HamburgerMenu = styled.span<StyledProps>`
+  width: ${(props) => (props.$click == "true" ? "4rem" : "3.5rem")};
+  height: ${(props) => (props.$click == "true" ? "2px" : "5px")};
   border-radius: 3px;
   z-index: 12;
   position: fixed;
   top: 3rem;
   left: 0;
-  transform: ${(props) => (props.$click=="true" ? "translateX(80vw)" : " translateX(0)")};
+  transform: ${(props) => (props.$click == "true" ? "translateX(80vw)" : " translateX(0)")};
  
   display: none;
   justify-content: start;
@@ -83,7 +88,7 @@ const HamburgerMenu = styled.span`
     }
   }
 `;
-const Menu = styled.div`
+const Menu = styled.div<StyledProps>`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -100,7 +105,7 @@ const Menu = styled.div`
     background-color: ${(props) => `rgba(${props.theme.bodyRgba},0.85)`};
     backdrop-filter: blur(3px);
     transform: ${(props) =>
-      props.$click=="true" ? "translateY(0)" : "translateY(1000%)"};
+    props.$click == "true" ? "translateY(0)" : "translateY(1000%)"};
     transition: all 0.3s ease;
     flex-direction: column;
     justify-content: center;

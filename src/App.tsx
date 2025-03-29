@@ -1,13 +1,14 @@
-import { MyRoutes, Sidebar, Device, Light, Dark, AuthContextProvider, Menuambur, useUsuariosStore, Login, SpinnerLoader, Fondo1 } from "./index";
+import { MyRoutes, Sidebar, Device, Light, Dark, AuthContextProvider, Menuambur, useUsuariosStore, Login, SpinnerLoader } from "./index";
 import { useLocation } from "react-router-dom";
-import { createContext, useState } from "react";
+import { createContext, JSX, useState } from "react";
 import { ThemeProvider } from "styled-components";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { styled } from "styled-components";
 import { useQuery } from "@tanstack/react-query";
 
-export const ThemeContext = createContext(null);
-function App() {
+type ThemeContextType = typeof Dark | null;
+
+export const ThemeContext = createContext<ThemeContextType>(null);
+function App(): JSX.Element {
   const { mostrarUsuarios, datausuarios } = useUsuariosStore();
 
   const { pathname } = useLocation();

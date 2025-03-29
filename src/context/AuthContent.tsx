@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase,InsertarUsuarios } from "../index";
 const AuthContext = createContext();
-export const AuthContextProvider = ({ children }) => {
+export const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState([]);
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
@@ -20,7 +20,7 @@ export const AuthContextProvider = ({ children }) => {
       authListener.subscription;
     };
   }, []);
-  const insertarUsuarios = async (dataProvider, idAuthSupabase) => {
+  const insertarUsuarios = async (dataProvider: { name: string; picture: string }, idAuthSupabase: string) => {
     const p = {
       nombres: dataProvider.name,
       foto: dataProvider.picture,
