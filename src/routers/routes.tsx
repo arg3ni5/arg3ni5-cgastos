@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
-import { Login, Home, ProtectedRoute, UserAuth, Configuracion, Categorias, Movimientos, Informes, Vincular, Conexiones } from "../index";
+import { Login, Home, ProtectedRoute, Configuracion, Categorias, Movimientos, Informes, Vincular, Conexiones, useUserAuth } from "../index";
 export function MyRoutes() {
-  const { user } = UserAuth();
+  const { user } = useUserAuth();
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
