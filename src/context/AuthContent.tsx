@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { supabase, InsertarUsuarios } from "../index";
-import { Database } from "../types/supabase";
+import { supabase, InsertarUsuarios, Database } from "../index";
 
 // Tipar fila de la tabla usuarios
 type UsuarioInsert = Database["public"]["Tables"]["usuarios"]["Insert"];

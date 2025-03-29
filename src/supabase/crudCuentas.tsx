@@ -1,5 +1,4 @@
-import { supabase } from "../index";
-import { Database } from "../types/supabase";
+import { Database, supabase } from "../index";
 
 type Cuenta = Database["public"]["Tables"]["cuenta"]["Row"];
 

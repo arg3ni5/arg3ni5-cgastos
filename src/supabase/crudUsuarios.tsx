@@ -1,6 +1,5 @@
 import Swal from "sweetalert2";
-import { supabase, ObtenerIdAuthSupabase } from "../index";
-import { Database } from "../types/supabase";
+import { supabase, ObtenerIdAuthSupabase, Database } from "../index";
 
 type Usuario = Database["public"]["Tables"]["usuarios"]["Row"];
 type UsuarioInsert = Database["public"]["Tables"]["usuarios"]["Insert"];
@@ -11,7 +10,10 @@ export const ConsultarUsuario = async (
 ): Promise<{ data: Usuario | null; error: string | null }> => {
   try {
     if (idAuthSupabase === undefined) {
-      idAuthSupabase = await ObtenerIdAuthSupabase();
+      const id = await ObtenerIdAuthSupabase();
+      if (id !== null) {
+        idAuthSupabase = id;
+      }
     }
     if (idAuthSupabase === null || idAuthSupabase === undefined) {
       return { data: null, error: "No se pudo obtener el idAuthSupabase" };
@@ -62,8 +64,8 @@ export const InsertarUsuarios = async (
     console.log(
       "InsertarUsuarios",
       (error as any).error_description ||
-        (error as Error).message ||
-        "An unknown error occurred"
+      (error as Error).message ||
+      "An unknown error occurred"
     );
     return null;
   }
@@ -91,7 +93,7 @@ export const MostrarUsuarios = async (): Promise<Usuario | null> => {
   } catch (error) {
     alert(
       ((error as any).error_description || (error as Error).message) +
-        " MostrarUsuarios"
+      " MostrarUsuarios"
     );
     return null;
   }
@@ -115,7 +117,7 @@ export async function EditarTemaMonedaUser(p: Partial<Usuario> & { id: number })
   } catch (error) {
     alert(
       ((error as any).error_description || (error as Error).message) +
-        " EditarTemaMonedaUser"
+      " EditarTemaMonedaUser"
     );
   }
 }
