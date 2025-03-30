@@ -2,7 +2,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import { ReactNode } from "react";
 
 interface ProtectedRouteProps {
-  user: unknown; // Podés usar un tipo más preciso si tenés uno (ej. `UserMetadata`)
+  user: unknown;
   redirectTo: string;
   children?: ReactNode;
 }

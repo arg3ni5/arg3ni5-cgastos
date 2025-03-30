@@ -20,7 +20,7 @@ export const useUsuariosStore = create<UsuariosStore>((set, get) => ({
     set({ datausuarios: response });
 
     if (response) {
-      set({ idusuario: response.id });
+      set({ idusuario: response.id });      
       return response;
     }
 
