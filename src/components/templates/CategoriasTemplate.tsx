@@ -11,23 +11,33 @@ import {
   TablaCategorias,
   RegistrarCategorias,
   Lottieanimacion,
+  Database,
+  Tipo,
 } from "../../index";
-import { useState } from "react";
+import { JSX, useState } from "react";
 import vacioverde from "../../assets/vacioverde.json";
 import vaciorojo from "../../assets/vaciorojo.json";
-export function CategoriasTemplate({ data }) {
+
+type Categoria = Database["public"]["Tables"]["categorias"]["Row"];
+
+interface CategoriasTemplateProps {
+  data: Categoria[];
+}
+
+
+export function CategoriasTemplate({ data }: CategoriasTemplateProps): JSX.Element {
   const [openRegistro, SetopenRegistro] = useState(false);
   const [accion, setAccion] = useState("");
   const [dataSelect, setdataSelect] = useState([]);
   const [state, setState] = useState(false);
   const [stateTipo, setStateTipo] = useState(false);
-  const { colorCategoria, tituloBtnDes, bgCategoria, setTipo,tipo } =
-    useOperaciones();
-  function cambiarTipo(p) {
+  const { colorCategoria, tituloBtnDes, bgCategoria, setTipo, tipo } = useOperaciones();
+
+  const cambiarTipo = (p: Tipo) => {
     setTipo(p);
     setStateTipo(!stateTipo);
     setState(false);
-  }
+  };
 
   function cerrarDesplegables() {
     setStateTipo(false);
