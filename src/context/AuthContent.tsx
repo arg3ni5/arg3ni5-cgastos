@@ -1,22 +1,22 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { supabase, InsertarUsuarios, Database } from "../index";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
-// Tipar fila de la tabla usuarios
 type UsuarioInsert = Database["public"]["Tables"]["usuarios"]["Insert"];
 
-// Tipar lo que se guarda como usuario en el contexto (metadata o null)
+
 interface AuthContextType {
   user: { name: string; picture: string } | null;
 }
 
-// Crear contexto con valor inicial `undefined` para forzar que use el provider
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Tipar props del provider
+
 export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AuthContextType["user"]>(null);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
 
   useEffect(() => {
@@ -38,7 +38,10 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
 
           await insertarUsuarios(user, session.user.id);
           
-          navigate("/");
+          if (pathname === "/login") {
+            navigate("/");
+            return; 
+          }
         }
       }
     );

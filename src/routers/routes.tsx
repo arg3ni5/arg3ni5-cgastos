@@ -1,11 +1,15 @@
 import { Routes, Route } from "react-router-dom";
 import { Login, Home, ProtectedRoute, Configuracion, Categorias, Movimientos, Informes, Vincular, Conexiones, useUserAuth } from "../index";
-export function MyRoutes() {
+interface ProtectedRouteProps {
+  isLoading: boolean;
+}
+
+export const MyRoutes = ({ isLoading }: ProtectedRouteProps) => {
   const { user } = useUserAuth();
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-      <Route element={<ProtectedRoute user={user} redirectTo="/" />}>
+      <Route element={<ProtectedRoute user={user} redirectTo="/" isLoading={isLoading} />}>
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Home />} />
         <Route path="/conexiones" element={<Conexiones />} />
