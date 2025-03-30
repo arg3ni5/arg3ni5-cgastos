@@ -1,3 +1,4 @@
+
 import styled from "styled-components";
 import {
   EffectCards,
@@ -8,23 +9,41 @@ import {
   Autoplay,
 } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { useEffect, FC, useRef } from "react";
 // Import Swiper styles
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-import "swiper/css/scrollbar";
-import "swiper/css/effect-cards";
 import img1 from "../../assets/Ruleta/ruleta9.png";
 import img2 from "../../assets/Ruleta/ruleta8.png";
 import img3 from "../../assets/Ruleta/ruleta5.png";
 import img4 from "../../assets/Ruleta/ruleta6.png";
 import img5 from "../../assets/Ruleta/ruleta7.png";
 import Arrow from "../../assets/Arrow.svg";
-export function Carousel() {
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+console.log("Ruta del Arrow SVG:", Arrow);
+
+
+export const Carousel: FC = () => {
+  const prevRef = useRef(null);
+  const nextRef = useRef(null);
+
+  useEffect(() => {
+    import("swiper/css");
+    import("swiper/css/navigation");
+    import("swiper/css/pagination");
+    import("swiper/css/scrollbar");
+    import("swiper/css/effect-cards");
+  }, []);
+
   return (
     <CarouselContainer>
+      
+      <div className="custom-button-prev" ref={prevRef}>
+        <IoIosArrowBack />
+      </div>
+      <div className="custom-button-next" ref={nextRef}>
+        <IoIosArrowForward />
+      </div>
+
       <Swiper
-        // install Swiper modules
         autoplay={{ delay: 1500, disableOnInteraction: false }}
         modules={[
           EffectCards,
@@ -34,34 +53,37 @@ export function Carousel() {
           A11y,
           Autoplay,
         ]}
-        navigation={true}
+        navigation={{
+          prevEl: prevRef.current,
+          nextEl: nextRef.current,
+        }}
+        onInit={(swiper) => {
+          const navigation = swiper.params.navigation as any;
+          navigation.prevEl = prevRef.current;
+          navigation.nextEl = nextRef.current;
+
+          swiper.navigation.init();
+          swiper.navigation.update();
+        }}
+
         pagination={{ type: "fraction" }}
         scrollbar={{ draggable: true }}
         effect={"cards"}
       >
-        <SwiperSlide>
-          <img src={img1} />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img src={img2} />
-        </SwiperSlide>
-        <SwiperSlide>
-          {" "}
-          <img src={img3} />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img src={img4} />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img src={img5} />
-        </SwiperSlide>
+        {[img1, img2, img3, img4, img5].map((img, i) => (
+          <SwiperSlide key={i}>
+            <img src={img} alt={`slide-${i + 1}`} />
+          </SwiperSlide>
+        ))}
       </Swiper>
+
     </CarouselContainer>
   );
 }
 const CarouselContainer = styled.div`
   width: 20vw;
   height: 50vh;
+
   @media (max-width: 70em) {
     height: 40vh;
     padding: 15px 0;
@@ -78,58 +100,57 @@ const CarouselContainer = styled.div`
     height: 35vh;
     width: 40vw;
   }
+
   .swiper {
     width: 100%;
     height: 100%;
   }
+
   .swiper-slide {
     border-radius: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow:hidden;
+    overflow: hidden;
+
     img {
       display: block;
       height: 100%;
       object-fit: contain;
     }
   }
-  .swiper-button-next {
+
+  .swiper-pagination-fraction {
     color: ${(props) => props.theme.text};
-    right: 0;
-    width: 4rem;
-    top: 60%;
-    background-image: url(${Arrow});
-    background-position: center;
-    background-size: cover;
-    &:after {
-      display: none;
-    }
-    @media (max-width: 64em) {
-      width: 3rem;
-    }
-    @media (max-width: 30em) {
-      width: 2rem;
-    }
+    font-size: 1.5rem;
+    font-weight: 600;
   }
-  .swiper-button-prev {
-    color: ${(props) => props.theme.text};
+
+  .custom-button-prev,
+  .custom-button-next {
+    position: absolute;
     right: 0;
-    width: 4rem;
     top: 60%;
-    background-image: url(${Arrow});
+    padding-top: 5px;
+    color: ${(props) => props.theme.text};
+    
+    background: #21252B;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
     background-position: center;
     background-size: cover;
-    transform: rotate(180deg);
+
     &:after {
       display: none;
-    }
-    @media (max-width: 64em) {
-      width: 3rem;
-    }
-    @media (max-width: 30em) {
-      width: 2rem;
     }
   }
 
+  .custom-button-prev {
+    left: 0;
+  }
+
+  .custom-button-next {
+    right: 0;
+  }
 `;
