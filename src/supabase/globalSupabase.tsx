@@ -1,6 +1,7 @@
 import { supabase } from "../index";
 import { Session, User } from "@supabase/supabase-js";
 
+
 export const ObtenerIdAuthSupabase = async (): Promise<string | null> => {
   const {
     data: { session },
