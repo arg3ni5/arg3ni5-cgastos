@@ -43,7 +43,7 @@ function App(): JSX.Element {
                 </div>
 
                 <Containerbody>
-                  <MyRoutes />
+                  <MyRoutes isLoading={isLoading}/>
                 </Containerbody>
               </Container>
             ) : (
