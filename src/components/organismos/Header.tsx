@@ -1,6 +1,17 @@
-import styled from "styled-components";
 import { ContentHeader, DataUser } from "../../index";
-export function Header({ stateConfig }) {
+import { MouseEventHandler } from "react";
+
+// Definir el tipo de props para Header
+interface StateConfig {
+  state: boolean;
+  setState: MouseEventHandler<HTMLDivElement>;
+}
+
+interface HeaderProps {
+  stateConfig: StateConfig;
+}
+
+export const Header = ({ stateConfig }: HeaderProps) => {
   return (
     <ContentHeader>
       <div

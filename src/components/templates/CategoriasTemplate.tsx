@@ -87,7 +87,7 @@ export function CategoriasTemplate({ data }: CategoriasTemplateProps): JSX.Eleme
               <ListaMenuDesplegable
                 data={DataDesplegableTipo}
                 top="112%"
-                funcion={(p) => cambiarTipo(p)}
+                funcion={(p) => cambiarTipo(p as Tipo)}
               />
             )}
           </div>
