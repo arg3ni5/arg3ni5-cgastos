@@ -6,7 +6,18 @@ import {
   SidebarCard,
 } from "../../../index";
 import { NavLink } from "react-router-dom";
-export function Sidebar({ state, setState }) {
+import { JSX } from "react";
+
+interface SidebarProps {
+  state: boolean;
+  setState: (value: boolean) => void;
+}
+
+interface StyledProps {
+  $isopen: string;
+}
+
+export const Sidebar = ({ state, setState }: SidebarProps): JSX.Element => {
   return (
     <Main $isopen={state.toString()}>
       <span className="Sidebarbutton" onClick={() => setState(!state)}>
@@ -60,7 +71,7 @@ export function Sidebar({ state, setState }) {
     </Main>
   );
 }
-const Container = styled.div`
+const Container = styled.div<StyledProps>`
   color: ${(props) => props.theme.text};
   background: ${(props) => props.theme.bg};
   position: fixed;
@@ -76,7 +87,7 @@ const Container = styled.div`
     border-radius: 10px;
   }
   &::-webkit-scrollbar-thumb {
-    background-color: ${(props)=>props.theme.colorScroll};
+    background-color: ${(props) => props.theme.colorScroll};
     border-radius: 10px;
   }
 
@@ -95,7 +106,7 @@ const Container = styled.div`
       width: 30px;
       cursor: pointer;
       transition: 0.3s ease;
-      transform: ${({ $isopen }) => ($isopen==="true" ? `scale(0.7)` : `scale(1.5)`)}
+      transform: ${({ $isopen }) => ($isopen === "true" ? `scale(0.7)` : `scale(1.5)`)}
         rotate(${({ theme }) => theme.logorotate});
       img {
         width: 100%;
@@ -103,7 +114,7 @@ const Container = styled.div`
       }
     }
     h2 {
-      display: ${({ $isopen }) => ($isopen==="true" ? `block` : `none`)};
+      display: ${({ $isopen }) => ($isopen === "true" ? `block` : `none`)};
     }
     @keyframes flotar {
       0% {
@@ -165,7 +176,7 @@ const Container = styled.div`
     }
   }
 `;
-const Main = styled.div`
+const Main = styled.div<StyledProps>`
   .Sidebarbutton {
     position: fixed;
     top: 70px;
@@ -183,7 +194,7 @@ const Main = styled.div`
     transition: all 0.2s;
     z-index: 2;
     transform: ${({ $isopen }) =>
-      $isopen==="true" ? `translateX(162px) rotate(3.142rad)` : `initial`};
+    $isopen === "true" ? `translateX(162px) rotate(3.142rad)` : `initial`};
     color: ${(props) => props.theme.text};
   }
 `;

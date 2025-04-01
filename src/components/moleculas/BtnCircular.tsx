@@ -1,5 +1,17 @@
+import { ReactNode } from "react";
 import styled from "styled-components";
-export function BtnCircular({
+
+interface BtnCircularProps {
+  icono: ReactNode;
+  width: string;
+  height: string;
+  bgcolor: string;
+  textcolor: string;
+  fontsize: string;
+  translatex: string;
+  translatey: string;
+}
+export const BtnCircular = ({
   icono,
   width,
   height,
@@ -8,7 +20,7 @@ export function BtnCircular({
   fontsize,
   translatex,
   translatey,
-}) {
+}: BtnCircularProps) => {
   return (
     <Container
       $bgcolor={bgcolor}
@@ -23,7 +35,18 @@ export function BtnCircular({
     </Container>
   );
 }
-const Container = styled.div`
+
+interface ContainerProps {
+  width: string;
+  height: string;
+  $bgcolor: string;
+  $textcolor: string;
+  $fontsize: string;
+  $translatex: string;
+  $translatey: string;
+}
+
+const Container = styled.div<ContainerProps>`
   background: ${(props) => props.$bgcolor};
   min-width: ${(props) => props.width};
   min-height: ${(props) => props.height};

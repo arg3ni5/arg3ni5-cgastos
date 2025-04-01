@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { v, Btnsave } from "../../../index";
-export function SidebarCard() {
+import { JSX } from "react";
+export const SidebarCard = (): JSX.Element => {
   return (
     <Container>
       <span className="icon">{<v.iconoayuda />}</span>

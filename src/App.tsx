@@ -6,6 +6,7 @@ import { createContext, JSX, useState } from "react";
 import { ThemeProvider } from "styled-components";
 import { styled } from "styled-components";
 import { useQuery } from "@tanstack/react-query";
+import { LoadingProvider } from "./context/LoadingContext";
 
 type ThemeContextType = typeof Dark | null;
 
@@ -22,6 +23,8 @@ function App(): JSX.Element {
   const { isLoading, error } = useQuery({ queryKey: ["mostrar usuarios"], queryFn: () => mostrarUsuarios() });
 
   if (isLoading) {
+    console.log(isLoading);
+
     return <SpinnerLoader />;
   }
   if (error) {
@@ -31,28 +34,30 @@ function App(): JSX.Element {
   return (
     <>
       <ThemeContext.Provider value={Dark}>
-        <ThemeProvider theme={themeStyle}>
-          <AuthContextProvider>
-            {pathname != "/login" ? (
-              <Container className={sidebarOpen ? "active" : ""}>
-                <div className="ContentSidebar">
-                  <Sidebar state={sidebarOpen} setState={() => setSidebarOpen(!sidebarOpen)} />
-                </div>
-                <div className="ContentMenuambur">
-                  <Menuambur />
-                </div>
+        <LoadingProvider>
+          <ThemeProvider theme={themeStyle}>
+            <AuthContextProvider>
+              {pathname != "/login" ? (
+                <Container className={sidebarOpen ? "active" : ""}>
+                  <div className="ContentSidebar">
+                    <Sidebar state={sidebarOpen} setState={() => setSidebarOpen(!sidebarOpen)} />
+                  </div>
+                  <div className="ContentMenuambur">
+                    <Menuambur />
+                  </div>
 
-                <Containerbody>
-                  <MyRoutes isLoading={isLoading}/>
-                </Containerbody>
-              </Container>
-            ) : (
-              <Login />
-            )}
+                  <Containerbody>
+                    <MyRoutes isLoading={isLoading} />
+                  </Containerbody>
+                </Container>
+              ) : (
+                <Login />
+              )}
 
-            {/* <ReactQueryDevtools initialIsOpen={true} /> */}
-          </AuthContextProvider>
-        </ThemeProvider>
+              {/* <ReactQueryDevtools initialIsOpen={true} /> */}
+            </AuthContextProvider>
+          </ThemeProvider>
+        </LoadingProvider>
       </ThemeContext.Provider>
     </>
   );
