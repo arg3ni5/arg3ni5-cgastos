@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { LinksArray, SecondarylinksArray } from "../../index";
 import { NavLink } from "react-router-dom";
 
-export function Menuambur(): JSX.Element {
+export const Menuambur = (): JSX.Element => {
   const [click, setClick] = useState(false);
   return (
     <Container>

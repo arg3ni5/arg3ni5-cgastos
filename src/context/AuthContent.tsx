@@ -71,7 +71,6 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Custom hook tipado
 export const useUserAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {

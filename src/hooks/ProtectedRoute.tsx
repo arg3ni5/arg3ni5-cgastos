@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { ReactNode } from "react";
-import { SpinnerLoader } from "../components/moleculas/SpinnerLoader";
+import { ReactNode, useEffect } from "react";
+import { useLoading } from "../context/LoadingContext";
 
 interface ProtectedRouteProps {
   user: unknown;
@@ -10,8 +10,13 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ user, redirectTo, children, isLoading = true }: ProtectedRouteProps) => {
-  if (isLoading) return <SpinnerLoader/>;
+  const { setIsLoading } = useLoading();
 
-  if (user == null) return <Navigate replace to={redirectTo} />;
+  useEffect(() => {
+    if (isLoading) setIsLoading(true);
+    else setIsLoading(false);
+  }, [isLoading])
+
+  //if (!isLoading && user == null) return <Navigate replace to={redirectTo} />;
   return children ? <>{children}</> : <Outlet />;
 };

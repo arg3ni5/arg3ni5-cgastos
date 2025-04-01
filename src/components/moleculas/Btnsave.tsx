@@ -7,7 +7,7 @@ interface BtnsaveProps {
   funcion?: () => void;
   titulo: string;
   bgcolor: string;
-  icono: React.ReactNode;
+  icono?: React.ReactNode;
   url?: string;
 }
 

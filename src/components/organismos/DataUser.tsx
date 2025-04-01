@@ -21,7 +21,7 @@ interface MenuOption {
   [key: string]: any; // Por si hay otros campos
 }
 
-export function DataUser({ stateConfig }: { stateConfig: StateConfig }) {
+export const DataUser = ({ stateConfig }: { stateConfig: StateConfig }) => {
   const { user } = useUserAuth(); // user: { name: string; picture: string } | null
   const { signout } = useAuthStore();
 
@@ -44,7 +44,7 @@ export function DataUser({ stateConfig }: { stateConfig: StateConfig }) {
         bgcolor={`linear-gradient(15deg, rgba(255, 88, 58, 0.86) 9%, #f8bf5b 100%)`}
         textcolor="#ffffff"
         fontsize="11px"
-        translatex="-50px"
+        translatex="-75px"
         translatey="-12px"
       />
       <span className="nombre">{user?.name}</span>
@@ -64,7 +64,7 @@ const Container = styled.div`
   position: relative;
   top: 0;
   right: 0;
-  width: 200px;
+  width: 250px;
   display: flex;
   justify-content: center;
   align-items: center;

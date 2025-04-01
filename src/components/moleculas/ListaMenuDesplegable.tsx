@@ -4,9 +4,9 @@ import { ItemsDesplegable, v } from "../../index";
 
 interface ItemType {
   text: string;
-  color: string;
   tipo: string;
-  bgcolor: string;
+  color?: string;
+  bgcolor?: string;
 }
 
 interface ListaMenuDesplegableProps {
