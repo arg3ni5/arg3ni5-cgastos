@@ -1,22 +1,22 @@
-import { useEffect } from "react";
 import styled from "styled-components";
-import { Header, useUsuariosStore, useConexionesStore } from "../../index";
+import { Header, useUsuariosStore, useConexionesStore, Database } from "../../index";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+
+type Conexion = Database["public"]["Tables"]["conexiones_usuarios"]["Row"];
 
 export function ConexionesTemplate() {
   const { datausuarios } = useUsuariosStore();
   const { mostrarConexiones, conexiones, eliminarConexion } = useConexionesStore();
-  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const { isLoading, error } = useQuery({
     queryKey: ["mostrar conexiones", datausuarios?.id],
-    queryFn: () => mostrarConexiones({ usuario_id: datausuarios.id }),
+    queryFn: () => mostrarConexiones({ usuario_id: datausuarios?.id }),
     enabled: !!datausuarios?.id,
   });
 
-  const confirmarEliminacion = async (conexion) => {
+  const confirmarEliminacion = async (conexion: Conexion) => {
     const result = await Swal.fire({
       title: "¿Eliminar esta conexión?",
       text: `@${conexion.canal_username || "sin username"} (${conexion.canal})`,
@@ -30,7 +30,12 @@ export function ConexionesTemplate() {
 
     if (result.isConfirmed) {
       try {
-        await eliminarConexion({ id: conexion.id });
+        await eliminarConexion({ usuario_id: conexion.id });
+        if (datausuarios?.id !== undefined) {
+          queryClient.invalidateQueries({
+            queryKey: ["mostrar conexiones", datausuarios.id],
+          });
+        }
         Swal.fire("✅ Eliminado", "Conexión eliminada correctamente", "success");
       } catch (err) {
         Swal.fire("❌ Error", "No se pudo eliminar la conexión", "error");
@@ -41,7 +46,7 @@ export function ConexionesTemplate() {
   return (
     <Container>
       <header className="header">
-        <Header stateConfig={{ state: false, setState: () => {} }} />
+        <Header stateConfig={{ state: false, setState: () => { } }} />
       </header>
       <section className="main">
         <h2>Cuentas vinculadas</h2>
@@ -49,12 +54,12 @@ export function ConexionesTemplate() {
         {isLoading && <p>🔄 Cargando vinculaciones...</p>}
         {error && <p>❌ Error al cargar vinculaciones</p>}
 
-        {conexiones?.length > 0 ? (
+        {conexiones && conexiones?.length > 0 ? (
           <ListaCuentas>
             <ul>
-              {conexiones.map((conexion) => (
+              {conexiones.map((conexion: Conexion) => (
                 <li key={conexion.id}>
-                  <span className="icono">🔗</span>
+                  <span role="img" aria-label={`Vinculación ${conexion.canal}`} className="icono">🔗</span>
                   <strong>{conexion.canal}</strong> – @{conexion.canal_username || "sin username"} (ID: {conexion.canal_user_id})
                   <button className="btn-eliminar" onClick={() => confirmarEliminacion(conexion)} title="Eliminar">
                     🗑️
