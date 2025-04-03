@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import { Icono } from "../../index";
 import { useNavigate } from "react-router-dom";
 
 interface BtnsaveProps {
@@ -9,9 +8,17 @@ interface BtnsaveProps {
   bgcolor: string;
   icono?: React.ReactNode;
   url?: string;
+  type?: "button" | "submit" | "reset";
 }
 
-export const Btnsave: React.FC<BtnsaveProps> = ({ funcion, titulo, bgcolor, icono, url }) => {
+export const Btnsave: React.FC<BtnsaveProps> = ({ 
+  funcion, 
+  titulo, 
+  bgcolor, 
+  icono, 
+  url,
+  type = "button" 
+}) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -23,9 +30,8 @@ export const Btnsave: React.FC<BtnsaveProps> = ({ funcion, titulo, bgcolor, icon
   };
 
   return (
-    <Container type="button" $bgcolor={bgcolor} onClick={handleClick}>
-      <Icono>{icono}</Icono>
-      <span className="btn">{titulo}</span>
+    <Container type={type} $bgcolor={bgcolor} onClick={handleClick}>
+      <div className="btn"><span className="icon">{icono}</span> <span>{titulo}</span></div>
     </Container>
   );
 };
@@ -56,6 +62,11 @@ const Container = styled.button<StyledButtonProps>`
     transition: 0.2s;
     color: #000;
     white-space: nowrap;
+
+    .icon {
+      position: relative;
+      top : 0.1em;
+    }
 
     a {
       text-decoration: none;
