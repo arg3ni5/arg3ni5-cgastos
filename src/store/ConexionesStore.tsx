@@ -1,21 +1,15 @@
 import { create } from "zustand";
-import { InsertarConexion, MostrarConexiones, EliminarConexiones, Conexion } from "../index";
-
-
-interface ParametrosBusqueda {
-  usuario_id: number | undefined;
-  // otros posibles filtros
-}
+import { InsertarConexion, MostrarConexiones, EliminarConexiones, Conexion, ConexionInsert, ConexionQueryParams } from "../index";
 
 interface ConexionesStore {
   isAuth: boolean;
   conexiones: Conexion[] | null;
-  parametros?: ParametrosBusqueda;
+  parametros?: ConexionQueryParams;
   categoriaItemSelect?: Conexion | null;
 
-  mostrarConexiones: (params: ParametrosBusqueda) => Promise<Conexion[] | null>;
-  insertarConexion: (c: Conexion) => Promise<void>;
-  eliminarConexion: (params: ParametrosBusqueda) => Promise<void>;
+  mostrarConexiones: (params: ConexionQueryParams) => Promise<Conexion[] | null>;
+  insertarConexion: (c: ConexionInsert) => Promise<void>;
+  eliminarConexion: (params: ConexionQueryParams) => Promise<void>;
 }
 
 
@@ -33,14 +27,14 @@ export const useConexionesStore = create<ConexionesStore>((set, get) => ({
     return response;
   },
 
-  insertarConexion: async (c: Conexion) => {
+  insertarConexion: async (c: ConexionInsert) => {
     await InsertarConexion(c);
     const { mostrarConexiones, parametros } = get();
     const nuevas = await mostrarConexiones(parametros!);
     set({ conexiones: nuevas });
   },
 
-  eliminarConexion: async (p: ParametrosBusqueda) => {
+  eliminarConexion: async (p: ConexionQueryParams) => {
     await EliminarConexiones({id: p.usuario_id!} as Conexion);
     const { mostrarConexiones, parametros } = get();
     const nuevas = await mostrarConexiones(parametros!);
