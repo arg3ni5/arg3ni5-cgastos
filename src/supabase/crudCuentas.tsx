@@ -2,6 +2,7 @@ import { Database, supabase } from "../index";
 
 export type Cuenta = Database["public"]["Tables"]["cuenta"]["Row"];
 export type CuentaInsert = Database["public"]["Tables"]["cuenta"]["Insert"];
+export type CuentaUpdate = Database["public"]["Tables"]["cuenta"]["Update"];
 
 interface Params {
   idusuario: number;
@@ -36,7 +37,7 @@ export async function InsertarCuenta(cuenta: CuentaInsert): Promise<Cuenta | nul
   }
 }
 
-export async function ActualizarCuenta(id: number, cuenta: Partial<Cuenta>): Promise<Cuenta | null> {
+export async function ActualizarCuenta(id: number, cuenta: CuentaUpdate): Promise<Cuenta | null> {
   try {
     const { data, error } = await supabase
       .from("cuenta")

@@ -30,7 +30,7 @@ interface CategoriasTemplateProps {
 export function CategoriasTemplate({ data }: CategoriasTemplateProps): JSX.Element {
   const [openRegistro, setOpenRegistro] = useState(false);
   const [accion, setAccion] = useState("");
-  const [dataSelect, setdataSelect] = useState<CategoriaInsert | CategoriaUpdate>();
+  const [dataSelect, setDataSelect] = useState<CategoriaInsert | CategoriaUpdate>();
   const [state, setState] = useState(false);
   const [stateTipo, setStateTipo] = useState(false);
   const { colorCategoria, tituloBtnDes, bgCategoria, setTipo, tipo } = useOperaciones();
@@ -56,7 +56,7 @@ export function CategoriasTemplate({ data }: CategoriasTemplateProps): JSX.Eleme
   function nuevoRegistro() {
     setOpenRegistro(!openRegistro);
     setAccion("Nuevo");
-    setdataSelect({});
+    setDataSelect({});
   }
   return (
     <Container onClick={cerrarDesplegables}>
@@ -117,7 +117,7 @@ export function CategoriasTemplate({ data }: CategoriasTemplateProps): JSX.Eleme
         <TablaCategorias
           data={data}
           SetopenRegistro={setOpenRegistro}
-          setdataSelect={setdataSelect}
+          setdataSelect={setDataSelect}
           setAccion={setAccion}
         />
       </section>

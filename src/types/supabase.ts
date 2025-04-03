@@ -83,6 +83,7 @@ export type Database = {
         Row: {
           descripcion: string
           icono: string | null
+          tipo: string | null
           id: number
           idusuario: number | null
           saldo_actual: number | null
@@ -90,6 +91,7 @@ export type Database = {
         Insert: {
           descripcion?: string
           icono?: string | null
+          tipo: string | null
           id?: number
           idusuario?: number | null
           saldo_actual?: number | null

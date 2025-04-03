@@ -1,4 +1,4 @@
-import { Header, v, Btnfiltro, useOperaciones, Tipo, ContentFiltros, Btndesplegable, ListaMenuDesplegable, DataDesplegableCuenta, RegistrarCuentas } from "../../index";
+import { Header, v, Btnfiltro, useOperaciones, Tipo, ContentFiltros, Btndesplegable, ListaMenuDesplegable, DataDesplegableCuenta, RegistrarCuentas, Cuenta, CuentaInsert, CuentaUpdate } from "../../index";
 import { useState } from "react";
 import { useUsuariosStore, useCuentaStore } from "../../index";
 import { useQuery } from "@tanstack/react-query";
@@ -11,7 +11,7 @@ export const CuentasTemplate = () => {
 	const { datausuarios } = useUsuariosStore();
 	const { mostrarCuentas, datacuentas, insertarCuenta, actualizarCuenta, eliminarCuenta } = useCuentaStore();
 	const [accion, setAccion] = useState("");
-	const [dataSelect, setdataSelect] = useState([]);
+	const [dataSelect, setDataSelect] = useState<CuentaInsert | CuentaUpdate>();
 	const [stateTipo, setStateTipo] = useState(false);
 	const { colorCategoria, tituloBtnDes, bgCategoria, setTipo, tipo } = useOperaciones();
 
@@ -39,7 +39,7 @@ export const CuentasTemplate = () => {
 	const nuevoRegistro = () => {
 		setOpenRegistro(!openRegistro);
 		setAccion("Nuevo");
-		setdataSelect([]);
+		setDataSelect({});
 	};
 
 	const { isLoading, error } = useQuery({
@@ -53,31 +53,7 @@ export const CuentasTemplate = () => {
 		enabled: !!datausuarios?.id,
 	});
 
-	const handleCreate = async () => {
-		const { value: formValues } = await Swal.fire({
-			title: 'Nueva Cuenta',
-			html: `
-        <input id="descripcion" class="swal2-input" placeholder="Descripción">
-        <input id="saldo" type="number" class="swal2-input" placeholder="Saldo inicial">
-        <input id="icono" class="swal2-input" placeholder="Icono">
-      `,
-			focusConfirm: false,
-			preConfirm: () => {
-				return {
-					descripcion: (document.getElementById('descripcion') as HTMLInputElement).value,
-					saldo_actual: Number((document.getElementById('saldo') as HTMLInputElement).value),
-					icono: (document.getElementById('icono') as HTMLInputElement).value,
-					idusuario: datausuarios?.id ?? 0
-				}
-			}
-		});
-
-		if (formValues) {
-			await insertarCuenta(formValues);
-		}
-	};
-
-	const handleUpdate = async (cuenta) => {
+	const handleUpdate = async (cuenta: CuentaUpdate) => {
 		const { value: formValues } = await Swal.fire({
 			title: 'Editar Cuenta',
 			html: `
@@ -94,6 +70,10 @@ export const CuentasTemplate = () => {
 				}
 			}
 		});
+
+		if (!cuenta.id) {
+			return;
+		}
 
 		if (formValues) {
 			await actualizarCuenta(cuenta.id, formValues);
@@ -122,9 +102,9 @@ export const CuentasTemplate = () => {
 		<Container onClick={cerrarDesplegables}>
 			{openRegistro && (
 				<RegistrarCuentas
-					dataSelect={dataSelect}
+					dataSelect={dataSelect || {}}
 					onClose={() => setOpenRegistro(!openRegistro)}
-					accion={accion}
+					accion={accion as "Editar" | "Crear"}
 				/>
 			)}
 
@@ -133,39 +113,39 @@ export const CuentasTemplate = () => {
 			</header>
 
 			<section className="tipo">
-        <ContentFiltros>
-          <div
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            <Btndesplegable
-              textcolor={colorCategoria}
-              bgcolor={bgCategoria}
-              text={tituloBtnDes}
-              funcion={openTipo}
-            />
-            {stateTipo && (
-              <ListaMenuDesplegable
-                data={DataDesplegableCuenta}
-                top="112%"
-                funcion={(p) => cambiarTipo(p as Tipo)}
-              />
-            )}
-          </div>
-        </ContentFiltros>
-      </section>
+				<ContentFiltros>
+					<div
+						onClick={(e) => {
+							e.stopPropagation();
+						}}
+					>
+						<Btndesplegable
+							textcolor={colorCategoria}
+							bgcolor={bgCategoria}
+							text={tituloBtnDes}
+							funcion={openTipo}
+						/>
+						{stateTipo && (
+							<ListaMenuDesplegable
+								data={DataDesplegableCuenta}
+								top="112%"
+								funcion={(p) => cambiarTipo(p as Tipo)}
+							/>
+						)}
+					</div>
+				</ContentFiltros>
+			</section>
 
 			<section className="area2">
-        <ContentFiltro>
-          <Btnfiltro
-            funcion={nuevoRegistro}
-            bgcolor={bgCategoria}
-            textcolor={colorCategoria}
-            icono={<v.agregar />}
-          />
-        </ContentFiltro>
-      </section>
+				<ContentFiltro>
+					<Btnfiltro
+						funcion={nuevoRegistro}
+						bgcolor={bgCategoria}
+						textcolor={colorCategoria}
+						icono={<v.agregar />}
+					/>
+				</ContentFiltro>
+			</section>
 
 			<section className="main">
 				{isLoading && <p>Cargando cuentas...</p>}
@@ -178,7 +158,7 @@ export const CuentasTemplate = () => {
 									<span className="icon">{cuenta.icono}</span>
 									<h3>{cuenta.descripcion}</h3>
 								</div>
-								<p className="balance">{datausuarios.moneda} {cuenta.saldo_actual.toFixed(2)}</p>
+								<p className="balance">{datausuarios?.moneda} {cuenta.saldo_actual?.toFixed(2)}</p>
 								<div className="card-actions">
 									<button onClick={() => handleUpdate(cuenta)}>✏️</button>
 									<button onClick={() => handleDelete(cuenta.id)}>🗑️</button>

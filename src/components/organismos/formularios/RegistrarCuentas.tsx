@@ -2,133 +2,158 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { v } from "../../../styles/variables";
 import {
-  InputText,
-  Spinner,
-  useOperaciones,
-  Btnsave,
-  useUsuariosStore,
-  useCuentaStore,
+	InputText,
+	Spinner,
+	useOperaciones,
+	Btnsave,
+	useUsuariosStore,
+	useCuentaStore,
+	CuentaInsert,
+	CuentaUpdate,
 } from "../../../index";
 import { useForm } from "react-hook-form";
-import Emojipicker from "emoji-picker-react";
+import Emojipicker, { EmojiClickData } from "emoji-picker-react";
 
-export function RegistrarCuentas({ onClose, dataSelect, accion }) {
-  const { insertarCuenta, actualizarCuenta } = useCuentaStore();
-  const { datausuarios } = useUsuariosStore();
-  const [showPicker, setShowPicker] = useState(false);
-  const [emojiselect, setEmojiselect] = useState("💰");
-  const [estadoProceso, setEstadoproceso] = useState(false);
-  const { tipo } = useOperaciones();
-
-  const onEmojiClick = (emojiObject) => {
-    setEmojiselect(() => emojiObject.emoji);
-    setShowPicker(false);
-  };
-
-  const {
-    register,
-    formState: { errors },
-    handleSubmit,
-  } = useForm();
-
-  const insertar = async (data) => {
-    const cuentaData = {
-      descripcion: data.descripcion,
-      saldo_actual: Number(data.saldo_actual),
-      icono: emojiselect,
-      idusuario: datausuarios.id,
-      tipo: tipo
-    };
-
-    try {
-      setEstadoproceso(true);
-      if (accion === "Editar") {
-        await actualizarCuenta(dataSelect.id, cuentaData);
-      } else {
-        await insertarCuenta(cuentaData);
-      }
-      setEstadoproceso(false);
-      onClose();
-    } catch (error) {
-      alert("Error al procesar la cuenta");
-      setEstadoproceso(false);
-    }
-  };
-
-  useEffect(() => {
-    if (accion === "Editar") {
-      setEmojiselect(dataSelect.icono);
-    }
-  }, []);
-
-  return (
-    <Container>
-      {estadoProceso && <Spinner />}
-
-      <div className="sub-contenedor">
-        <div className="headers">
-          <section>
-            <h1>
-              {accion === "Editar"
-                ? "Editar cuenta"
-                : "Registrar nueva cuenta"}
-            </h1>
-          </section>
-
-          <section>
-            <span onClick={onClose}>x</span>
-          </section>
-        </div>
-
-        <form className="formulario" onSubmit={handleSubmit(insertar)}>
-          <section>
-            <div>
-              <InputText
-                defaultValue={dataSelect?.descripcion}
-                register={register}
-                placeholder="Nombre de la cuenta"
-                errors={errors}
-                style={{ textTransform: "capitalize" }}
-              />
-            </div>
-            <div>
-              <InputText
-                type="number"
-                defaultValue={dataSelect?.saldo_actual}
-                register={register}
-                placeholder="Saldo inicial"
-                errors={errors}
-              />
-            </div>
-            <div>
-              <ContentTitle>
-                <input
-                  readOnly={true}
-                  value={emojiselect}
-                  type="text"
-                  onClick={() => setShowPicker(!showPicker)}
-                />
-                <span>Icono</span>
-              </ContentTitle>
-              {showPicker && (
-                <ContainerEmojiPicker>
-                  <Emojipicker onEmojiClick={onEmojiClick} />
-                </ContainerEmojiPicker>
-              )}
-            </div>
-            <div className="btnguardarContent">
-              <Btnsave
-                icono={<v.iconoguardar />}
-                titulo="Guardar"
-                bgcolor="#DAC1FF"
-              />
-            </div>
-          </section>
-        </form>
-      </div>
-    </Container>
-  );
+export type Accion = "Editar" | "Crear";
+interface RegistrarCuentasProps {
+	onClose: () => void;
+	dataSelect: CuentaInsert | CuentaUpdate;
+	accion: Accion;
 }
+
+interface FormInputs {
+	id?: number;
+	descripcion: string;
+	saldo_actual: number;
+	icono: string;
+	idusuario: number;
+	tipo: string;
+}
+
+export const RegistrarCuentas = ({ onClose, dataSelect, accion }: RegistrarCuentasProps) => {
+	const { insertarCuenta, actualizarCuenta } = useCuentaStore();
+	const { datausuarios } = useUsuariosStore();
+	const [showPicker, setShowPicker] = useState<boolean>(false);
+	const [emojiselect, setEmojiselect] = useState<string>("💰");
+	const [estadoProceso, setEstadoproceso] = useState<boolean>(false);
+	const { tipo } = useOperaciones();
+
+	const onEmojiClick = (emojiObject: EmojiClickData): void => {
+		setEmojiselect(() => emojiObject.emoji);
+		setShowPicker(false);
+	};
+
+	const {
+		register,
+		formState: { errors },
+		handleSubmit,
+	} = useForm<FormInputs>();
+
+	const insertar = async (formData: FormInputs): Promise<void> => {
+		if (!datausuarios?.id) {
+			return;
+		}
+
+		const cuentaData: CuentaInsert = {
+			descripcion: formData.descripcion,
+			saldo_actual: Number(formData.saldo_actual),
+			icono: emojiselect,
+			idusuario: datausuarios.id,
+			tipo: tipo
+		};
+
+		try {
+			setEstadoproceso(true);
+			if (accion === "Editar" && dataSelect.id) {
+				await actualizarCuenta(dataSelect.id, cuentaData);
+			} else {
+				await insertarCuenta(cuentaData);
+			}
+			setEstadoproceso(false);
+			onClose();
+		} catch (error) {
+			alert("Error al procesar la cuenta");
+			setEstadoproceso(false);
+		}
+	};
+
+	useEffect(() => {
+		if (accion === "Editar") {
+			setEmojiselect(dataSelect.icono || "💰");
+		}
+	}, []);
+
+	return (
+		<Container>
+			{estadoProceso && <Spinner />}
+
+			<div className="sub-contenedor">
+				<div className="headers">
+					<section>
+						<h1>
+							{accion === "Editar"
+								? "Editar cuenta"
+								: "Registrar nueva cuenta"}
+						</h1>
+					</section>
+
+					<section>
+						<span onClick={onClose}>x</span>
+					</section>
+				</div>
+
+				<form className="formulario" onSubmit={handleSubmit(insertar)}>
+					<section>
+						<div>
+							<InputText
+								defaultValue={dataSelect?.descripcion}
+								register={register}
+								name="descripcion"
+								placeholder="Nombre de la cuenta"
+								errors={errors}
+								style={{ textTransform: "capitalize" }}
+							/>
+						</div>
+						<div>
+							<InputText
+								type="number"
+								defaultValue={dataSelect?.saldo_actual ?? 0}
+								register={register}
+								name="saldo_actual"
+								placeholder="Saldo inicial"
+								errors={errors}
+							/>
+						</div>
+						<div>
+							<ContentTitle>
+								<input
+									readOnly={true}
+									value={emojiselect}
+									type="text"
+									onClick={() => setShowPicker(!showPicker)}
+								/>
+								<span>Icono</span>
+							</ContentTitle>
+							{showPicker && (
+								<ContainerEmojiPicker>
+									<Emojipicker onEmojiClick={onEmojiClick} />
+								</ContainerEmojiPicker>
+							)}
+						</div>
+						<div className="btnguardarContent">
+							<Btnsave
+								type="submit"
+								icono={<v.iconoguardar />}
+								titulo="Guardar"
+								bgcolor="#DAC1FF"
+							/>
+						</div>
+					</section>
+				</form>
+			</div>
+		</Container>
+	);
+};
 
 const Container = styled.div`
   transition: 0.5s;
