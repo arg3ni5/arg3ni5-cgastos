@@ -1,10 +1,12 @@
 import { Database, supabase } from "../index";
 
-type Cuenta = Database["public"]["Tables"]["cuenta"]["Row"];
+export type Cuenta = Database["public"]["Tables"]["cuenta"]["Row"];
+export type CuentaInsert = Database["public"]["Tables"]["cuenta"]["Insert"];
 
 interface Params {
   idusuario: number;
 }
+
 export async function MostrarCuentas(p: Params): Promise<Cuenta | null> {
   try {
     const { data } = await supabase
@@ -17,4 +19,48 @@ export async function MostrarCuentas(p: Params): Promise<Cuenta | null> {
     }
     return data;
   } catch (error) { return null; }
+}
+
+export async function InsertarCuenta(cuenta: CuentaInsert): Promise<Cuenta | null> {
+  try {
+    const { data, error } = await supabase
+      .from("cuenta")
+      .insert(cuenta)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    return null;
+  }
+}
+
+export async function ActualizarCuenta(id: number, cuenta: Partial<Cuenta>): Promise<Cuenta | null> {
+  try {
+    const { data, error } = await supabase
+      .from("cuenta")
+      .update(cuenta)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    return null;
+  }
+}
+
+export async function EliminarCuenta(id: number): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from("cuenta")
+      .delete()
+      .eq('id', id);
+
+    return !error;
+  } catch (error) {
+    return false;
+  }
 }
