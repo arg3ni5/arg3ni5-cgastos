@@ -27,6 +27,7 @@ export * from './components/organismos/Selector';
 export * from './components/organismos/Tabs';
 export * from './components/organismos/formularios/InputNumber';
 export * from './components/organismos/formularios/InputText';
+export * from './components/organismos/formularios/RegistrarCuentas';
 export * from './components/organismos/formularios/RegistrarCategorias';
 export * from './components/organismos/formularios/RegistrarMovimientos';
 export * from './components/organismos/graficas/Barras';
