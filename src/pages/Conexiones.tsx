@@ -1,4 +1,3 @@
-import styled from "styled-components";
 import { ConexionesTemplate } from "../index";
 export function Conexiones() {
   return (
@@ -7,4 +6,3 @@ export function Conexiones() {
     </>
   );
 }
-const Container = styled.div``;
