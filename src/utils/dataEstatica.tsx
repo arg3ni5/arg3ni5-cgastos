@@ -25,6 +25,21 @@ export const DesplegableUser = [
   },
 ];
 
+export const DataDesplegableCuenta = [
+  {
+    text: "Categoria Debito",
+    color: v.colorGastos,
+    tipo: "d",
+    bgcolor: v.colorbgGastos,
+  },
+  {
+    text: "Categoria Credito",
+    color: v.colorIngresos,
+    tipo: "c",
+    bgcolor: v.colorbgingresos,
+  },
+];
+
 export const DataDesplegableTipo = [
   {
     text: "Categorias gastos",
