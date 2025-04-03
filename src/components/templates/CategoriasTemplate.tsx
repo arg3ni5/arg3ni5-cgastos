@@ -13,6 +13,8 @@ import {
   Lottieanimacion,
   Database,
   Tipo,
+  CategoriaInsert,
+  CategoriaUpdate,
 } from "../../index";
 import { JSX, useState } from "react";
 import vacioverde from "../../assets/vacioverde.json";
@@ -26,9 +28,9 @@ interface CategoriasTemplateProps {
 
 
 export function CategoriasTemplate({ data }: CategoriasTemplateProps): JSX.Element {
-  const [openRegistro, SetopenRegistro] = useState(false);
+  const [openRegistro, setOpenRegistro] = useState(false);
   const [accion, setAccion] = useState("");
-  const [dataSelect, setdataSelect] = useState([]);
+  const [dataSelect, setdataSelect] = useState<CategoriaInsert | CategoriaUpdate>();
   const [state, setState] = useState(false);
   const [stateTipo, setStateTipo] = useState(false);
   const { colorCategoria, tituloBtnDes, bgCategoria, setTipo, tipo } = useOperaciones();
@@ -52,16 +54,16 @@ export function CategoriasTemplate({ data }: CategoriasTemplateProps): JSX.Eleme
     setStateTipo(false);
   }
   function nuevoRegistro() {
-    SetopenRegistro(!openRegistro);
+    setOpenRegistro(!openRegistro);
     setAccion("Nuevo");
-    setdataSelect([]);
+    setdataSelect({});
   }
   return (
     <Container onClick={cerrarDesplegables}>
       {openRegistro && (
         <RegistrarCategorias
-          dataSelect={dataSelect}
-          onClose={() => SetopenRegistro(!openRegistro)}
+          dataSelect={dataSelect || {}}
+          onClose={() => setOpenRegistro(!openRegistro)}
           accion={accion as "Editar" | "Crear"}
         />
       )}
@@ -114,7 +116,7 @@ export function CategoriasTemplate({ data }: CategoriasTemplateProps): JSX.Eleme
 
         <TablaCategorias
           data={data}
-          SetopenRegistro={SetopenRegistro}
+          SetopenRegistro={setOpenRegistro}
           setdataSelect={setdataSelect}
           setAccion={setAccion}
         />
