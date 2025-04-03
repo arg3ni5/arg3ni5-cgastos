@@ -47,19 +47,19 @@ export const useCategoriasStore = create<CategoriaStore>((set, get) => ({
 
   eliminarCategoria: async (p: CategoriaQueryParams) => {
     await EliminarCategorias(p);
-    const { mostrarCategorias } = get();
-    await mostrarCategorias(p);
+    const { mostrarCategorias, parametros } = get();
+    await mostrarCategorias(parametros);
   },
 
   eliminarCategoriasTodas: async (p: CategoriaQueryParams) => {
     await EliminarCategoriasTodas(p);
-    const { mostrarCategorias } = get();
-    await mostrarCategorias(p);
+    const { mostrarCategorias, parametros } = get();
+    await mostrarCategorias(parametros);
   },
 
   editarCategoria: async (p: CategoriaUpdate) => {
     await EditarCategorias(p);
-    const { mostrarCategorias } = get();
-    await mostrarCategorias(p);
+    const { mostrarCategorias, parametros } = get();
+    await mostrarCategorias(parametros);
   },
 }));
