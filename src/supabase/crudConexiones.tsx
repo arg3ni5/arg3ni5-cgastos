@@ -2,8 +2,11 @@ import { Database, supabase } from "../index";
 import Swal from "sweetalert2";
 
 export type Conexion = Database["public"]["Tables"]["conexiones_usuarios"]["Row"];
+export type ConexionInsert = Database["public"]["Tables"]["conexiones_usuarios"]["Insert"];
+export type ConexionUpdate = Database["public"]["Tables"]["conexiones_usuarios"]["Update"];
+export type ConexionQueryParams = Database["public"]["Tables"]["conexiones_usuarios"]["Row"];
 
-export async function InsertarConexion(c: Conexion) {
+export const InsertarConexion = async (c: ConexionInsert) => {
   try {
     const { data, error } = await supabase.from("conexiones_usuarios").insert(c).select();
     console.error("error", error);
@@ -31,7 +34,7 @@ export async function InsertarConexion(c: Conexion) {
   }
 }
 
-export const MostrarConexiones = async (c: Conexion): Promise<Conexion[] | null> => {
+export const MostrarConexiones = async (c: ConexionQueryParams): Promise<Conexion[] | null> => {
   try {
     const { data, error } = await supabase
       .from("conexiones_usuarios")
@@ -50,7 +53,7 @@ export const MostrarConexiones = async (c: Conexion): Promise<Conexion[] | null>
   }
 };
 
-export async function EliminarConexiones(c: Conexion) {
+export async function EliminarConexiones(c: ConexionQueryParams) {
   try {
     const { error } = await supabase.from("conexiones_usuarios").delete().eq("id", c.id);
 
