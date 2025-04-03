@@ -1,11 +1,31 @@
-import { supabase } from "../index";
+import { Database, supabase } from "../index";
 import Swal from "sweetalert2";
-export async function InsertarCategorias(p) {
+
+// Add utility function for error messages
+const showErrorMessage = (text: string, title: string = "Error") => {
+  Swal.fire({
+    icon: "error", title, text
+  });
+};
+
+export type Categoria = Database["public"]["Tables"]["categorias"]["Row"];
+export type CategoriaInsert = Database["public"]["Tables"]["categorias"]["Insert"];
+export type CategoriaUpdate = Database["public"]["Tables"]["categorias"]["Update"];
+export interface CategoriaQueryParams {
+  idusuario: number;
+  tipo: string;
+  id?: number;
+}
+
+export const InsertarCategorias = async (p: CategoriaInsert): Promise<void> => {
   try {
+    console.log("InsertarCategorias", p);
+    
     const { data, error } = await supabase
       .from("categorias")
       .insert(p)
       .select();
+
     if (error) {
       Swal.fire({
         icon: "error",
@@ -23,11 +43,12 @@ export async function InsertarCategorias(p) {
         timer: 1500,
       });
     }
-  } catch (error) {
+  } catch (error: any) {
     alert(error.error_description || error.message + " insertar categorias");
   }
-}
-export async function MostrarCategorias(p) {
+};
+
+export const MostrarCategorias = async (p: CategoriaQueryParams): Promise<Categoria[] | null> => {
   try {
     const { data } = await supabase
       .from("categorias")
@@ -36,44 +57,61 @@ export async function MostrarCategorias(p) {
       .eq("tipo", p.tipo)
       .order("id", { ascending: false });
     return data;
-  } catch (error) {}
-}
-export async function EliminarCategorias(p) {
+  } catch (error) {
+    return null;
+  }
+};
+
+export const EliminarCategorias = async (p: CategoriaQueryParams): Promise<void> => {
   try {
+    if (!p.id) {
+      showErrorMessage("ID is required");
+      throw new Error("ID is required");
+    }
     const { error } = await supabase
       .from("categorias")
       .delete()
       .eq("idusuario", p.idusuario)
       .eq("id", p.id);
     if (error) {
-      alert("Error al eliminar", error);
+      showErrorMessage(`Error al eliminar: ${error.message}`);
     }
-  } catch (error) {
-    alert(error.error_description || error.message + " eliminar categorias");
+  } catch (error: any) {
+    showErrorMessage(error.error_description || error.message + " eliminar categorias");
   }
-}
-export async function EditarCategorias(p) {
+};
+
+export const EditarCategorias = async (p: CategoriaUpdate): Promise<void> => {
   try {
+    if (!p.id) {
+      showErrorMessage("ID is required");
+      throw new Error("ID is required");
+    }
+    if (!p.idusuario) {
+      showErrorMessage("ID usuario is required");
+      throw new Error("ID usuario is required");
+    }
     const { error } = await supabase
       .from("categorias")
       .update(p)
       .eq("idusuario", p.idusuario)
       .eq("id", p.id);
     if (error) {
-      alert("Error al editar categoria", error);
+      showErrorMessage(`Error al editar categoria: ${error.message}`);
     }
-  } catch (error) {
-    alert(error.error_description || error.message + " editar categorias");
+  } catch (error: any) {
+    showErrorMessage(error.error_description || error.message + " editar categorias");
   }
-}
-export async function EliminarCategoriasTodas(p) {
+};
+
+export const EliminarCategoriasTodas = async (p: Pick<CategoriaQueryParams, 'idusuario'>): Promise<void> => {
   try {
     const { error } = await supabase
       .from("categorias")
       .delete()
-      .eq("idusuario", p.idusuario)
+      .eq("idusuario", p.idusuario);
     if (error) {
-      alert("Error al eliminar", error);
+      showErrorMessage("Error al eliminar");
     }
     Swal.fire({
       position: "top-end",
@@ -82,7 +120,7 @@ export async function EliminarCategoriasTodas(p) {
       showConfirmButton: false,
       timer: 1000,
     });
-  } catch (error) {
+  } catch (error: any) {
     alert(error.error_description || error.message + " eliminar categorias");
   }
-}
+};

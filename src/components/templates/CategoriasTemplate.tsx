@@ -62,7 +62,7 @@ export function CategoriasTemplate({ data }: CategoriasTemplateProps): JSX.Eleme
         <RegistrarCategorias
           dataSelect={dataSelect}
           onClose={() => SetopenRegistro(!openRegistro)}
-          accion={accion}
+          accion={accion as "Editar" | "Crear"}
         />
       )}
 

@@ -8,74 +8,109 @@ import {
   Btnsave,
   useUsuariosStore,
   useCategoriasStore,
+  CategoriaUpdate,
+  Categoria
 } from "../../../index";
 import { useForm } from "react-hook-form";
-import { CirclePicker } from "react-color";
-import Emojipicker from "emoji-picker-react";
+import { CirclePicker, ColorResult } from "react-color";
+import Emojipicker, { EmojiClickData } from "emoji-picker-react";
 
-export function RegistrarCategorias({ onClose, dataSelect, accion }) {
+export type Accion = "Editar" | "Crear";
+interface RegistrarCategoriasProps {
+  onClose: () => void;
+  dataSelect: Categoria;
+  accion: Accion;
+}
+
+export const RegistrarCategorias = ({ onClose, dataSelect, accion }: RegistrarCategoriasProps) => {
   const { insertarCategorias, editarCategoria } = useCategoriasStore();
   const { datausuarios } = useUsuariosStore();
-  const [showPicker, setShowPicker] = useState(false);
-  const [emojiselect, setEmojiselect] = useState("😻");
-  const [currentColor, setColor] = useState("#F44336");
-
-  const [estadoProceso, setEstadoproceso] = useState(false);
+  const [showPicker, setShowPicker] = useState<boolean>(false);
+  const [emojiselect, setEmojiselect] = useState<string>("😻");
+  const [currentColor, setColor] = useState<string>("#F44336");
+  const [estadoProceso, setEstadoproceso] = useState<boolean>(false);
   const { tipo } = useOperaciones();
-  function onEmojiClick(emojiObject) {
+
+  function onEmojiClick(emojiObject: EmojiClickData): void {
     setEmojiselect(() => emojiObject.emoji);
     setShowPicker(false);
   }
-  function elegirColor(color) {
+
+  function elegirColor(color: ColorResult): void {
     setColor(color.hex);
   }
 
+  // Add this interface for form data
+  interface FormInputs {
+    descripcion: string;
+    color: string;
+    icono: string;
+    idusuario?: number;
+    tipo?: string;
+    id?: number;
+  }
+  
   const {
     register,
     formState: { errors },
     handleSubmit,
-  } = useForm();
-  async function insertar(data) {
-    if (accion === "Editar") {
-      const p = {
-        descripcion: data.descripcion,
-        color: currentColor,
-        icono: emojiselect,
+  } = useForm<FormInputs>();
+  
+  // Update InputText component to register all required fields
+  <InputText
+    defaultValue={dataSelect.descripcion || ""}
+    register={register}
+    name="descripcion"
+    placeholder="Descripcion"
+    errors={errors}
+    style={{ textTransform: "capitalize" }}
+  />
+  
+  // Update the insertar function
+  const insertar = async (formData: FormInputs): Promise<void> => {
+    if (datausuarios?.id == undefined) {
+      return;
+    }
+  
+    const baseData = {
+      descripcion: formData.descripcion,
+      color: currentColor,
+      icono: emojiselect,
+      idusuario: datausuarios.id,
+      tipo: tipo,
+    };
+  
+    if (accion === "Editar" && dataSelect.id) {
+      const updateData: CategoriaUpdate = {
+        ...baseData,
         id: dataSelect.id,
-        idusuario:datausuarios.id,
-        tipo: tipo,
       };
+      
       try {
         setEstadoproceso(true);
-        await editarCategoria(p);
+        await editarCategoria(updateData);
         setEstadoproceso(false);
         onClose();
       } catch (error) {}
     } else {
-      const p = {
-        descripcion: data.descripcion,
-        color: currentColor,
-        icono: emojiselect,
-        idusuario: datausuarios.id,
-        tipo: tipo,
-      };
       try {
         setEstadoproceso(true);
-        await insertarCategorias(p);
+        await insertarCategorias(baseData);
         setEstadoproceso(false);
-
         onClose();
       } catch (error) {
         alert("error ingresar Form");
       }
     }
-  }
+  };
+
   useEffect(() => {
     if (accion === "Editar") {
-      setEmojiselect(dataSelect.icono);
-      setColor(dataSelect.color);
-    } 
+      setEmojiselect(dataSelect.icono || "😻");
+      setColor(dataSelect.color || '#F44336');
+    }
   }, []);
+  
   return (
     <Container>
       {estadoProceso && <Spinner />}
@@ -99,7 +134,7 @@ export function RegistrarCategorias({ onClose, dataSelect, accion }) {
           <section>
             <div>
               <InputText
-                defaultValue={dataSelect.descripcion}
+                defaultValue={dataSelect.descripcion || ""}
                 register={register}
                 placeholder="Descripcion"
                 errors={errors}
@@ -118,7 +153,7 @@ export function RegistrarCategorias({ onClose, dataSelect, accion }) {
             <div>
               <ContentTitle>
                 <input
-                readOnly={true}
+                  readOnly={true}
                   value={emojiselect}
                   type="text"
                   onClick={() => setShowPicker(!showPicker)}
@@ -133,6 +168,8 @@ export function RegistrarCategorias({ onClose, dataSelect, accion }) {
             </div>
             <div className="btnguardarContent">
               <Btnsave
+                // funcion={handleSubmit(insertar)}
+                type="submit"
                 icono={<v.iconoguardar />}
                 titulo="Guardar"
                 bgcolor="#DAC1FF"

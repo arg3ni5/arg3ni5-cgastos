@@ -1,4 +1,17 @@
 import styled from "styled-components";
+import { CSSProperties } from "react";
+import { UseFormRegister, FieldErrors } from "react-hook-form";
+
+interface InputTextProps {
+  style?: CSSProperties;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  defaultValue?: string | number;
+  placeholder?: string;
+  register: UseFormRegister<any>;
+  errors: FieldErrors;
+  type?: string;
+  name?: string;
+}
 
 export function InputText({
   style,
@@ -7,36 +20,30 @@ export function InputText({
   placeholder,
   register,
   errors,
-}) {
+  type = "text",
+  name = "descripcion",
+}: InputTextProps) {
   return (
-   
     <Container>
-    
-        <input
+      <input
         style={style}
-        onChange={onChange}
-        type="text"
+        // Remove onChange prop since it will be handled by register
+        type={type}
         defaultValue={defaultValue}
         placeholder={placeholder}
-        {...register("descripcion", { required: true, minLength: 2 })}
-      ></input>
+        {...register(name, { required: true, minLength: 2 })}
+      />
 
-
-    
-      {errors.descripcion?.type === "required" && (
-       
-          <p>Campo requerido</p>
-        
+      {errors[name]?.type === "required" && (
+        <p>Campo requerido</p>
       )}
-      {errors.descripcion?.type === "minLength" && (
-     
-<p>Debe tener al menos 2 caracteres</p>
-
-      
+      {errors[name]?.type === "minLength" && (
+        <p>Debe tener al menos 2 caracteres</p>
       )}
     </Container>
   );
 }
+
 const Container = styled.div`
   position: relative;
   input {
