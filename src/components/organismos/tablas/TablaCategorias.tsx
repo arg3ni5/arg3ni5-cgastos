@@ -1,26 +1,52 @@
+import { useState } from "react";
 import styled from "styled-components";
 import {
   ContentAccionesTabla,
   useCategoriasStore,
   Paginacion,
+  Categoria,
+  CategoriaQueryParams
 } from "../../../index";
 import Swal from "sweetalert2";
 import { v } from "../../../styles/variables";
-import { useState } from "react";
-export function TablaCategorias({
+
+interface TablaCategoriasProps {
+  data: Categoria[];
+  setOpenRegistro: (value: boolean) => void;
+  setdataSelect: (data: Categoria) => void;
+  setAccion: (accion: "Editar" | "Crear") => void;
+}
+
+interface ColorContentProps {
+  $alto: string;
+  $ancho: string;
+  color: string;
+}
+
+export const TablaCategorias = ({
   data,
-  SetopenRegistro,
+  setOpenRegistro,
   setdataSelect,
   setAccion,
-}) {
- if(data.length==0) return;
-  const [pagina, setPagina] = useState(1);
-  const [porPagina, setPorPagina] = useState(10);
+}: TablaCategoriasProps) => {
+  // Add better data validation
+  if (!data || !Array.isArray(data)) {
+    return <Container>No hay datos disponibles</Container>;
+  }
+
+  if (data.length === 0) {
+    return <Container>No hay categorías registradas</Container>;
+  }
+
+  const [pagina, setPagina] = useState<number>(1);
+  const [porPagina, setPorPagina] = useState<number>(10);
+
   const mx = data.length / porPagina;
   const maximo = mx < 1 ? 1 : mx;
 
   const { eliminarCategoria } = useCategoriasStore();
-  function eliminar(p) {
+
+  const eliminar = (p: Categoria): void => {
     Swal.fire({
       title: "¿Estás seguro(a)(e)?",
       text: "Una vez eliminado, ¡no podrá recuperar este registro!",
@@ -30,16 +56,18 @@ export function TablaCategorias({
       cancelButtonColor: "#d33",
       confirmButtonText: "Si, eliminar",
     }).then(async (result) => {
-      if (result.isConfirmed) {
-        await eliminarCategoria({ id: p.id, idusuario: p.idusuario });
+      if (result.isConfirmed && p.id && p.idusuario) {
+        await eliminarCategoria({ id: p.id } as CategoriaQueryParams);
       }
     });
-  }
-  function editar(data) {
-    SetopenRegistro(true);
+  };
+
+  const editar = (data: Categoria): void => {
+    setOpenRegistro(true);
     setdataSelect(data);
     setAccion("Editar");
-  }
+  };
+
   return (
     <>
       <Container>
@@ -66,7 +94,7 @@ export function TablaCategorias({
                     <td data-title="Color" className="Colordiv">
                       <div className="ColorContent">
                         <Colorcontent
-                          color={item.color}
+                          color={item.color || ''}
                           $alto="25px"
                           $ancho="25px"
                         />
@@ -226,7 +254,7 @@ const Container = styled.div`
     }
   }
 `;
-const Colorcontent = styled.div`
+const Colorcontent = styled.div<ColorContentProps>`
   justify-content: center;
   min-height: ${(props) => props.$alto};
   width: ${(props) => props.$ancho};

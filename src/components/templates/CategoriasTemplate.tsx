@@ -11,23 +11,21 @@ import {
   TablaCategorias,
   RegistrarCategorias,
   Lottieanimacion,
-  Database,
   Tipo,
   CategoriaInsert,
   CategoriaUpdate,
+  Categoria,
 } from "../../index";
 import { JSX, useState } from "react";
 import vacioverde from "../../assets/vacioverde.json";
 import vaciorojo from "../../assets/vaciorojo.json";
-
-type Categoria = Database["public"]["Tables"]["categorias"]["Row"];
 
 interface CategoriasTemplateProps {
   data: Categoria[];
 }
 
 
-export function CategoriasTemplate({ data }: CategoriasTemplateProps): JSX.Element {
+export const CategoriasTemplate = ({ data }: CategoriasTemplateProps): JSX.Element => {
   const [openRegistro, setOpenRegistro] = useState(false);
   const [accion, setAccion] = useState("");
   const [dataSelect, setDataSelect] = useState<CategoriaInsert | CategoriaUpdate>();
@@ -35,29 +33,31 @@ export function CategoriasTemplate({ data }: CategoriasTemplateProps): JSX.Eleme
   const [stateTipo, setStateTipo] = useState(false);
   const { colorCategoria, tituloBtnDes, bgCategoria, setTipo, tipo } = useOperaciones();
 
-  const cambiarTipo = (p: Tipo) => {
+  const cambiarTipo = (p: Tipo): void => {
     setTipo(p);
     setStateTipo(!stateTipo);
     setState(false);
   };
 
-  function cerrarDesplegables() {
+  const cerrarDesplegables = (): void => {
     setStateTipo(false);
     setState(false);
-  }
-  function openTipo() {
+  };
+
+  const openTipo = (): void => {
     setStateTipo(!stateTipo);
     setState(false);
-  }
-  function openUser() {
+  };
+  const openUser = (): void => {
     setState(!state);
     setStateTipo(false);
-  }
-  function nuevoRegistro() {
+  };
+
+  const nuevoRegistro = (): void => {
     setOpenRegistro(!openRegistro);
     setAccion("Nuevo");
     setDataSelect({});
-  }
+  };
   return (
     <Container onClick={cerrarDesplegables}>
       {openRegistro && (
@@ -116,7 +116,7 @@ export function CategoriasTemplate({ data }: CategoriasTemplateProps): JSX.Eleme
 
         <TablaCategorias
           data={data}
-          SetopenRegistro={setOpenRegistro}
+          setOpenRegistro={setOpenRegistro}
           setdataSelect={setDataSelect}
           setAccion={setAccion}
         />
