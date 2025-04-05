@@ -5,11 +5,15 @@ import { useQuery } from "@tanstack/react-query";
 import Swal from "sweetalert2";
 import { Container, ContentFiltro } from "./CuentasTemplate.styles";
 
-export const CuentasTemplate = () => {
+interface CuentasTemplateProps {
+	data: Cuenta[];
+}
+
+export const CuentasTemplate = (cuentas: CuentasTemplateProps) => {
 	const [state, setState] = useState(false);
 	const [openRegistro, setOpenRegistro] = useState(false);
 	const { datausuarios } = useUsuariosStore();
-	const { mostrarCuentas, datacuentas, insertarCuenta, actualizarCuenta, eliminarCuenta } = useCuentaStore();
+	const { mostrarCuentas, cuentas: datacuentas, insertarCuenta, actualizarCuenta, eliminarCuenta } = useCuentaStore();
 	const [accion, setAccion] = useState("");
 	const [dataSelect, setDataSelect] = useState<CuentaInsert | CuentaUpdate>();
 	const [stateTipo, setStateTipo] = useState(false);

@@ -3,18 +3,16 @@ import { Database, supabase } from "../index";
 export type Cuenta = Database["public"]["Tables"]["cuenta"]["Row"];
 export type CuentaInsert = Database["public"]["Tables"]["cuenta"]["Insert"];
 export type CuentaUpdate = Database["public"]["Tables"]["cuenta"]["Update"];
-
-interface Params {
+export interface CuentasQueryParams {
   idusuario: number;
 }
 
-export async function MostrarCuentas(p: Params): Promise<Cuenta | null> {
+export async function MostrarCuentas(p: CuentasQueryParams): Promise<Cuenta[] | null> {
   try {
     const { data } = await supabase
       .from("cuenta")
       .select()
-      .eq("idusuario", p.idusuario)
-      .maybeSingle();
+      .eq("idusuario", p.idusuario);
     if (data) {
       return data;
     }

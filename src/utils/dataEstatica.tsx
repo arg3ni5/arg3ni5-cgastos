@@ -3,7 +3,7 @@ import {
   AiOutlineApartment,
   AiOutlineSetting,
 } from "react-icons/ai";
-import { MdOutlineAnalytics } from "react-icons/md";
+import { MdAccountBalance, MdOutlineAnalytics } from "react-icons/md";
 import { TbPig } from "react-icons/tb"
 import { v } from '../styles/variables';
 
@@ -81,6 +81,11 @@ export const LinksArray = [
     label: "Home",
     icon: <AiOutlineHome />,
     to: "/",
+  },
+  {
+    label: "Cuentas",
+    icon: <MdAccountBalance  />,
+    to: "/cuentas",
   },
   {
     label: "Categorias",

@@ -11,6 +11,7 @@ interface InputTextProps {
   errors: FieldErrors;
   type?: string;
   name?: string;
+  minLength?: number;
 }
 
 export function InputText({
@@ -20,6 +21,7 @@ export function InputText({
   placeholder,
   register,
   errors,
+  minLength,
   type = "text",
   name = "descripcion",
 }: InputTextProps) {
@@ -31,7 +33,7 @@ export function InputText({
         type={type}
         defaultValue={defaultValue}
         placeholder={placeholder}
-        {...register(name, { required: true, minLength: 2 })}
+        {...register(name, { required: true, minLength })}
       />
 
       {errors[name]?.type === "required" && (
