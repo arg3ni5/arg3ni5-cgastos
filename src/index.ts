@@ -81,5 +81,7 @@ export * from './supabase/crudUsuarios';
 export * from './supabase/globalSupabase';
 export * from './supabase/supabase.config';
 export * from './types/supabase';
+export * from './types/types';
+export * from './utils/sweetAlertUtils';
 export * from './utils/Conversiones';
 export * from './utils/dataEstatica';

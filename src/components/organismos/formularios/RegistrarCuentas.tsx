@@ -10,11 +10,11 @@ import {
 	useCuentaStore,
 	CuentaInsert,
 	CuentaUpdate,
+	Accion,
 } from "../../../index";
 import { useForm } from "react-hook-form";
 import Emojipicker, { EmojiClickData } from "emoji-picker-react";
 
-export type Accion = "Editar" | "Crear";
 interface RegistrarCuentasProps {
 	onClose: () => void;
 	dataSelect: CuentaInsert | CuentaUpdate;

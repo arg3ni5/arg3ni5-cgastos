@@ -1,7 +1,6 @@
 import { Database, supabase } from "../index";
 import Swal from "sweetalert2";
 
-// Add utility function for error messages
 const showErrorMessage = (text: string, title: string = "Error") => {
   Swal.fire({
     icon: "error", title, text
