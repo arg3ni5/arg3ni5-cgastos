@@ -1,34 +1,43 @@
-import styled from "styled-components";
 import {
   CategoriasTemplate,
   useCategoriasStore,
   useOperaciones,
   useUsuariosStore,
   SpinnerLoader,
-  Lottieanimacion,
+  Categoria,
 } from "../index";
 import { useQuery } from "@tanstack/react-query";
 
-export function Categorias() {
+interface QueryParams {
+  idusuario: number;
+  tipo: string;
+}
+
+export const Categorias = () => {
   const { tipo } = useOperaciones();
   const { datacategoria, mostrarCategorias } = useCategoriasStore();
   const { datausuarios } = useUsuariosStore();
-  const { isLoading, error } = useQuery({queryKey:["mostrar categorias", tipo],queryFn: () =>
-    mostrarCategorias({ idusuario: datausuarios.id, tipo: tipo })
-});
+
+  const { isLoading, error } = useQuery<Categoria[], Error>({
+    queryKey: ["mostrar cuentas", tipo],
+    queryFn: () =>
+      mostrarCategorias({
+        idusuario: datausuarios?.id,
+        tipo
+      } as QueryParams),
+    enabled: !!datausuarios?.id,
+  });
+
   if (isLoading) {
     return <SpinnerLoader />;
   }
+
   if (error) {
-    return <h1>Error...</h1>;
+    return <h1>Error: {error.message}</h1>;
   }
 
   return (
-    <>
-      
-      <CategoriasTemplate data={datacategoria}>
-       
-      </CategoriasTemplate>
-    </>
+    <CategoriasTemplate data={datacategoria || []}>
+    </CategoriasTemplate>
   );
-}
+};
