@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { JSX, useState } from "react";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import { Switch } from "@mui/material";
@@ -12,42 +12,52 @@ import {
   InputText,
   useCuentaStore,
   v,
-  Btnsave,useUsuariosStore
+  Btnsave,
+  Accion,
+  Movimiento
 } from "../../../index";
-import { useEffect } from "react";
-export function RegistrarMovimientos({ setState, state, dataSelect, accion }) {
+interface RegistrarMovimientosProps {
+  setState: () => void;
+  state: boolean;
+  dataSelect: Movimiento;
+  accion?: Accion;
+}
+
+interface FormInputs {
+  fecha: string;
+  descripcion: string;
+  monto: number;
+}
+
+export const RegistrarMovimientos = ({ setState, state, dataSelect, accion }: RegistrarMovimientosProps): JSX.Element => {
   const { cuentaItemSelect } = useCuentaStore();
-  const { datacategoria, categoriaItemSelect, selectCategoria } =
-    useCategoriasStore();
+  const { datacategoria, categoriaItemSelect, selectCategoria } = useCategoriasStore();
   const { tipo } = useOperaciones();
   const { insertarMovimientos } = useMovimientosStore();
  
-  const [estado, setEstado] = useState(true);
-  const [ignorar, setIgnorar] = useState(false);
-  const [stateCategorias, setStateCategorias] = useState(false);
+  const [estado, setEstado] = useState<boolean>(true);
+  const [ignorar, setIgnorar] = useState<boolean>(false);
+  const [stateCategorias, setStateCategorias] = useState<boolean>(false);
   const fechaactual = new Date();
+
   const {
     register,
     formState: { errors },
     handleSubmit,
-  } = useForm();
+  } = useForm<FormInputs>();
 
-  const insertar = async (data) => {
-    let estadoText = 0;
-    if (estado) {
-      estadoText = 1;
-    }
+  const insertar = async (data: FormInputs): Promise<void> => {
+    const estadoText = estado ? 1 : 0;
 
     const p = {
-      tipo: tipo,
+      tipo,
       estado: estadoText,
       fecha: data.fecha,
       descripcion: data.descripcion,
       idcuenta: cuentaItemSelect.id,
-      valor: parseFloat(data.monto),
+      valor: parseFloat(data.monto.toString()),
       idcategoria: categoriaItemSelect.id,
     };
-
 
     try {
       await insertarMovimientos(p);
@@ -56,9 +66,10 @@ export function RegistrarMovimientos({ setState, state, dataSelect, accion }) {
       alert(err);
     }
   };
-  function estadoControl(e) {
+
+  const estadoControl = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setEstado(e.target.checked);
-  }
+  };
 
 
   return (

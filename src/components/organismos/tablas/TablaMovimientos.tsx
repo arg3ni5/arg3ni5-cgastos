@@ -1,29 +1,41 @@
 import styled from "styled-components";
 import {
   ContentAccionesTabla,
-  useCategoriasStore,
+  Movimiento,
+  MovimientosMesAnio,
   Paginacion,
   useMovimientosStore,
 } from "../../../index";
 import Swal from "sweetalert2";
 import { v } from "../../../styles/variables";
-import { useState } from "react";
-export function TablaMovimientos({
+import { JSX, useState } from "react";
+import { convertToMovimiento } from '../../../supabase/crudMovimientos';
+
+interface TablaMovimientosProps {
+  data: MovimientosMesAnio | null;
+  setOpenRegistro: (value: boolean) => void;
+  setDataSelect: (data: Movimiento) => void;
+  setAccion: (value: string) => void;
+}
+
+export const TablaMovimientos = ({
   data,
-  SetopenRegistro,
-  setdataSelect,
+  setOpenRegistro,
+  setDataSelect,
   setAccion,
-}) {
+}: TablaMovimientosProps): JSX.Element | null => {
   if (data == null) {
-    return;
+    return null;
   }
-  const [pagina, setPagina] = useState(1);
-  const [porPagina, setPorPagina] = useState(10);
+
+  const [pagina, setPagina] = useState<number>(1);
+  const [porPagina, setPorPagina] = useState<number>(10);
   const mx = data.length / porPagina;
   const maximo = mx < 1 ? 1 : mx;
 
   const { eliminarMovimiento } = useMovimientosStore();
-  function eliminar(p) {
+
+  const eliminar = (p: Movimiento): void => {
     Swal.fire({
       title: "¿Estás seguro(a)(e)?",
       text: "Una vez eliminado, ¡no podrá recuperar este registro!",
@@ -34,15 +46,17 @@ export function TablaMovimientos({
       confirmButtonText: "Si, eliminar",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await eliminarMovimiento({ id: p.id });
+        await eliminarMovimiento({ id: p.id } as Movimiento);
       }
     });
-  }
-  function editar(data) {
-    SetopenRegistro(true);
-    setdataSelect(data);
+  };
+
+  const editar = (data: Movimiento): void => {
+    setOpenRegistro(true);
+    setDataSelect(data);
     setAccion("Editar");
-  }
+  };
+
   return (
     <>
       <Container>
@@ -61,7 +75,7 @@ export function TablaMovimientos({
           <tbody>
             {data.map((item, index) => {
               return (
-                <tr key={item.id}>
+                <tr key={index}>
                   <th scope="row">
                     <Situacion
                       $bgcolor={item.estado == "1" ? "#69e673" : "#b3b3b3"}
@@ -76,8 +90,8 @@ export function TablaMovimientos({
                   <td data-title="Monto">{item.valorymoneda}</td>
                   <td data-title="Acciones" >
                     <ContentAccionesTabla
-                      funcionEditar={() => editar(item)}
-                      funcionEliminar={() => eliminar(item)}
+                      funcionEditar={() => editar(convertToMovimiento(item))}
+                      funcionEliminar={() => eliminar(convertToMovimiento(item))}
                     />
                   </td>
                 </tr>
@@ -232,7 +246,17 @@ const Container = styled.div`
     }
   }
 `;
-const Colorcontent = styled.div`
+interface ColorcontentProps {
+  $alto?: string;
+  $ancho?: string;
+  color?: string;
+}
+
+interface SituacionProps {
+  $bgcolor: string;
+}
+
+const Colorcontent = styled.div<ColorcontentProps>`
   justify-content: center;
   min-height: ${(props) => props.$alto};
   width: ${(props) => props.$ancho};
@@ -241,7 +265,8 @@ const Colorcontent = styled.div`
   border-radius: 50%;
   text-align: center;
 `;
-const Situacion = styled.div`
+
+const Situacion = styled.div<SituacionProps>`
   display: flex;
   justify-content: center;
   &::before {

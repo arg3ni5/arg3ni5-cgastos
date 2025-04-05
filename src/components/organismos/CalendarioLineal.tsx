@@ -1,81 +1,55 @@
 import styled from "styled-components";
 import { MdOutlineNavigateNext, MdArrowBackIos } from "react-icons/md";
-import { useEffect } from "react";
-import { useOperaciones } from "../../index";
-const months = [
-  "Enero",
-  "Febrero",
-  "Marzo",
-  "Abril",
-  "Mayo",
-  "Junio",
-  "Julio",
-  "Agosto",
-  "Septiembre",
-  "Octubre",
-  "Noviembre",
-  "Diciembre",
-];
+import { JSX, useEffect } from "react";
+import { ConvertirCapitalize, useOperaciones } from "../../index";
+import dayjs, { Dayjs } from 'dayjs';
+import 'dayjs/locale/es';
 
-let date = new Date(),
-  currYear = date.getFullYear(),
-  currMonth = date.getMonth();
-export function CalendarioLineal({
+dayjs.locale('es');
+
+interface CalendarioLinealProps {
+  value: Dayjs;
+  setValue: (value: Dayjs) => void;
+}
+
+export const CalendarioLineal = ({
   value,
   setValue,
-  setFormatoFecha
- 
-}) {
-  const { colorCategoria,setMes ,setAño} = useOperaciones();
-  function IniciarCalendario() {
-    setValue(months[currMonth] + currYear);
-    let mes = "";
-    if (currMonth + 1 < 10) {
-      mes = "0" + (currMonth + 1);
-    } else {
-      mes = currMonth + 1;
-    }
-    let formatofecha = mes + "/" + currYear;
-    setMes(mes);
-    setAño(currYear);
-    setFormatoFecha(formatofecha);
-  }
-  function adelante() {
-    currMonth += 1;
-    if (currMonth < 0 || currMonth > 11) {
-      date = new Date(currYear, currMonth, new Date().getDate());
-      currYear = date.getFullYear();
-      currMonth = date.getMonth();
-    } else {
-      date = new Date();
-    }
-    IniciarCalendario();
-  }
-  function atras() {
-    currMonth -= 1;
-    if (currMonth < 0 || currMonth > 11) {
-      date = new Date(currYear, currMonth, new Date().getDate());
-      currYear = date.getFullYear();
-      currMonth = date.getMonth();
-    } else {
-      date = new Date();
-    }
-    IniciarCalendario();
-  }
+}: CalendarioLinealProps): JSX.Element => {
+  const { colorCategoria, setMes, setAño } = useOperaciones();
+
+  const IniciarCalendario = (): void => {
+    setValue(dayjs());
+    setMes(dayjs().month() + 1);
+    setAño(dayjs().year());
+  };
+
+  const adelante = (): void => {
+    setValue(value.add(1, 'month'));
+    setMes(value.month() + 2);
+    setAño(value.year());
+  };
+
+  const atras = (): void => {
+    setValue(value.subtract(1, 'month'));
+    setMes(value.month());
+    setAño(value.year());
+  };
 
   useEffect(() => {
     IniciarCalendario();
   }, []);
+
   return (
     <Container className="wrapper" $colortext={colorCategoria}>
       <header>
-       
+
         <div className="subcontainer">
           <span onClick={atras} className="atras">
             <MdArrowBackIos />
           </span>
           <section className="contentValue">
-            <p>{value.toString()}</p>
+            <p>{ConvertirCapitalize(value.format('MMMM YYYY'))}</p>
           </section>
 
           <span onClick={adelante} className="adelante">
@@ -85,8 +59,12 @@ export function CalendarioLineal({
       </header>
     </Container>
   );
+};
+
+interface ContainerProps {
+  $colortext: string;
 }
-const Container = styled.div`
+const Container = styled.div<ContainerProps>`
   width: 450px;
   border-radius: 10px;
   height: 100%;

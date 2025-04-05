@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { v } from "../styles/variables";
-interface TipoMovimiento {
+export interface TipoMovimiento {
   tipo: string;
   text: string;
   color: string;

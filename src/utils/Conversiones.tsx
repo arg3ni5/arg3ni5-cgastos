@@ -1,5 +1,4 @@
 
-export function ConvertirCapitalize(input) {
-  return (input.charAt(0).toUpperCase()+input.slice(1).toLowerCase());
-
-}
+export const ConvertirCapitalize = (input: string): string => {
+  return (input.charAt(0).toUpperCase() + input.slice(1).toLowerCase());
+};
