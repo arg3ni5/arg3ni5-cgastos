@@ -1,63 +1,87 @@
-import { supabase } from "./supabase.config";
-import Swal from "sweetalert2";
-export const InsertarMovimientos = async (p) => {
+import { Database, supabase } from "../index";
+import { showErrorMessage, showSuccessMessage } from "../utils/sweetAlertUtils";
+
+export type Movimiento = Database["public"]["Tables"]["movimientos"]["Row"];
+export type MovimientoInsert = Database["public"]["Tables"]["movimientos"]["Insert"];
+export type MovimientoUpdate = Database["public"]["Tables"]["movimientos"]["Update"];
+
+export const InsertarMovimientos = async (p: MovimientoInsert): Promise<void> => {
   try {
     const { data, error } = await supabase
       .from("movimientos")
       .insert(p)
       .select();
     if (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Ya existe un registro con " + p.descripcion,
-        footer: '<a href="">Agregue una nueva descripcion</a>',
-      });
+      showErrorMessage(`Ya existe un registro con ${p.descripcion}`);
     }
     if (data) {
-      Swal.fire({
-        icon: "success",
-        title: "Registrado",
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      showSuccessMessage("Registrado");
     }
-  } catch (error) {
-    alert(error.error_description || error.message + " insertar movimientos");
+  } catch (error: any) {
+    showErrorMessage(error.error_description || error.message + " insertar movimientos");
   }
 };
-export async function EliminarMovimientos(p) {
+
+export const EliminarMovimientos = async (p: Movimiento): Promise<void> => {
   try {
     const { error } = await supabase
       .from("movimientos")
       .delete()
       .eq("id", p.id);
     if (error) {
-      alert("Error al eliminar", error);
+      showErrorMessage(`Error al eliminar: ${error.message}`);
     }
-  } catch (error) {
-    alert(error.error_description || error.message + " eliminar movimientos");
+  } catch (error: any) {
+    showErrorMessage(error.error_description || error.message + " eliminar movimientos");
   }
-}
-export async function MostrarMovimientosPorMesAño(p) {
+};
+
+
+
+export type MovimientosMesAnioParams = Database["public"]["Functions"]["mmovimientosmesanio"]["Args"];
+export type MovimientosMesAnio = Database["public"]["Functions"]["mmovimientosmesanio"]["Returns"];
+
+export const MostrarMovimientosPorMesAño = async (p: MovimientosMesAnioParams): Promise<MovimientosMesAnio | null> => {
   try {
-    const { data } = await supabase.rpc("mmovimientosmesanio", {
-      anio: p.año,
-      mes: p.mes,
-      iduser: p.idusuario,
-      tipocategoria: p.tipocategoria,
-    });
+    const { data, error } = await supabase.rpc("mmovimientosmesanio", p);
+    if (error) {
+      showErrorMessage(`Error al mostrar movimientos: ${error.message}`);
+      return null;
+    }
     return data;
-  } catch (error) {}
-}
-export async function RptMovimientosPorMesAño(p) {
+  } catch (error: any) {
+    showErrorMessage(error.error_description || error.message + " mostrar movimientos");
+    return null;
+  }
+};
+
+export type RptMovimientosMesAnioParams = Database["public"]["Functions"]["rptmovimientos_anio_mes"]["Args"];
+export type RptMovimientosMesAnio = Database["public"]["Functions"]["rptmovimientos_anio_mes"]["Returns"];
+
+
+export const RptMovimientosPorMesAño = async (p: RptMovimientosMesAnioParams): Promise<RptMovimientosMesAnio | null> => {
   try {
-    const { data } = await supabase.rpc("rptmovimientos_anio_mes", {
-      anio: p.año,
-      mes: p.mes,
-      iduser: p.idusuario,
-      tipocategoria: p.tipocategoria,
-    });
+    const { data, error } = await supabase.rpc("rptmovimientos_anio_mes", p);
+    if (error) {
+      showErrorMessage(`Error al generar reporte: ${error.message}`);
+      return null;
+    }
     return data;
-  } catch (error) {}
-}
+  } catch (error: any) {
+    showErrorMessage(error.error_description || error.message + " reporte movimientos");
+    return null;
+  }
+};
+
+
+// Add this function after your type definitions and before the other functions
+export const convertToMovimiento = (item: MovimientosMesAnio[number]): Movimiento => {
+  return {
+    id: item.id,
+    descripcion: item.descripcion,
+    valor: item.valor,
+    fecha: item.fecha,
+    estado: item.estado
+
+  } as Movimiento;
+};

@@ -16,18 +16,19 @@ import {
   ListaMenuDesplegable,
   Btnfiltro,
   RegistrarMovimientos,
+  Movimiento,
+  TipoMovimiento,
 } from "../../index";
 import { Device } from "../../styles/breakpoints";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-export function MovimientosTemplate() {
-  
-  const [dataSelect, setdataSelect] = useState([]);
-  const [accion, setAccion] = useState("");
-  const [openRegistro, SetopenRegistro] = useState(false);
+
+export const MovimientosTemplate = (): JSX.Element => {
+  const [dataSelect, setDataSelect] = useState<Movimiento>();
+  const [, setAccion] = useState("");
+  const [openRegistro, setOpenRegistro] = useState(false);
   const [value, setValue] = useState(dayjs(Date.now()));
-  const [formatoFecha, setFormatoFecha] = useState("");
   const [state, setState] = useState(false);
   const [stateTipo, setStateTipo] = useState(false);
   const {
@@ -37,12 +38,11 @@ export function MovimientosTemplate() {
     año,
     mes,
     bgCategoria,
-    tituloBtnDes,
     tituloBtnDesMovimientos,
   } = useOperaciones();
-  useEffect(()=>{
+  useEffect(() => {
 
-  },[])
+  }, [])
   const { idusuario } = useUsuariosStore();
   const {
     totalMesAño,
@@ -53,45 +53,51 @@ export function MovimientosTemplate() {
   } = useMovimientosStore();
   const { mostrarCuentas } = useCuentaStore();
   const { mostrarCategorias } = useCategoriasStore();
-  function openTipo() {
+  const openTipo = (): void => {
     setStateTipo(!stateTipo);
     setState(false);
-  }
-  function cambiarTipo(p) {
+  };
+
+  const cambiarTipo = (p: TipoMovimiento): void => {
     setTipoMovimientos(p);
     setStateTipo(!stateTipo);
     setState(false);
-  }
-  function nuevoRegistro() {
-    SetopenRegistro(!openRegistro);
+  };
+
+  const nuevoRegistro = (): void => {
+    setOpenRegistro(!openRegistro);
     setAccion("Nuevo");
-    setdataSelect([]);
+    setDataSelect(undefined);
+  };
+
+  useQuery({
+    queryKey:
+      [
+        "mostrar movimientos mes año",
+        { año: año, mes: mes, idusuario: idusuario, tipocategoria: tipo },
+      ], queryFn:
+      () =>
+        mostrarMovimientos({
+          anio: año,
+          mes: mes,
+          iduser: idusuario,
+          tipocategoria: tipo,
+        }), refetchOnWindowFocus: false,
+  });
+  useQuery({ queryKey: ["mostrar cuentas"], queryFn: () => mostrarCuentas({ idusuario: idusuario }) });
+  useQuery({
+    queryKey: ["mostrar categorias", { idusuario: idusuario, tipo: tipo }], queryFn: () =>
+      mostrarCategorias({ idusuario: idusuario, tipo: tipo })
   }
-  useQuery({queryKey:
-    [
-      "mostrar movimientos mes año",
-      { año: año, mes: mes, idusuario: idusuario, tipocategoria: tipo },
-    ],queryFn:
-    () =>
-      mostrarMovimientos({
-        año: año,
-        mes: mes,
-        idusuario: idusuario,
-        tipocategoria: tipo,
-      }),refetchOnWindowFocus:false,
-    });
-  useQuery({queryKey:["mostrar cuentas"],queryFn: () => mostrarCuentas({ idusuario: idusuario })});
-  useQuery({queryKey:["mostrar categorias", { idusuario: idusuario, tipo: tipo }],queryFn: () =>
-    mostrarCategorias({ idusuario: idusuario, tipo: tipo })}
   );
 
   return (
     <Container>
       {openRegistro && (
         <RegistrarMovimientos
-          dataSelect={dataSelect}
+          dataSelect={dataSelect!}
           state={openRegistro}
-          setState={() => SetopenRegistro(!openRegistro)}
+          setState={() => setOpenRegistro(!openRegistro)}
         />
       )}
 
@@ -117,7 +123,7 @@ export function MovimientosTemplate() {
               <ListaMenuDesplegable
                 data={DataDesplegableMovimientos}
                 top="112%"
-                funcion={(p) => cambiarTipo(p)}
+                funcion={(p) => cambiarTipo(p as TipoMovimiento)}
               />
             )}
           </div>
@@ -155,12 +161,14 @@ export function MovimientosTemplate() {
         <CalendarioLineal
           value={value}
           setValue={setValue}
-          formatofecha={formatoFecha}
-          setFormatoFecha={setFormatoFecha}
         />
       </section>
       <section className="main">
-        <TablaMovimientos data={datamovimientos} />
+        <TablaMovimientos
+          data={datamovimientos}
+          setOpenRegistro={setOpenRegistro}
+          setDataSelect={setDataSelect}
+          setAccion={setAccion} />
       </section>
     </Container>
   );
