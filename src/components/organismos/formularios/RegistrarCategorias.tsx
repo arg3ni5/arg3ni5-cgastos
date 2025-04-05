@@ -9,13 +9,13 @@ import {
   useUsuariosStore,
   useCategoriasStore,
   CategoriaUpdate,
-  CategoriaInsert
+  CategoriaInsert,
+  Accion
 } from "../../../index";
 import { useForm } from "react-hook-form";
 import { CirclePicker, ColorResult } from "react-color";
 import Emojipicker, { EmojiClickData } from "emoji-picker-react";
 
-export type Accion = "Editar" | "Crear";
 interface RegistrarCategoriasProps {
   onClose: () => void;
   dataSelect: CategoriaInsert | CategoriaUpdate;
