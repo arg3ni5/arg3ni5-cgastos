@@ -19,7 +19,7 @@ import {
 interface RegistrarMovimientosProps {
   setState: () => void;
   state: boolean;
-  dataSelect: Movimiento;
+  dataSelect: Movimiento | undefined;
   accion?: Accion;
 }
 
@@ -29,12 +29,12 @@ interface FormInputs {
   monto: number;
 }
 
-export const RegistrarMovimientos = ({ setState, state, dataSelect, accion }: RegistrarMovimientosProps): JSX.Element => {
+export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movimiento, accion }: RegistrarMovimientosProps): JSX.Element => {
   const { cuentaItemSelect } = useCuentaStore();
   const { datacategoria, categoriaItemSelect, selectCategoria } = useCategoriasStore();
   const { tipo } = useOperaciones();
   const { insertarMovimientos } = useMovimientosStore();
- 
+
   const [estado, setEstado] = useState<boolean>(true);
   const [ignorar, setIgnorar] = useState<boolean>(false);
   const [stateCategorias, setStateCategorias] = useState<boolean>(false);
@@ -46,21 +46,21 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect, accion }: Re
     handleSubmit,
   } = useForm<FormInputs>();
 
-  const insertar = async (data: FormInputs): Promise<void> => {
+  const insertar = async (formData: FormInputs): Promise<void> => {
     const estadoText = estado ? 1 : 0;
 
-    const p = {
+    const baseData = {
       tipo,
       estado: estadoText,
-      fecha: data.fecha,
-      descripcion: data.descripcion,
+      fecha: formData.fecha,
+      descripcion: formData.descripcion,
       idcuenta: cuentaItemSelect.id,
-      valor: parseFloat(data.monto.toString()),
+      valor: parseFloat(formData.monto.toString()),
       idcategoria: categoriaItemSelect.id,
     };
 
     try {
-      await insertarMovimientos(p);
+      await insertarMovimientos(baseData);
       setState();
     } catch (err) {
       alert(err);
@@ -115,7 +115,7 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect, accion }: Re
             <ContainerFecha>
               <label>Fecha:</label>
 
-              <input defaultValue={fechaactual.toJSON().slice(0,10)}
+              <input defaultValue={fechaactual.toJSON().slice(0, 10)}
                 type="date"
                 {...register("fecha", { required: true })}
               ></input>
