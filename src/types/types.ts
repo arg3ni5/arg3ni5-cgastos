@@ -1,1 +1,1 @@
-export type Accion = "Editar" | "Crear";
+export type Accion = "Editar" | "Nuevo";

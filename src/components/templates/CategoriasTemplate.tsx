@@ -15,6 +15,7 @@ import {
   CategoriaInsert,
   CategoriaUpdate,
   Categoria,
+  Accion,
 } from "../../index";
 import { JSX, useState } from "react";
 import vacioverde from "../../assets/vacioverde.json";
@@ -64,7 +65,7 @@ export const CategoriasTemplate = ({ data }: CategoriasTemplateProps): JSX.Eleme
         <RegistrarCategorias
           dataSelect={dataSelect || {}}
           onClose={() => setOpenRegistro(!openRegistro)}
-          accion={accion as "Editar" | "Crear"}
+          accion={accion as Accion}
         />
       )}
 
