@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import {
+  Accion,
   ContentAccionesTabla,
   Movimiento,
   MovimientosMesAnio,
@@ -15,7 +16,7 @@ interface TablaMovimientosProps {
   data: MovimientosMesAnio | null;
   setOpenRegistro: (value: boolean) => void;
   setDataSelect: (data: Movimiento) => void;
-  setAccion: (value: string) => void;
+  setAccion: (value: Accion) => void;
 }
 
 export const TablaMovimientos = ({

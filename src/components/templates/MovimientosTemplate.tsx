@@ -18,6 +18,7 @@ import {
   RegistrarMovimientos,
   Movimiento,
   TipoMovimiento,
+  Accion,
 } from "../../index";
 import { Device } from "../../styles/breakpoints";
 import dayjs from "dayjs";
@@ -25,8 +26,9 @@ import { JSX, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 export const MovimientosTemplate = (): JSX.Element => {
-  const [dataSelect, setDataSelect] = useState<Movimiento>();
-  const [, setAccion] = useState("");
+  // Update the state definition with a default value
+  const [dataSelect, setDataSelect] = useState<Movimiento | undefined>(undefined);
+  const [accion, setAccion] = useState<Accion>("Nuevo");
   const [openRegistro, setOpenRegistro] = useState(false);
   const [value, setValue] = useState(dayjs(Date.now()));
   const [state, setState] = useState(false);
@@ -95,7 +97,8 @@ export const MovimientosTemplate = (): JSX.Element => {
     <Container>
       {openRegistro && (
         <RegistrarMovimientos
-          dataSelect={dataSelect!}
+          accion={accion}
+          dataSelect={dataSelect}
           state={openRegistro}
           setState={() => setOpenRegistro(!openRegistro)}
         />

@@ -1,17 +1,36 @@
 import styled from "styled-components";
 import {v} from "../../index"
-export function Selector({ color, state, funcion, texto1, texto2 }) {
+import { JSX } from "react";
+interface SelectorProps {
+  color: string;
+  state?: boolean;
+  funcion: () => void;
+  texto1?: string | null | undefined;
+  texto2?: string | null | undefined;
+}
+
+export const Selector = ({ 
+  color, 
+  state, 
+  funcion, 
+  texto1, 
+  texto2 
+}: SelectorProps): JSX.Element => {
   return (
     <Container color={color} onClick={funcion}>
       <div>
         <span>{texto1}</span>
         <span>{texto2}</span>
       </div>
-      <span className={state?"open":"close"}>{<v.iconoFlechabajo/>}</span>
+      <span className={state ? "open" : "close"}>{<v.iconoFlechabajo/>}</span>
     </Container>
   );
+};
+interface ContainerProps {
+  color: string;
 }
-const Container = styled.div`
+
+const Container = styled.div<ContainerProps>`
  display: flex;
  justify-content:space-between;
  align-items: center;
