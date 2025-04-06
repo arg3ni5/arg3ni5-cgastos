@@ -14,7 +14,10 @@ import {
   v,
   Btnsave,
   Accion,
-  Movimiento
+  Movimiento,
+  MovimientoInsert,
+  showErrorMessage,
+  MovimientoUpdate
 } from "../../../index";
 interface RegistrarMovimientosProps {
   setState: () => void;
@@ -33,7 +36,7 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
   const { cuentaItemSelect } = useCuentaStore();
   const { datacategoria, categoriaItemSelect, selectCategoria } = useCategoriasStore();
   const { tipo } = useOperaciones();
-  const { insertarMovimientos } = useMovimientosStore();
+  const { insertarMovimientos, actualizarMovimientos } = useMovimientosStore();
 
   const [estado, setEstado] = useState<boolean>(true);
   const [ignorar, setIgnorar] = useState<boolean>(false);
@@ -49,16 +52,25 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
   const insertar = async (formData: FormInputs): Promise<void> => {
     const estadoText = estado ? 1 : 0;
 
-    const baseData = {
-      tipo,
-      estado: estadoText,
-      fecha: formData.fecha,
-      descripcion: formData.descripcion,
-      idcuenta: cuentaItemSelect.id,
-      valor: parseFloat(formData.monto.toString()),
-      idcategoria: categoriaItemSelect.id,
-    };
+    if (categoriaItemSelect == null) {
+      showErrorMessage("Seleccione una categoria");
+      return;
+    }
+    if (cuentaItemSelect == null) {
+      showErrorMessage("Seleccione una cuenta");
+      return;
+    }
 
+    const baseData = {
+      descripcion: formData.descripcion,
+      estado: estadoText.toString(),
+      fecha: formData.fecha,
+      id: dataSelect.id,
+      idcategoria: categoriaItemSelect.id,
+      idcuenta: cuentaItemSelect.id,
+      tipo,
+      valor: parseFloat(formData.monto.toString()),
+    } as MovimientoInsert;
     try {
       await insertarMovimientos(baseData);
       setState();
@@ -66,6 +78,37 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
       alert(err);
     }
   };
+
+  const actualizar = async (formData: FormInputs): Promise<void> => {
+    const estadoText = estado ? 1 : 0;
+
+    if (categoriaItemSelect == null) {
+      showErrorMessage("Seleccione una categoria");
+      return;
+    }
+    if (cuentaItemSelect == null) {
+      showErrorMessage("Seleccione una cuenta");
+      return;
+    }
+
+    const baseData = {
+      descripcion: formData.descripcion,
+      estado: estadoText.toString(),
+      fecha: formData.fecha,
+      id: dataSelect.id,
+      idcategoria: categoriaItemSelect.id,
+      idcuenta: cuentaItemSelect.id,
+      tipo,
+      valor: parseFloat(formData.monto.toString()),
+    } as MovimientoUpdate;
+    try {
+      await actualizarMovimientos(baseData);
+      setState();
+    }
+    catch (err) {
+      console.error(err);
+    }
+  }
 
   const estadoControl = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setEstado(e.target.checked);
@@ -76,26 +119,23 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
     <Container onClick={setState}>
       <div
         className="sub-contenedor"
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-      >
+        onClick={(e) => { e.stopPropagation(); }}>
         <div className="encabezado">
           <div>
-            <h1>Nuevo {tipo == "i" ? "ingreso" : "gasto"}</h1>
+            <h1>{accion} {tipo == "i" ? "ingreso" : "gasto"}</h1>
           </div>
           <div>
             <span onClick={setState}>{<v.iconocerrar />}</span>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit(insertar)} className="formulario">
+        <form onSubmit={accion == "Nuevo" ? handleSubmit(insertar) : handleSubmit(actualizar)} className="formulario">
           <section>
             <div>
               <label>Monto:</label>
               <div>
                 <InputNumber
-                  defaultValue={dataSelect.valor}
+                  defaultValue={dataSelect.valor!}
                   register={register}
                   placeholder="Ingrese monto"
                   errors={errors}
@@ -126,7 +166,7 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
             <div>
               <label>Descripción:</label>
               <InputText
-                defaultValue={dataSelect.descripcion}
+                defaultValue={dataSelect.descripcion!}
                 register={register}
                 placeholder="Ingrese una descripcion"
                 errors={errors}
@@ -155,10 +195,10 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
 
           <div className="contentBtnsave">
             <Btnsave
+              type="submit"
               titulo="Guardar"
               bgcolor="#DAC1FF"
               icono={<v.iconoguardar />}
-              className="btnsave"
             />
           </div>
         </form>

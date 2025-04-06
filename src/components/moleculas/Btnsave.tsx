@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 interface BtnsaveProps {
   funcion?: () => void;
+  className?: string;
   titulo: string;
   bgcolor: string;
   icono?: React.ReactNode;
@@ -13,6 +14,7 @@ interface BtnsaveProps {
 
 export const Btnsave: React.FC<BtnsaveProps> = ({ 
   funcion, 
+  className, 
   titulo, 
   bgcolor, 
   icono, 
@@ -31,7 +33,7 @@ export const Btnsave: React.FC<BtnsaveProps> = ({
 
   return (
     <Container type={type} $bgcolor={bgcolor} onClick={handleClick}>
-      <div className="btn"><span className="icon">{icono}</span> <span>{titulo}</span></div>
+      <div className={className || "btn"}><span className="icon">{icono}</span> <span>{titulo}</span></div>
     </Container>
   );
 };

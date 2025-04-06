@@ -36,6 +36,22 @@ export const EliminarMovimientos = async (p: Movimiento): Promise<void> => {
   }
 };
 
+export const ActualizarMovimientos = async (p: MovimientoUpdate): Promise<void> => {
+  try {
+    if (!p.id) {
+      showErrorMessage("No se puede actualizar el registro");
+      return;
+    }
+    await supabase
+      .from("movimientos")
+      .update(p)
+      .eq("id", p.id)
+
+  } catch (error: any) {
+    showErrorMessage(error.error_description || error.message + " insertar movimientos");
+  }
+}
+
 
 
 export type MovimientosMesAnioParams = Database["public"]["Functions"]["mmovimientosmesanio"]["Args"];

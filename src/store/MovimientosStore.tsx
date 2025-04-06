@@ -9,7 +9,9 @@ import {
   RptMovimientosMesAnio,
   RptMovimientosMesAnioParams,
   MovimientoInsert,
-  Movimiento
+  Movimiento,
+  MovimientoUpdate,
+  ActualizarMovimientos
 } from "../index";
 
 interface MovimientosState {
@@ -22,6 +24,7 @@ interface MovimientosState {
   mostrarMovimientos: (p: MovimientosMesAnioParams) => Promise<MovimientosMesAnio | null>;
   calcularTotales: (response: MovimientosMesAnio) => void;
   insertarMovimientos: (p: MovimientoInsert) => Promise<void>;
+  actualizarMovimientos: (p: MovimientoUpdate) => Promise<void>;
   eliminarMovimiento: (p: Movimiento) => Promise<void>;
   rptMovimientosAñoMes: (p: RptMovimientosMesAnioParams) => Promise<RptMovimientosMesAnio | null>;
 }
@@ -58,7 +61,13 @@ export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
     });
   },
 
-  insertarMovimientos: async (p: MovimientoInsert): Promise<void> => {
+  actualizarMovimientos: async (p: MovimientoUpdate): Promise<void> => {    
+    await ActualizarMovimientos(p);
+    const { mostrarMovimientos, parametros } = get();
+    await mostrarMovimientos(parametros);
+  },
+
+  insertarMovimientos: async (p: MovimientoInsert): Promise<void> => {    
     await InsertarMovimientos(p);
     const { mostrarMovimientos, parametros } = get();
     await mostrarMovimientos(parametros);
