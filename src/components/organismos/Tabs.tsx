@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { JSX, useState } from "react";
 import styled from "styled-components";
 import {
   v,
@@ -10,16 +10,44 @@ import {
   Barras,
 } from "../../index";
 import { useQuery } from "@tanstack/react-query";
-export function Tabs() {
-  const [activeTab, setactiveTab] = useState(0);
-  const handleClick = (index) => {
-    setactiveTab(index);
+interface ContainerProps {
+  $activetab: string;
+  theme: {
+    bg: string;
+    carouselColor: string;
   };
+}
+
+interface DataGrafica {
+  labels: string[];
+  datasets: {
+    tension: number;
+    fill: boolean;
+    label: string;
+    borderRadius: number;
+    cutout: number;
+    minBarLength: string;
+    data: number[];
+    backgroundColor: string[];
+    borderColor: string[];
+    borderWidth: number;
+    hoverOffset: number;
+    offset: number;
+  }[];
+}
+
+export const Tabs = (): JSX.Element => {
+  const [activeTab, setActiveTab] = useState<number>(0);
+  
+  const handleClick = (index: number): void => {
+    setActiveTab(index);
+  };
+
   const { idusuario } = useUsuariosStore();
-  const { año, mes, tipo,tituloBtnDesMovimientos } = useOperaciones();
-  const { dataRptMovimientosAñoMes, rptMovimientosAñoMes } =
-    useMovimientosStore();
-  const datagrafica = {
+  const { año, mes, tipo, tituloBtnDesMovimientos } = useOperaciones();
+  const { dataRptMovimientosAñoMes, rptMovimientosAñoMes } = useMovimientosStore();
+
+  const datagrafica: DataGrafica = {
     labels: dataRptMovimientosAñoMes?.map((item) => item.descripcion),
     datasets: [
       {
@@ -52,27 +80,27 @@ export function Tabs() {
       },
     ],
   };
-  const { isLoading, error } = useQuery({queryKey:["reporte movimientos",{
-    año: año,
-    mes: mes,
-    tipocategoria: tipo,
-    idusuario: idusuario,
-  }],queryFn: () =>
-    rptMovimientosAñoMes({
-      año: año,
-      mes: mes,
+
+  const { isLoading, error } = useQuery({
+    queryKey: ["reporte movimientos", {
+      año,
+      mes,
       tipocategoria: tipo,
-      idusuario: idusuario,
+      idusuario,
+    }],
+    queryFn: () => rptMovimientosAñoMes({
+      anio: año,
+      mes,
+      tipocategoria: tipo,
+      iduser: idusuario,
     })
-});
-  if (isLoading) {
-    return <h1>cargando</h1>;
-  }
-  if (error) {
-    return <h1>Error</h1>;
-  }
+  });
+
+  if (isLoading) return <h1>cargando</h1>;
+  if (error) return <h1>Error</h1>;
+
   return (
-    <Container className="container" activeTab={`${activeTab}00%`}>
+    <Container className="container" $activetab={`${activeTab}00%`}>  {/* Changed prop name here */}
       <ul className="tabs">
         <li
           className={activeTab == 0 ? "active" : ""}
@@ -100,16 +128,17 @@ export function Tabs() {
           <Dona datagrafica={datagrafica} data={dataRptMovimientosAñoMes} titulo={tituloBtnDesMovimientos} />
         )}
         {activeTab === 1 && (
-          <Lineal datagrafica={datagrafica} data={dataRptMovimientosAñoMes} titulo={tituloBtnDesMovimientos}/>
+          <Lineal datagrafica={datagrafica} data={dataRptMovimientosAñoMes} titulo={tituloBtnDesMovimientos} />
         )}
         {activeTab === 2 && (
-          <Barras datagrafica={datagrafica} data={dataRptMovimientosAñoMes} titulo={tituloBtnDesMovimientos}/>
+          <Barras datagrafica={datagrafica} data={dataRptMovimientosAñoMes} titulo={tituloBtnDesMovimientos} />
         )}
       </div>
     </Container>
   );
-}
-const Container = styled.div`
+};
+
+const Container = styled.div<ContainerProps>`
   position: relative;
   display: flex;
   align-items: center;
@@ -153,7 +182,7 @@ const Container = styled.div`
       z-index: 1;
       border-radius: 99px;
       transition: 0.25s ease-out;
-      transform: translateX(${(props) => props.activeTab});
+      transform: translateX(${(props) => props.$activetab});  // Changed here
       box-shadow: 0px 10px 20px -3px ${(props) => props.theme.carouselColor};
     }
   }

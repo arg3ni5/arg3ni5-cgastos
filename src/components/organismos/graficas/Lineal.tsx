@@ -11,6 +11,8 @@ import {
   Legend,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import { JSX } from "react";
+import { RptMovimientosMesAnio } from "../../../index";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -21,32 +23,48 @@ ChartJS.register(
   Filler,
   Legend
 );
-export function Lineal({ datagrafica, data,titulo }) {
-  const style ={
-    width:"400px"
-  }
+interface LinealProps {
+  datagrafica: {
+    labels: string[];
+    datasets: {
+      tension: number;
+      fill: boolean;
+      label: string;
+      data: number[];
+      backgroundColor: string[];
+      borderColor: string[];
+      borderWidth: number;
+    }[];
+  };
+  data: RptMovimientosMesAnio;
+  titulo: string;
+}
+
+export const Lineal = ({ datagrafica, data, titulo }: LinealProps): JSX.Element => {
+  const style = {
+    width: "400px"
+  };
+
   return (
     <Container>
       <section>
-        <Line data={datagrafica} style={style}/>
+        <Line data={datagrafica} style={style} />
       </section>
       <section>
         <h2>{titulo} por categoria</h2>
-        {data.map((item, index) => {
-          return (
-            <ContentCars>
-              <div className="contentDescripcion">
-                <span>{item.icono}</span>
-                <span className="descripcion">{item.descripcion}</span>
-              </div>
-              <span>{item.total}</span>
-            </ContentCars>
-          );
-        })}
+        {data.map((item, index) => (
+          <ContentCars key={index}>
+            <div className="contentDescripcion">
+              <span>{item.icono}</span>
+              <span className="descripcion">{item.descripcion}</span>
+            </div>
+            <span>{item.total}</span>
+          </ContentCars>
+        ))}
       </section>
     </Container>
   );
-}
+};
 const Container = styled.div`
 display:flex;
 flex-wrap:wrap;

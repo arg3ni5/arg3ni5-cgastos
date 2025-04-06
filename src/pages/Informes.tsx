@@ -1,10 +1,7 @@
-import styled from "styled-components";
+import { JSX } from "react";
 import { InformesTemplate } from "../index";
-export function Informes() {
-  return (
-   
-      <InformesTemplate />
-   
-  );
-}
+
+export const Informes = (): JSX.Element => {
+  return <InformesTemplate />;
+};
 
