@@ -9,6 +9,8 @@ import {
   Legend,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+import { JSX } from "react";
+import { RptMovimientosMesAnio } from "../../../index";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -17,32 +19,48 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-export function Barras({ datagrafica, data,titulo }) {
-  const style ={
-    width:"400px"
-  }
+interface BarrasProps {
+  datagrafica: {
+    labels: string[];
+    datasets: {
+      tension: number;
+      fill: boolean;
+      label: string;
+      data: number[];
+      backgroundColor: string[];
+      borderColor: string[];
+      borderWidth: number;
+    }[];
+  };
+  data: RptMovimientosMesAnio;
+  titulo: string;
+}
+
+export const Barras = ({ datagrafica, data, titulo }: BarrasProps): JSX.Element => {
+  const style = {
+    width: "400px"
+  };
+
   return (
     <Container>
       <section>
-        <Bar data={datagrafica} style={style}/>
+        <Bar data={datagrafica} style={style} />
       </section>
       <section>
         <h2>{titulo} por categoria</h2>
-        {data.map((item, index) => {
-          return (
-            <ContentCars>
-              <div className="contentDescripcion">
-                <span>{item.icono}</span>
-                <span className="descripcion">{item.descripcion}</span>
-              </div>
-              <span>{item.total}</span>
-            </ContentCars>
-          );
-        })}
+        {data.map((item, index) => (
+          <ContentCars key={index}>
+            <div className="contentDescripcion">
+              <span>{item.icono}</span>
+              <span className="descripcion">{item.descripcion}</span>
+            </div>
+            <span>{item.total}</span>
+          </ContentCars>
+        ))}
       </section>
     </Container>
   );
-}
+};
 const Container = styled.div`
 display:flex;
 flex-wrap:wrap;

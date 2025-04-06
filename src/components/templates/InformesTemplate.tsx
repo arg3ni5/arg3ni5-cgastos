@@ -1,8 +1,8 @@
 import styled from "styled-components";
-import { CalendarioLineal, Header, Tabs,ContentFiltros ,Btndesplegable,ListaMenuDesplegable,DataDesplegableMovimientos,useOperaciones,Btnfiltro,v} from "../../index";
-import { useState } from "react";
-import dayjs from "dayjs";
-export function InformesTemplate() {
+import { CalendarioLineal, Header, Tabs, ContentFiltros, Btndesplegable, ListaMenuDesplegable, DataDesplegableMovimientos, useOperaciones, Btnfiltro, v, TipoMovimiento } from "../../index";
+import { JSX, useState } from "react";
+import dayjs, { Dayjs } from "dayjs";
+export const InformesTemplate = (): JSX.Element => {
   const {
     setTipoMovimientos,
     tipo,
@@ -13,24 +13,18 @@ export function InformesTemplate() {
     tituloBtnDes,
     tituloBtnDesMovimientos,
   } = useOperaciones();
-  const [stateTipo, setStateTipo] = useState(false);
-  const [state, setState] = useState(false);
-  const [value, setValue] = useState(dayjs(Date.now()));
-  const [formatoFecha, setFormatoFecha] = useState("");
-  function openTipo() {
+  const [stateTipo, setStateTipo] = useState<boolean>(false);
+  const [state, setState] = useState<boolean>(false);
+  const [value, setValue] = useState<Dayjs>(dayjs(Date.now()));
+  const openTipo = (): void => {
     setStateTipo(!stateTipo);
     setState(false);
-  }
-  function nuevoRegistro() {
-    SetopenRegistro(!openRegistro);
-    setAccion("Nuevo");
-    setdataSelect([]);
-  }
-  function cambiarTipo(p) {
+  };
+  const cambiarTipo = (p: TipoMovimiento): void => {
     setTipoMovimientos(p);
     setStateTipo(!stateTipo);
     setState(false);
-  }
+  };
   return (
     <Container>
       <header className="header">
@@ -39,7 +33,7 @@ export function InformesTemplate() {
         />
       </header>
       <section className="area1">
-      <ContentFiltros>
+        <ContentFiltros>
           <div
             onClick={(e) => {
               e.stopPropagation();
@@ -55,24 +49,20 @@ export function InformesTemplate() {
               <ListaMenuDesplegable
                 data={DataDesplegableMovimientos}
                 top="112%"
-                funcion={(p) => cambiarTipo(p)}
+                funcion={(p) => cambiarTipo(p as TipoMovimiento)}
               />
             )}
           </div>
         </ContentFiltros>
         <h1>Informes</h1>
-       
-       
 
       </section>
       <section className="area2">
-        <CalendarioLineal  value={value}
-          setValue={setValue}
-          formatofecha={formatoFecha}
-          setFormatoFecha={setFormatoFecha}/>
+        <CalendarioLineal value={value}
+          setValue={setValue} />
       </section>
       <section className="main">
-        <Tabs/>
+        <Tabs />
       </section>
     </Container>
   );

@@ -1,33 +1,50 @@
 import styled from "styled-components";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
+import { JSX } from "react";
+import { RptMovimientosMesAnio } from "../../../index";
 ChartJS.register(ArcElement, Tooltip, Legend);
-export function Dona({ datagrafica, data,titulo }) {
-  const style ={
-    width:"400px"
-  }
+interface DonaProps {
+  datagrafica: {
+    labels: string[];
+    datasets: {
+      data: number[];
+      backgroundColor: string[];
+      borderColor: string[];
+      borderWidth: number;
+      hoverOffset: number;
+      offset: number;
+    }[];
+  };
+  data: RptMovimientosMesAnio;
+  titulo: string;
+}
+
+export const Dona = ({ datagrafica, data, titulo }: DonaProps): JSX.Element => {
+  const style = {
+    width: "400px"
+  };
+
   return (
     <Container>
-      <section >
-        <Doughnut data={datagrafica} style={style}/>
+      <section>
+        <Doughnut data={datagrafica} style={style} />
       </section>
       <section>
         <h2>{titulo} por categoria</h2>
-        {data.map((item, index) => {
-          return (
-            <ContentCars>
-              <div className="contentDescripcion">
-                <span>{item.icono}</span>
-                <span className="descripcion">{item.descripcion}</span>
-              </div>
-              <span>{item.total}</span>
-            </ContentCars>
-          );
-        })}
+        {data.map((item, index) => (
+          <ContentCars key={index}>
+            <div className="contentDescripcion">
+              <span>{item.icono}</span>
+              <span className="descripcion">{item.descripcion}</span>
+            </div>
+            <span>{item.total}</span>
+          </ContentCars>
+        ))}
       </section>
     </Container>
   );
-}
+};
 const Container = styled.div`
 display:flex;
 flex-wrap:wrap;

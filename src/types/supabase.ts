@@ -248,7 +248,7 @@ export type Database = {
           anio: number
           mes: number
           iduser: number
-          tipocategoria: string
+          tipocategoria?: string
         }
         Returns: {
           total: number
