@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { MostrarCuentas, InsertarCuenta, ActualizarCuenta, EliminarCuenta, Cuenta, CuentaInsert } from "../index";
 
 interface CuentaStore {
-  cuentaItemSelect: Cuenta[];
+  cuentaItemSelect: Cuenta;
   cuentas: Cuenta[];
   mostrarCuentas: (p: { idusuario: number }) => Promise<Cuenta[]>;
   insertarCuenta: (cuenta: CuentaInsert) => Promise<Cuenta | null>;
@@ -11,14 +11,14 @@ interface CuentaStore {
 }
 
 export const useCuentaStore = create<CuentaStore>((set, get) => ({
-  cuentaItemSelect: [],
+  cuentaItemSelect: {} as Cuenta,
   cuentas: [],
 
   mostrarCuentas: async (p) => {
     const response = await MostrarCuentas(p);
     if (response) {
       set({ cuentas: response });
-      set({ cuentaItemSelect: response });
+      set({ cuentaItemSelect: response.filter(item => item.descripcion === "Billetera")[0] });
     }
     return response || [];
   },
