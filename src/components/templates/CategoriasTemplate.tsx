@@ -95,8 +95,7 @@ export const CategoriasTemplate = ({ data }: CategoriasTemplateProps): JSX.Eleme
             )}
           </div>
         </ContentFiltros>
-      </section>
-      <section className="area2">
+        
         <ContentFiltro>
           <Btnfiltro
             funcion={nuevoRegistro}
@@ -146,9 +145,10 @@ const Container = styled.div`
   }
   .tipo {
     grid-area: tipo;
-    /* background-color: rgba(229, 67, 26, 0.14); */
+    /* background-color: rgba(107, 214, 14, 0.14); */
     display: flex;
     align-items: center;
+    justify-content: space-between;
   }
   .area2 {
     grid-area: area2;

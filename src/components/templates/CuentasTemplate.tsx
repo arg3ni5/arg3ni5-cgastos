@@ -1,4 +1,4 @@
-import { Header, v, Btnfiltro, useOperaciones, Tipo, ContentFiltros, Btndesplegable, ListaMenuDesplegable, DataDesplegableCuenta, RegistrarCuentas, Cuenta, CuentaInsert, CuentaUpdate } from "../../index";
+import { Header, v, Btnfiltro, useOperaciones, Tipo, ContentFiltros, Btndesplegable, ListaMenuDesplegable, DataDesplegableCuenta, RegistrarCuentas, Cuenta, CuentaInsert, CuentaUpdate, Accion } from "../../index";
 import { useState } from "react";
 import { useUsuariosStore, useCuentaStore } from "../../index";
 import { useQuery } from "@tanstack/react-query";
@@ -9,18 +9,18 @@ interface CuentasTemplateProps {
 	data: Cuenta[];
 }
 
-export const CuentasTemplate = (cuentas: CuentasTemplateProps) => {
+export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 	const [state, setState] = useState(false);
 	const [openRegistro, setOpenRegistro] = useState(false);
 	const { datausuarios } = useUsuariosStore();
-	const { mostrarCuentas, cuentas: datacuentas, insertarCuenta, actualizarCuenta, eliminarCuenta } = useCuentaStore();
+	const { mostrarCuentas, insertarCuenta, actualizarCuenta, eliminarCuenta } = useCuentaStore();
 	const [accion, setAccion] = useState("");
 	const [dataSelect, setDataSelect] = useState<CuentaInsert | CuentaUpdate>();
 	const [stateTipo, setStateTipo] = useState(false);
-	const { colorCategoria, tituloBtnDes, bgCategoria, setTipo, tipo } = useOperaciones();
+	const { colorCategoria, tituloBtnDesCuentas, bgCategoria, setTipoCuenta } = useOperaciones();
 
 	const cambiarTipo = (p: Tipo) => {
-		setTipo(p);
+		setTipoCuenta(p);
 		setStateTipo(!stateTipo);
 		setState(false);
 	};
@@ -61,10 +61,10 @@ export const CuentasTemplate = (cuentas: CuentasTemplateProps) => {
 		const { value: formValues } = await Swal.fire({
 			title: 'Editar Cuenta',
 			html: `
-        <input id="descripcion" class="swal2-input" placeholder="Descripción" value="${cuenta.descripcion}">
-        <input id="saldo" type="number" class="swal2-input" placeholder="Saldo" value="${cuenta.saldo_actual}">
-        <input id="icono" class="swal2-input" placeholder="Icono" value="${cuenta.icono}">
-      `,
+				<input id="descripcion" class="swal2-input" placeholder="Descripción" value="${cuenta.descripcion}">
+				<input id="saldo" type="number" class="swal2-input" placeholder="Saldo" value="${cuenta.saldo_actual}">
+				<input id="icono" class="swal2-input" placeholder="Icono" value="${cuenta.icono}">
+			`,
 			focusConfirm: false,
 			preConfirm: () => {
 				return {
@@ -108,7 +108,7 @@ export const CuentasTemplate = (cuentas: CuentasTemplateProps) => {
 				<RegistrarCuentas
 					dataSelect={dataSelect || {}}
 					onClose={() => setOpenRegistro(!openRegistro)}
-					accion={accion as "Editar" | "Crear"}
+					accion={accion as Accion}
 				/>
 			)}
 
@@ -126,7 +126,7 @@ export const CuentasTemplate = (cuentas: CuentasTemplateProps) => {
 						<Btndesplegable
 							textcolor={colorCategoria}
 							bgcolor={bgCategoria}
-							text={tituloBtnDes}
+							text={tituloBtnDesCuentas}
 							funcion={openTipo}
 						/>
 						{stateTipo && (
@@ -138,9 +138,7 @@ export const CuentasTemplate = (cuentas: CuentasTemplateProps) => {
 						)}
 					</div>
 				</ContentFiltros>
-			</section>
 
-			<section className="area2">
 				<ContentFiltro>
 					<Btnfiltro
 						funcion={nuevoRegistro}
@@ -154,9 +152,9 @@ export const CuentasTemplate = (cuentas: CuentasTemplateProps) => {
 			<section className="main">
 				{isLoading && <p>Cargando cuentas...</p>}
 				{error && <p>Error al cargar las cuentas</p>}
-				{datacuentas?.length > 0 ? (
+				{data?.length > 0 ? (
 					<div className="accounts-grid">
-						{datacuentas.map((cuenta) => (
+						{data.map((cuenta) => (
 							<div key={cuenta.id} className="account-card">
 								<div className="card-header">
 									<span className="icon">{cuenta.icono}</span>

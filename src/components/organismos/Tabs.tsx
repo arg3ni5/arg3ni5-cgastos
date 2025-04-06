@@ -38,17 +38,17 @@ interface DataGrafica {
 
 export const Tabs = (): JSX.Element => {
   const [activeTab, setActiveTab] = useState<number>(0);
-  
+
   const handleClick = (index: number): void => {
     setActiveTab(index);
   };
 
   const { idusuario } = useUsuariosStore();
   const { año, mes, tipo, tituloBtnDesMovimientos } = useOperaciones();
-  const { dataRptMovimientosAñoMes, rptMovimientosAñoMes } = useMovimientosStore();
+  const { dataRptMovimientosAñoMes, rptMovimientosAñoMes, rptParams } = useMovimientosStore();
 
-  const datagrafica: DataGrafica = {
-    labels: dataRptMovimientosAñoMes?.map((item) => item.descripcion),
+  const datagraficaG: DataGrafica = {
+    labels: dataRptMovimientosAñoMes?.g.map((item) => item.descripcion),
     datasets: [
       {
         tension: 0.3,
@@ -57,7 +57,41 @@ export const Tabs = (): JSX.Element => {
         borderRadius: 5,
         cutout: 30,
         minBarLength: "100px",
-        data: dataRptMovimientosAñoMes?.map((item) => item.total),
+        data: dataRptMovimientosAñoMes?.g.map((item) => item.total),
+        backgroundColor: [
+          "rgba(255, 99, 132, 0.2)",
+          "rgba(54, 162, 235, 0.2)",
+          "rgba(255, 206, 86, 0.2)",
+          "rgba(75, 192, 192, 0.2)",
+          "rgba(153, 102, 255, 0.2)",
+          "rgba(255, 159, 64, 0.2)",
+        ],
+        borderColor: [
+          "rgba(255, 99, 132, 1)",
+          "rgba(54, 162, 235, 1)",
+          "rgba(255, 206, 86, 1)",
+          "rgba(75, 192, 192, 1)",
+          "rgba(153, 102, 255, 1)",
+          "rgba(255, 159, 64, 1)",
+        ],
+        borderWidth: 2,
+        hoverOffset: 16,
+        offset: 10,
+      },
+    ],
+  };
+
+  const datagraficaI: DataGrafica = {
+    labels: dataRptMovimientosAñoMes?.i.map((item) => item.descripcion),
+    datasets: [
+      {
+        tension: 0.3,
+        fill: true,
+        label: "Total",
+        borderRadius: 5,
+        cutout: 30,
+        minBarLength: "100px",
+        data: dataRptMovimientosAñoMes?.i.map((item) => item.total),
         backgroundColor: [
           "rgba(255, 99, 132, 0.2)",
           "rgba(54, 162, 235, 0.2)",
@@ -125,13 +159,21 @@ export const Tabs = (): JSX.Element => {
 
       <div className="tab-content">
         {activeTab === 0 && (
-          <Dona datagrafica={datagrafica} data={dataRptMovimientosAñoMes} titulo={tituloBtnDesMovimientos} />
+          <>
+            {rptParams.tipocategoria}
+            {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && <Dona datagrafica={datagraficaG} data={dataRptMovimientosAñoMes.g} titulo={tituloBtnDesMovimientos} />)}
+            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && <Dona datagrafica={datagraficaI} data={dataRptMovimientosAñoMes.i} titulo={tituloBtnDesMovimientos} />)}
+          </>
         )}
         {activeTab === 1 && (
-          <Lineal datagrafica={datagrafica} data={dataRptMovimientosAñoMes} titulo={tituloBtnDesMovimientos} />
+          rptParams.tipocategoria === "g" ?
+            <Lineal datagrafica={datagraficaG} data={dataRptMovimientosAñoMes.g} titulo={tituloBtnDesMovimientos} /> :
+            <Lineal datagrafica={datagraficaI} data={dataRptMovimientosAñoMes.i} titulo={tituloBtnDesMovimientos} />
         )}
         {activeTab === 2 && (
-          <Barras datagrafica={datagrafica} data={dataRptMovimientosAñoMes} titulo={tituloBtnDesMovimientos} />
+          rptParams.tipocategoria === "g" ?
+            <Barras datagrafica={datagraficaG} data={dataRptMovimientosAñoMes.g} titulo={tituloBtnDesMovimientos} /> :
+            <Barras datagrafica={datagraficaI} data={dataRptMovimientosAñoMes.i} titulo={tituloBtnDesMovimientos} />
         )}
       </div>
     </Container>

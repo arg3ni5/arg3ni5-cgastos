@@ -1,16 +1,12 @@
 import styled from "styled-components";
-import { CalendarioLineal, Header, Tabs, ContentFiltros, Btndesplegable, ListaMenuDesplegable, DataDesplegableMovimientos, useOperaciones, Btnfiltro, v, TipoMovimiento } from "../../index";
+import { CalendarioLineal, Header, Tabs, ContentFiltros, Btndesplegable, ListaMenuDesplegable, DataDesplegableMovimientos, useOperaciones, Btnfiltro, v, Tipo } from "../../index";
 import { JSX, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 export const InformesTemplate = (): JSX.Element => {
   const {
     setTipoMovimientos,
-    tipo,
     colorCategoria,
-    año,
-    mes,
     bgCategoria,
-    tituloBtnDes,
     tituloBtnDesMovimientos,
   } = useOperaciones();
   const [stateTipo, setStateTipo] = useState<boolean>(false);
@@ -20,7 +16,7 @@ export const InformesTemplate = (): JSX.Element => {
     setStateTipo(!stateTipo);
     setState(false);
   };
-  const cambiarTipo = (p: TipoMovimiento): void => {
+  const cambiarTipo = (p: Tipo): void => {
     setTipoMovimientos(p);
     setStateTipo(!stateTipo);
     setState(false);
@@ -49,7 +45,7 @@ export const InformesTemplate = (): JSX.Element => {
               <ListaMenuDesplegable
                 data={DataDesplegableMovimientos}
                 top="112%"
-                funcion={(p) => cambiarTipo(p as TipoMovimiento)}
+                funcion={(p) => cambiarTipo(p as Tipo)}
               />
             )}
           </div>

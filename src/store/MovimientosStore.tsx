@@ -14,9 +14,14 @@ import {
   ActualizarMovimientos
 } from "../index";
 
+interface DataRptMovimientosAñoMes {
+  i: RptMovimientosMesAnio;
+  g: RptMovimientosMesAnio;
+}
 interface MovimientosState {
   datamovimientos: MovimientosMesAnio;
-  dataRptMovimientosAñoMes: RptMovimientosMesAnio;
+  rptParams: RptMovimientosMesAnioParams;
+  dataRptMovimientosAñoMes: { i: RptMovimientosMesAnio, g: RptMovimientosMesAnio };
   totalMesAño: number;
   totalMesAñoPagados: number;
   totalMesAñoPendientes: number;
@@ -26,12 +31,13 @@ interface MovimientosState {
   insertarMovimientos: (p: MovimientoInsert) => Promise<void>;
   actualizarMovimientos: (p: MovimientoUpdate) => Promise<void>;
   eliminarMovimiento: (p: Movimiento) => Promise<void>;
-  rptMovimientosAñoMes: (p: RptMovimientosMesAnioParams) => Promise<RptMovimientosMesAnio | null>;
+  rptMovimientosAñoMes: (p: RptMovimientosMesAnioParams) => Promise<DataRptMovimientosAñoMes | null>;
 }
 
 export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
+  rptParams: {} as RptMovimientosMesAnioParams,
   datamovimientos: [],
-  dataRptMovimientosAñoMes: [],
+  dataRptMovimientosAñoMes: { i: [], g: [] },
   totalMesAño: 0,
   totalMesAñoPagados: 0,
   totalMesAñoPendientes: 0,
@@ -61,13 +67,13 @@ export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
     });
   },
 
-  actualizarMovimientos: async (p: MovimientoUpdate): Promise<void> => {    
+  actualizarMovimientos: async (p: MovimientoUpdate): Promise<void> => {
     await ActualizarMovimientos(p);
     const { mostrarMovimientos, parametros } = get();
     await mostrarMovimientos(parametros);
   },
 
-  insertarMovimientos: async (p: MovimientoInsert): Promise<void> => {    
+  insertarMovimientos: async (p: MovimientoInsert): Promise<void> => {
     await InsertarMovimientos(p);
     const { mostrarMovimientos, parametros } = get();
     await mostrarMovimientos(parametros);
@@ -79,9 +85,14 @@ export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
     await mostrarMovimientos(parametros);
   },
 
-  rptMovimientosAñoMes: async (p: RptMovimientosMesAnioParams) => {
-    const response = await RptMovimientosPorMesAño(p);
-    set({ dataRptMovimientosAñoMes: response || [] });
+  rptMovimientosAñoMes: async (p: RptMovimientosMesAnioParams): Promise<DataRptMovimientosAñoMes> => {
+    set({ rptParams: p });
+    const i = p.tipocategoria === "i" || p.tipocategoria === "b" ?
+      await RptMovimientosPorMesAño({ ...p, tipocategoria: "i" }) || [] : [];
+    const g = p.tipocategoria === "i" || p.tipocategoria === "b" ?
+      await RptMovimientosPorMesAño({ ...p, tipocategoria: "g" }) || [] : [];
+    const response = { i, g };
+    set({ dataRptMovimientosAñoMes: { i: i || [], g: g || [] } });
     return response;
   },
 }));

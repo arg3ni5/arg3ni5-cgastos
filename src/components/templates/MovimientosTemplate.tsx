@@ -17,8 +17,8 @@ import {
   Btnfiltro,
   RegistrarMovimientos,
   Movimiento,
-  TipoMovimiento,
   Accion,
+  Tipo,
 } from "../../index";
 import { Device } from "../../styles/breakpoints";
 import dayjs from "dayjs";
@@ -60,7 +60,7 @@ export const MovimientosTemplate = (): JSX.Element => {
     setState(false);
   };
 
-  const cambiarTipo = (p: TipoMovimiento): void => {
+  const cambiarTipo = (p: Tipo): void => {
     setTipoMovimientos(p);
     setStateTipo(!stateTipo);
     setState(false);
@@ -126,7 +126,7 @@ export const MovimientosTemplate = (): JSX.Element => {
               <ListaMenuDesplegable
                 data={DataDesplegableMovimientos}
                 top="112%"
-                funcion={(p) => cambiarTipo(p as TipoMovimiento)}
+                funcion={(p) => cambiarTipo(p as Tipo)}
               />
             )}
           </div>
@@ -189,6 +189,7 @@ const Container = styled.div`
     "totales" 360px
     "calendario" 100px
     "main" auto;
+
     @media ${Device.tablet} {
       grid-template:
     "header" 100px

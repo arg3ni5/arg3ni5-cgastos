@@ -22,8 +22,10 @@ export const Container = styled.div`
 
   .tipo {
     grid-area: tipo;
+    /* background-color: rgba(107, 214, 14, 0.14); */
     display: flex;
     align-items: center;
+    justify-content: space-between;
   }
 
   .area1 {
