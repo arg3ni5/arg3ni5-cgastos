@@ -167,11 +167,20 @@ export const MovimientosTemplate = (): JSX.Element => {
         />
       </section>
       <section className="main">
-        <TablaMovimientos
-          data={datamovimientos}
-          setOpenRegistro={setOpenRegistro}
-          setDataSelect={setDataSelect}
-          setAccion={setAccion} />
+
+        {(tipo == "i" || tipo == "b") &&
+          <TablaMovimientos
+            data={datamovimientos.i}
+            setOpenRegistro={setOpenRegistro}
+            setDataSelect={setDataSelect}
+            setAccion={setAccion} />}
+
+        {(tipo == "g" || tipo == "b") &&
+          <TablaMovimientos
+            data={datamovimientos.g}
+            setOpenRegistro={setOpenRegistro}
+            setDataSelect={setDataSelect}
+            setAccion={setAccion} />}
       </section>
     </Container>
   );
