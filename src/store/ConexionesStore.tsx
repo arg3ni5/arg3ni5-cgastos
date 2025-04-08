@@ -1,5 +1,9 @@
 import { create } from "zustand";
-import { InsertarConexion, MostrarConexiones, EliminarConexiones, Conexion, ConexionInsert, ConexionQueryParams } from "../index";
+import { InsertarConexion, MostrarConexiones, EliminarConexiones, Conexion, ConexionInsert } from "../index";
+
+type ConexionQueryParams = {
+  usuario_id: number;
+};
 
 interface ConexionesStore {
   isAuth: boolean;
@@ -9,7 +13,7 @@ interface ConexionesStore {
 
   mostrarConexiones: (params: ConexionQueryParams) => Promise<Conexion[] | null>;
   insertarConexion: (c: ConexionInsert) => Promise<void>;
-  eliminarConexion: (params: ConexionQueryParams) => Promise<void>;
+  eliminarConexion: (params: Conexion) => Promise<void>;
 }
 
 
@@ -18,7 +22,7 @@ export const useConexionesStore = create<ConexionesStore>((set, get) => ({
   conexiones: [],
   
   mostrarConexiones: async (p) => {
-    const response = await MostrarConexiones({id: p.usuario_id!} as Conexion);
+    const response = await MostrarConexiones({usuario_id: Number(p.usuario_id!)} as Conexion);
     set({
       parametros: p,
       conexiones: response,
@@ -34,8 +38,8 @@ export const useConexionesStore = create<ConexionesStore>((set, get) => ({
     set({ conexiones: nuevas });
   },
 
-  eliminarConexion: async (p: ConexionQueryParams) => {
-    await EliminarConexiones({id: p.usuario_id!} as Conexion);
+  eliminarConexion: async (p: Conexion) => {
+    await EliminarConexiones({id: p.id} as Conexion);
     const { mostrarConexiones, parametros } = get();
     const nuevas = await mostrarConexiones(parametros!);
     set({ conexiones: nuevas });

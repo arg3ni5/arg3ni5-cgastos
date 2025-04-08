@@ -4,22 +4,34 @@ import { Header, supabase, useConexionesStore, useUsuariosStore } from "../../in
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 
-export function VincularTemplate() {
+interface Conexion {
+  canal: string;
+  canal_user_id: string;
+  canal_username: string;
+  usuario_id: string;
+}
+
+export const VincularTemplate: React.FC = () => {
   const { datausuarios } = useUsuariosStore();
-  const { conexiones, insertarConexion, mostrarConexiones, eliminarConexion } = useConexionesStore();
-  const [status, setStatus] = useState("loading");
-  const [msgError, setMsgError] = useState("");
+  const { conexiones, insertarConexion, mostrarConexiones } = useConexionesStore();
+  const [status, setStatus] = useState<'loading' | 'no-session' | 'success' | 'already' | 'error'>('loading');
+  const [msgError, setMsgError] = useState<string>('');
   const navigate = useNavigate();
 
   const urlParams = new URLSearchParams(window.location.search);
-  const canal = urlParams.get("canal") || "telegram";
-  const canal_user_id = urlParams.get("id");
-  const canal_username = urlParams.get("username") || "";
+  const canal = urlParams.get('canal') || 'telegram';
+  const canal_user_id = urlParams.get('id');
+  const canal_username = urlParams.get('username') || '';
 
   const { isLoading, error } = useQuery({
-    queryKey: ["mostrar conexiones", datausuarios?.id],
-    queryFn: () => mostrarConexiones({ usuario_id: datausuarios.id }),
-    enabled: !!datausuarios, // solo ejecuta si hay usuario
+    queryKey: ['mostrar conexiones', datausuarios?.id],
+    queryFn: () => {
+      if (!datausuarios?.id) {
+        throw new Error('User ID is required');
+      }
+      return mostrarConexiones({ usuario_id: datausuarios.id });
+    },
+    enabled: !!datausuarios,
   });
 
   useEffect(() => {
@@ -29,6 +41,12 @@ export function VincularTemplate() {
 
       if (!session) {
         setStatus("no-session");
+        return;
+      }
+
+      if(datausuarios?.id === undefined) {
+        setStatus("error");
+        setMsgError("No se encontró el ID de usuario.");
         return;
       }
 
@@ -60,7 +78,7 @@ export function VincularTemplate() {
       } catch (err) {
         console.log("error", err);
 
-        if (err.message.includes("duplicate")) {
+        if (err instanceof Error && err.message.includes("duplicate")) {
           setStatus("already");
         } else {
           setStatus("error");
@@ -91,7 +109,7 @@ export function VincularTemplate() {
         {msgError && <p>{msgError}</p>}
       </section>
       <section className="main">
-        {conexiones?.length > 0 && (
+        {conexiones && conexiones?.length > 0 && (
           <ListaCuentas>
             <h3>Cuentas vinculadas</h3>
             <ul>

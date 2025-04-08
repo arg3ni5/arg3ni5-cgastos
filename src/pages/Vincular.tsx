@@ -1,4 +1,3 @@
-import styled from "styled-components";
 import { VincularTemplate } from "../index";
 export function Vincular() {
   return (
@@ -7,4 +6,3 @@ export function Vincular() {
     </>
   );
 }
-const Container = styled.div``;

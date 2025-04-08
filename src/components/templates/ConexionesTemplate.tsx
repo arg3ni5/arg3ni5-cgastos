@@ -1,18 +1,30 @@
 import styled from "styled-components";
-import { Header, useUsuariosStore, useConexionesStore, Database } from "../../index";
+import { Header, useUsuariosStore, useConexionesStore, ConexionQueryParams, Conexion } from "../../index";
 import Swal from "sweetalert2";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-type Conexion = Database["public"]["Tables"]["conexiones_usuarios"]["Row"];
+interface HeaderStateConfig {
+  state: boolean;
+  setState: (value: boolean) => void;
+}
 
-export function ConexionesTemplate() {
+export const ConexionesTemplate: React.FC = () => {
   const { datausuarios } = useUsuariosStore();
   const { mostrarConexiones, conexiones, eliminarConexion } = useConexionesStore();
   const queryClient = useQueryClient();
 
+  if (!datausuarios) {
+    return <div>Loading...</div>;
+  }
+
   const { isLoading, error } = useQuery({
     queryKey: ["mostrar conexiones", datausuarios?.id],
-    queryFn: () => mostrarConexiones({ usuario_id: datausuarios?.id }),
+    queryFn: () => {
+      if (datausuarios?.id === undefined) {
+        throw new Error('User ID is required');
+      }
+      return mostrarConexiones({ usuario_id: datausuarios.id } as ConexionQueryParams);
+    },
     enabled: !!datausuarios?.id,
   });
 
@@ -30,7 +42,7 @@ export function ConexionesTemplate() {
 
     if (result.isConfirmed) {
       try {
-        await eliminarConexion({ usuario_id: conexion.id });
+        await eliminarConexion({ usuario_id: conexion.id } as ConexionQueryParams);
         if (datausuarios?.id !== undefined) {
           queryClient.invalidateQueries({
             queryKey: ["mostrar conexiones", datausuarios.id],
