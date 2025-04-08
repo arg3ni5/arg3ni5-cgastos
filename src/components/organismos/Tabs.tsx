@@ -160,20 +160,21 @@ export const Tabs = (): JSX.Element => {
       <div className="tab-content">
         {activeTab === 0 && (
           <>
-            {rptParams.tipocategoria}
-            {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && <Dona datagrafica={datagraficaG} data={dataRptMovimientosAñoMes.g} titulo={tituloBtnDesMovimientos} />)}
-            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && <Dona datagrafica={datagraficaI} data={dataRptMovimientosAñoMes.i} titulo={tituloBtnDesMovimientos} />)}
+            {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && <Dona datagrafica={datagraficaG} data={dataRptMovimientosAñoMes.g} titulo={'Gastos'} />)}
+            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && <Dona datagrafica={datagraficaI} data={dataRptMovimientosAñoMes.i} titulo={"Ingresos"} />)}
           </>
         )}
         {activeTab === 1 && (
-          rptParams.tipocategoria === "g" ?
-            <Lineal datagrafica={datagraficaG} data={dataRptMovimientosAñoMes.g} titulo={tituloBtnDesMovimientos} /> :
-            <Lineal datagrafica={datagraficaI} data={dataRptMovimientosAñoMes.i} titulo={tituloBtnDesMovimientos} />
+          <>
+            {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && <Lineal datagrafica={datagraficaG} data={dataRptMovimientosAñoMes.g} titulo={'Gastos'} />)}
+            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && <Lineal datagrafica={datagraficaI} data={dataRptMovimientosAñoMes.i} titulo={"Ingresos"} />)}
+          </>
         )}
         {activeTab === 2 && (
-          rptParams.tipocategoria === "g" ?
-            <Barras datagrafica={datagraficaG} data={dataRptMovimientosAñoMes.g} titulo={tituloBtnDesMovimientos} /> :
-            <Barras datagrafica={datagraficaI} data={dataRptMovimientosAñoMes.i} titulo={tituloBtnDesMovimientos} />
+          <>
+            {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && <Barras datagrafica={datagraficaG} data={dataRptMovimientosAñoMes.g} titulo={'Gastos'} />)}
+            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && <Barras datagrafica={datagraficaI} data={dataRptMovimientosAñoMes.i} titulo={"Ingresos"} />)}
+          </>
         )}
       </div>
     </Container>

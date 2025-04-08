@@ -155,7 +155,7 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
             <ContainerFecha>
               <label>Fecha:</label>
 
-              <input defaultValue={fechaactual.toJSON().slice(0, 10)}
+              <input defaultValue={dataSelect.fecha || fechaactual.toJSON().slice(0, 10)}
                 type="date"
                 {...register("fecha", { required: true })}
               ></input>
