@@ -18,16 +18,20 @@ interface DataRptMovimientosAñoMes {
   i: RptMovimientosMesAnio;
   g: RptMovimientosMesAnio;
 }
+interface DataMovimientos {
+  i: MovimientosMesAnio;
+  g: MovimientosMesAnio;
+}
 interface MovimientosState {
-  datamovimientos: MovimientosMesAnio;
+  datamovimientos: DataMovimientos;
   rptParams: RptMovimientosMesAnioParams;
   dataRptMovimientosAñoMes: { i: RptMovimientosMesAnio, g: RptMovimientosMesAnio };
   totalMesAño: number;
   totalMesAñoPagados: number;
   totalMesAñoPendientes: number;
   parametros: MovimientosMesAnioParams;
-  mostrarMovimientos: (p: MovimientosMesAnioParams) => Promise<MovimientosMesAnio | null>;
-  calcularTotales: (response: MovimientosMesAnio) => void;
+  mostrarMovimientos: (p: MovimientosMesAnioParams) => Promise<DataMovimientos>;
+  calcularTotales: (data: DataMovimientos) => void;
   insertarMovimientos: (p: MovimientoInsert) => Promise<void>;
   actualizarMovimientos: (p: MovimientoUpdate) => Promise<void>;
   eliminarMovimiento: (p: Movimiento) => Promise<void>;
@@ -36,7 +40,7 @@ interface MovimientosState {
 
 export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
   rptParams: {} as RptMovimientosMesAnioParams,
-  datamovimientos: [],
+  datamovimientos: { i: [], g: [] },
   dataRptMovimientosAñoMes: { i: [], g: [] },
   totalMesAño: 0,
   totalMesAñoPagados: 0,
@@ -44,19 +48,54 @@ export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
   parametros: {} as MovimientosMesAnioParams,
 
   mostrarMovimientos: async (p: MovimientosMesAnioParams) => {
-    const response = await MostrarMovimientosPorMesAño(p);
     set({ parametros: p });
+    const i = p.tipocategoria === "i" || p.tipocategoria === "b" ?
+      await MostrarMovimientosPorMesAño({ ...p, tipocategoria: "i" }) || [] : [];
+    const g = p.tipocategoria === "g" || p.tipocategoria === "b" ?
+      await MostrarMovimientosPorMesAño({ ...p, tipocategoria: "g" }) || [] : [];
+    const response = { i, g };
+
     const { calcularTotales } = get();
     if (response) calcularTotales(response);
-    set({ datamovimientos: response || [] });
+
+    console.log(response);
+    
+    set({ datamovimientos: { i: i || [], g: g || [] } });
     return response;
   },
 
-  calcularTotales: (response: MovimientosMesAnio): void => {
-    const dtPagados = response?.filter(item => Number(item.estado) === 1);
-    const dtPendientes = response?.filter(item => Number(item.estado) === 0);
+  calcularTotales: (data: DataMovimientos): void => {
+    const { parametros } = get();
+    
+    if (parametros.tipocategoria === "b") {
+      const totalIngresos = data.i?.reduce((sum, item) => sum + Number(item.valor), 0) || 0;
+      const totalGastos = data.g?.reduce((sum, item) => sum + Number(item.valor), 0) || 0;
+      
+      const ingPagados = data.i?.filter(item => Number(item.estado) === 1)
+        .reduce((sum, item) => sum + Number(item.valor), 0) || 0;
+      const gasPagados = data.g?.filter(item => Number(item.estado) === 1)
+        .reduce((sum, item) => sum + Number(item.valor), 0) || 0;
+      
+      const ingPendientes = data.i?.filter(item => Number(item.estado) === 0)
+        .reduce((sum, item) => sum + Number(item.valor), 0) || 0;
+      const gasPendientes = data.g?.filter(item => Number(item.estado) === 0)
+        .reduce((sum, item) => sum + Number(item.valor), 0) || 0;
 
-    const total = response?.reduce((sum, item) => sum + Number(item.valor), 0) || 0;
+      set({
+        totalMesAño: totalIngresos - totalGastos,
+        totalMesAñoPagados: ingPagados - gasPagados,
+        totalMesAñoPendientes: ingPendientes - gasPendientes
+      });
+      return;
+    }
+
+    const tipo = parametros.tipocategoria === "i" ? "i" : "g";
+    const movimientos = data[tipo];
+
+    const dtPagados = movimientos?.filter(item => Number(item.estado) === 1);
+    const dtPendientes = movimientos?.filter(item => Number(item.estado) === 0);
+
+    const total = movimientos?.reduce((sum, item) => sum + Number(item.valor), 0) || 0;
     const tpagados = dtPagados?.reduce((sum, item) => sum + Number(item.valor), 0) || 0;
     const tpendientes = dtPendientes?.reduce((sum, item) => sum + Number(item.valor), 0) || 0;
 
@@ -89,7 +128,7 @@ export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
     set({ rptParams: p });
     const i = p.tipocategoria === "i" || p.tipocategoria === "b" ?
       await RptMovimientosPorMesAño({ ...p, tipocategoria: "i" }) || [] : [];
-    const g = p.tipocategoria === "i" || p.tipocategoria === "b" ?
+    const g = p.tipocategoria === "g" || p.tipocategoria === "b" ?
       await RptMovimientosPorMesAño({ ...p, tipocategoria: "g" }) || [] : [];
     const response = { i, g };
     set({ dataRptMovimientosAñoMes: { i: i || [], g: g || [] } });
