@@ -18,7 +18,7 @@ interface DataRptMovimientosAñoMes {
   i: RptMovimientosMesAnio;
   g: RptMovimientosMesAnio;
 }
-interface DataMovimientos {
+export interface DataMovimientos {
   i: MovimientosMesAnio;
   g: MovimientosMesAnio;
 }
@@ -57,9 +57,6 @@ export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
 
     const { calcularTotales } = get();
     if (response) calcularTotales(response);
-
-    console.log(response);
-    
     set({ datamovimientos: { i: i || [], g: g || [] } });
     return response;
   },

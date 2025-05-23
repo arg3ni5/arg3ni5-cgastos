@@ -7,52 +7,22 @@ import 'dayjs/locale/es';
 
 dayjs.locale('es');
 
-interface CalendarioLinealProps {
-  value: Dayjs;
-  setValue: (value: Dayjs) => void;
-}
-
-export const CalendarioLineal = ({
-  value,
-  setValue,
-}: CalendarioLinealProps): JSX.Element => {
-  const { colorCategoria, setMes, setAño } = useOperaciones();
-
-  const IniciarCalendario = (): void => {
-    setValue(dayjs());
-    setMes(dayjs().month() + 1);
-    setAño(dayjs().year());
-  };
-
-  const adelante = (): void => {
-    setValue(value.add(1, 'month'));
-    setMes(value.month() + 2);
-    setAño(value.year());
-  };
-
-  const atras = (): void => {
-    setValue(value.subtract(1, 'month'));
-    setMes(value.month());
-    setAño(value.year());
-  };
-
-  useEffect(() => {
-    IniciarCalendario();
-  }, []);
+export const CalendarioLineal = (): JSX.Element => {
+  const { colorCategoria, setToday, date, addMonth, substractMonth } = useOperaciones();
 
   return (
     <Container className="wrapper" $colortext={colorCategoria}>
       <header>
 
         <div className="subcontainer">
-          <span onClick={atras} className="atras">
+          <span onClick={substractMonth} className="atras">
             <MdArrowBackIos />
           </span>
           <section className="contentValue">
-            <p>{ConvertirCapitalize(value.format('MMMM YYYY'))}</p>
+            <p onClick={setToday}>{ConvertirCapitalize(date.format('MMMM YYYY'))}</p>
           </section>
 
-          <span onClick={adelante} className="adelante">
+          <span onClick={addMonth} className="adelante">
             <MdOutlineNavigateNext />
           </span>
         </div>
@@ -65,7 +35,7 @@ interface ContainerProps {
   $colortext: string;
 }
 const Container = styled.div<ContainerProps>`
-  width: 450px;
+  width: 100%;
   border-radius: 10px;
   height: 100%;
   display: flex;
