@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import { v } from "../styles/variables";
+import dayjs, { Dayjs } from 'dayjs';
+
 export interface Tipo {
   tipo: string;
   text: string;
@@ -15,10 +17,11 @@ interface OperacionesState {
   tituloBtnDesMovimientos: string;
   colorCategoria: string;
   bgCategoria: string;
-  año: number;
-  mes: number;
-  setMes: (p: number) => void;
-  setAño: (p: number) => void;
+  date: Dayjs;
+  setToday: () => void;
+  addMonth: () => void;
+  substractMonth: () => void;
+  setDate: (p: Dayjs) => void;
   setTipoMovimientos: (p: Tipo) => void;
   setTipoCuenta: (p: Tipo) => void;
   setTipo: (p: Tipo) => void;
@@ -33,13 +36,20 @@ export const useOperaciones = create<OperacionesState>((set, get) => ({
   tituloBtnDesCuentas: "Categorias Debito",
   colorCategoria: v.colorIngresos,
   bgCategoria: v.colorbgingresos,
-  año: (new Date).getFullYear(),
-  mes: (new Date).getMonth() + 1,
-  setMes: (p: number) => {
-    set({ mes: p });
+  date: dayjs(),
+  setToday: () => {
+    set({ date: dayjs() });
   },
-  setAño: (p: number) => {
-    set({ año: p });
+  addMonth: () => {
+    const newValue = get().date.add(1, 'month');
+    set({ date: newValue });
+  },
+  substractMonth: () => {
+    const newValue = get().date.subtract(1, 'month');
+    set({ date: newValue });
+  },
+  setDate: (d: Dayjs) => {
+    set({ date: d });
   },
   setTipoMovimientos: (p: Tipo) => {
     set({

@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import { CalendarioLineal, Header, Tabs, ContentFiltros, Btndesplegable, ListaMenuDesplegable, DataDesplegableMovimientos, useOperaciones, Btnfiltro, v, Tipo } from "../../index";
 import { JSX, useState } from "react";
-import dayjs, { Dayjs } from "dayjs";
 export const InformesTemplate = (): JSX.Element => {
   const {
     setTipoMovimientos,
@@ -11,7 +10,6 @@ export const InformesTemplate = (): JSX.Element => {
   } = useOperaciones();
   const [stateTipo, setStateTipo] = useState<boolean>(false);
   const [state, setState] = useState<boolean>(false);
-  const [value, setValue] = useState<Dayjs>(dayjs(Date.now()));
   const openTipo = (): void => {
     setStateTipo(!stateTipo);
     setState(false);
@@ -54,8 +52,7 @@ export const InformesTemplate = (): JSX.Element => {
 
       </section>
       <section className="area2">
-        <CalendarioLineal value={value}
-          setValue={setValue} />
+        <CalendarioLineal/>
       </section>
       <section className="main">
         <Tabs />

@@ -1,64 +1,46 @@
 import styled from "styled-components";
 import {
   Header,
-  CalendarioLineal,
-  CardTotales,
-  useOperaciones,
-  v,
-  useMovimientosStore,
-  useUsuariosStore,
-  TablaMovimientos,
-  useCuentaStore,
-  useCategoriasStore,
-  DataDesplegableMovimientos,
   ContentFiltros,
   Btndesplegable,
+  useOperaciones,
   ListaMenuDesplegable,
   Btnfiltro,
-  RegistrarMovimientos,
-  Movimiento,
-  Accion,
+  v,
+  Lottieanimacion,
   Tipo,
+  Categoria,
+  Accion,
+  Movimiento,
+  TablaMovimientos,
+  useMovimientosStore,
+  RegistrarMovimientos,
+  CardTotales,
+  Device,
+  CalendarioLineal,
+  DataDesplegableMovimientos,
 } from "../../index";
-import { Device } from "../../styles/breakpoints";
+import { JSX, useState } from "react";
+import vacioverde from "../../assets/vacioverde.json";
+import vaciorojo from "../../assets/vaciorojo.json";
 import dayjs from "dayjs";
-import { JSX, useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+
 
 export const MovimientosTemplate = (): JSX.Element => {
-  // Update the state definition with a default value
-  const [dataSelect, setDataSelect] = useState<Movimiento | undefined>(undefined);
-  const [accion, setAccion] = useState<Accion>("Nuevo");
   const [openRegistro, setOpenRegistro] = useState(false);
-  const [value, setValue] = useState(dayjs(Date.now()));
+  const [accion, setAccion] = useState<Accion>("Nuevo");
   const [state, setState] = useState(false);
   const [stateTipo, setStateTipo] = useState(false);
-  const {
-    setTipoMovimientos,
-    tipo,
-    colorCategoria,
-    año,
-    mes,
-    bgCategoria,
-    tituloBtnDesMovimientos,
-  } = useOperaciones();
-  useEffect(() => {
-
-  }, [])
-  const { idusuario } = useUsuariosStore();
+  const [date, setDate] = useState(dayjs());
+  const { colorCategoria, bgCategoria, setTipoMovimientos, tipo, tituloBtnDesMovimientos } = useOperaciones();
   const {
     totalMesAño,
     totalMesAñoPagados,
     totalMesAñoPendientes,
-    mostrarMovimientos,
     datamovimientos,
   } = useMovimientosStore();
-  const { mostrarCuentas } = useCuentaStore();
-  const { mostrarCategorias } = useCategoriasStore();
-  const openTipo = (): void => {
-    setStateTipo(!stateTipo);
-    setState(false);
-  };
+
+  const [dataSelect, setDataSelect] = useState<Movimiento | undefined>(undefined);
 
   const cambiarTipo = (p: Tipo): void => {
     setTipoMovimientos(p);
@@ -66,35 +48,27 @@ export const MovimientosTemplate = (): JSX.Element => {
     setState(false);
   };
 
+  const cerrarDesplegables = (): void => {
+    setStateTipo(false);
+    setState(false);
+  };
+
+  const openTipo = (): void => {
+    setStateTipo(!stateTipo);
+    setState(false);
+  };
+  const openUser = (): void => {
+    setState(!state);
+    setStateTipo(false);
+  };
+
   const nuevoRegistro = (): void => {
     setOpenRegistro(!openRegistro);
     setAccion("Nuevo");
     setDataSelect(undefined);
   };
-
-  useQuery({
-    queryKey:
-      [
-        "mostrar movimientos mes año",
-        { año: año, mes: mes, idusuario: idusuario, tipocategoria: tipo },
-      ], queryFn:
-      () =>
-        mostrarMovimientos({
-          anio: año,
-          mes: mes,
-          iduser: idusuario,
-          tipocategoria: tipo,
-        }), refetchOnWindowFocus: false,
-  });
-  useQuery({ queryKey: ["mostrar cuentas"], queryFn: () => mostrarCuentas({ idusuario: idusuario }) });
-  useQuery({
-    queryKey: ["mostrar categorias", { idusuario: idusuario, tipo: tipo }], queryFn: () =>
-      mostrarCategorias({ idusuario: idusuario, tipo: tipo })
-  }
-  );
-
   return (
-    <Container>
+    <Container onClick={cerrarDesplegables}>
       {openRegistro && (
         <RegistrarMovimientos
           accion={accion}
@@ -105,12 +79,11 @@ export const MovimientosTemplate = (): JSX.Element => {
       )}
 
       <header className="header">
-        <Header
-          stateConfig={{ state: state, setState: () => setState(!state) }}
-        />
+        <Header stateConfig={{ state: state, setState: openUser }} />
       </header>
+
       <section className="tipo">
-        <ContentFiltros>
+      <ContentFiltros>
           <div
             onClick={(e) => {
               e.stopPropagation();
@@ -131,6 +104,7 @@ export const MovimientosTemplate = (): JSX.Element => {
             )}
           </div>
         </ContentFiltros>
+
         <ContentFiltro>
           <Btnfiltro
             funcion={nuevoRegistro}
@@ -140,6 +114,7 @@ export const MovimientosTemplate = (): JSX.Element => {
           />
         </ContentFiltro>
       </section>
+
       <section className="totales">
         <CardTotales
           total={totalMesAñoPendientes}
@@ -160,27 +135,38 @@ export const MovimientosTemplate = (): JSX.Element => {
           icono={<v.balance />}
         />
       </section>
+
       <section className="calendario">
-        <CalendarioLineal
-          value={value}
-          setValue={setValue}
-        />
+        <CalendarioLineal/>
       </section>
+
       <section className="main">
 
-        {(tipo == "i" || tipo == "b") &&
+        {(tipo == "i" || tipo == "b") && datamovimientos.i.length > 0 &&
           <TablaMovimientos
             data={datamovimientos.i}
             setOpenRegistro={setOpenRegistro}
             setDataSelect={setDataSelect}
             setAccion={setAccion} />}
 
-        {(tipo == "g" || tipo == "b") &&
+        {(tipo == "g" || tipo == "b") && datamovimientos.g.length > 0 &&
           <TablaMovimientos
             data={datamovimientos.g}
             setOpenRegistro={setOpenRegistro}
             setDataSelect={setDataSelect}
             setAccion={setAccion} />}
+
+            
+        {(
+          tipo == "i" && datamovimientos.i.length == 0 ||
+          tipo == "g" && datamovimientos.g.length == 0
+        ) && (
+            <Lottieanimacion
+              alto="300"
+              ancho="300"
+              animacion={tipo == "i" ? vacioverde : vaciorojo}
+            />
+          )}
       </section>
     </Container>
   );
@@ -199,15 +185,6 @@ const Container = styled.div`
     "calendario" 100px
     "main" auto;
 
-    @media ${Device.tablet} {
-      grid-template:
-    "header" 100px
-    "tipo" 100px
-    "totales" 100px
-    "calendario" 100px
-    "main" auto;
-    }
-
   .header {
     grid-area: header;
     /* background-color: rgba(103, 93, 241, 0.14); */
@@ -221,7 +198,7 @@ const Container = styled.div`
     align-items: center;
     justify-content: space-between;
   }
-  .totales {
+    .totales {
     grid-area: totales;
   //  background-color: rgba(229, 26, 165, 0.14);
     display: grid;
@@ -233,16 +210,23 @@ const Container = styled.div`
       grid-template-columns: repeat(3, 1fr);
     }
   }
-  .calendario {
+    .calendario {
     grid-area: calendario;
    // background-color: rgba(77, 237, 106, 0.14);
     display: flex;
     align-items: center;
     justify-content: center;
   }
+  .area2 {
+    grid-area: area2;
+    /* background-color: rgba(77, 237, 106, 0.14); */
+    display: flex;
+    align-items: center;
+    justify-content: end;
+  }
   .main {
     grid-area: main;
-   // background-color: rgba(179, 46, 241, 0.14);
+    /* background-color: rgba(179, 46, 241, 0.14); */
   }
 `;
 const ContentFiltro = styled.div`
