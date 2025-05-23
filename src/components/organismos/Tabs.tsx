@@ -8,6 +8,7 @@ import {
   useOperaciones,
   useUsuariosStore,
   Barras,
+  DataRptMovimientosAñoMes,
 } from "../../index";
 import { useQuery } from "@tanstack/react-query";
 interface ContainerProps {
@@ -44,7 +45,7 @@ export const Tabs = (): JSX.Element => {
   };
 
   const { idusuario } = useUsuariosStore();
-  const { año, mes, tipo, tituloBtnDesMovimientos } = useOperaciones();
+  const { date, tipo, tituloBtnDesMovimientos } = useOperaciones();
   const { dataRptMovimientosAñoMes, rptMovimientosAñoMes, rptParams } = useMovimientosStore();
 
   const datagraficaG: DataGrafica = {
@@ -115,26 +116,22 @@ export const Tabs = (): JSX.Element => {
     ],
   };
 
-  const { isLoading, error } = useQuery({
-    queryKey: ["reporte movimientos", {
-      año,
-      mes,
-      tipocategoria: tipo,
-      idusuario,
-    }],
+  const { isLoading, error } = useQuery<DataRptMovimientosAñoMes | null, Error>({
+    queryKey: ['rptMovimientos', tipo, idusuario, date.format('YYYY-MM')],
     queryFn: () => rptMovimientosAñoMes({
-      anio: año,
-      mes,
+      anio: date.year(),
+      mes: date.month() + 1,
       tipocategoria: tipo,
       iduser: idusuario,
-    })
+    }),
+    enabled : date.month() + 1 !== rptParams.mes || date.year() !== rptParams.anio
   });
 
-  if (isLoading) return <h1>cargando</h1>;
+  if (isLoading) return <h1>Cargando</h1>;
   if (error) return <h1>Error</h1>;
 
   return (
-    <Container className="container" $activetab={`${activeTab}00%`}>  {/* Changed prop name here */}
+    <Container className="container" $activetab={`${activeTab}00%`}>
       <ul className="tabs">
         <li
           className={activeTab == 0 ? "active" : ""}
