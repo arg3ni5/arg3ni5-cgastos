@@ -14,7 +14,7 @@ import {
   ActualizarMovimientos
 } from "../index";
 
-interface DataRptMovimientosAñoMes {
+export interface DataRptMovimientosAñoMes {
   i: RptMovimientosMesAnio;
   g: RptMovimientosMesAnio;
 }
