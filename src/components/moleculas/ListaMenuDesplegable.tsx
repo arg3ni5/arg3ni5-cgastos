@@ -18,7 +18,7 @@ interface ListaMenuDesplegableProps {
 
 export function ListaMenuDesplegable({ data, top, funcion }: ListaMenuDesplegableProps) {
   return (
-    <Container top={top}>
+    <Container $top={top}>
       {data.map((item, index) => {
         return (
           <ItemsDesplegable
@@ -31,14 +31,14 @@ export function ListaMenuDesplegable({ data, top, funcion }: ListaMenuDesplegabl
     </Container>
   );
 }
-const Container = styled.div<{ top: string }>`
+const Container = styled.div<{ $top: string }>`
   padding: 10px;
   display: flex;
   flex-direction: column;
   position: absolute;
   background-color: ${({ theme }) => theme.bg3};
   border-radius: 22px;
-  top: ${(props) => props.top};
+  top: ${(props) => props.$top};
   box-shadow: ${() => v.boxshadowGray};
   z-index: 1;
 `;
