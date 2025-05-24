@@ -9,7 +9,6 @@ import {
   v,
   Lottieanimacion,
   Tipo,
-  Categoria,
   Accion,
   Movimiento,
   TablaMovimientos,
@@ -19,11 +18,11 @@ import {
   Device,
   CalendarioLineal,
   DataDesplegableMovimientos,
+  obtenerTitulo,
 } from "../../index";
 import { JSX, useState } from "react";
 import vacioverde from "../../assets/vacioverde.json";
 import vaciorojo from "../../assets/vaciorojo.json";
-import dayjs from "dayjs";
 
 
 export const MovimientosTemplate = (): JSX.Element => {
@@ -31,7 +30,6 @@ export const MovimientosTemplate = (): JSX.Element => {
   const [accion, setAccion] = useState<Accion>("Nuevo");
   const [state, setState] = useState(false);
   const [stateTipo, setStateTipo] = useState(false);
-  const [date, setDate] = useState(dayjs());
   const { colorCategoria, bgCategoria, setTipoMovimientos, tipo, tituloBtnDesMovimientos } = useOperaciones();
   const {
     totalMesAño,
@@ -83,7 +81,7 @@ export const MovimientosTemplate = (): JSX.Element => {
       </header>
 
       <section className="tipo">
-      <ContentFiltros>
+        <ContentFiltros>
           <div
             onClick={(e) => {
               e.stopPropagation();
@@ -118,13 +116,13 @@ export const MovimientosTemplate = (): JSX.Element => {
       <section className="totales">
         <CardTotales
           total={totalMesAñoPendientes}
-          title={tipo == "g" ? "Gastos pendientes" : "Ingresos pendientes"}
+          title={obtenerTitulo(tipo, "pendientes")}
           color={colorCategoria}
           icono={<v.flechaarribalarga />}
         />
         <CardTotales
           total={totalMesAñoPagados}
-          title={tipo == "g" ? "Gastos pagados" : "Ingresos pagados"}
+          title={obtenerTitulo(tipo, "pagados")}
           color={colorCategoria}
           icono={<v.flechaabajolarga />}
         />
@@ -137,33 +135,36 @@ export const MovimientosTemplate = (): JSX.Element => {
       </section>
 
       <section className="calendario">
-        <CalendarioLineal/>
+        <CalendarioLineal />
       </section>
 
       <section className="main">
 
-        {(tipo == "i" || tipo == "b") && datamovimientos.i.length > 0 &&
+        {(tipo == "i" || tipo == "b")
+          && datamovimientos.i?.length > 0 &&
           <TablaMovimientos
             data={datamovimientos.i}
             setOpenRegistro={setOpenRegistro}
             setDataSelect={setDataSelect}
-            setAccion={setAccion} />}
+            setAccion={setAccion} />
+        }
 
-        {(tipo == "g" || tipo == "b") && datamovimientos.g.length > 0 &&
+        {(tipo == "g" || tipo == "b")
+          && datamovimientos.g.length > 0 &&
           <TablaMovimientos
             data={datamovimientos.g}
             setOpenRegistro={setOpenRegistro}
             setDataSelect={setDataSelect}
-            setAccion={setAccion} />}
+            setAccion={setAccion} />
+        }
 
-            
         {(
           tipo == "i" && datamovimientos.i.length == 0 ||
           tipo == "g" && datamovimientos.g.length == 0
         ) && (
             <Lottieanimacion
-              alto="300"
-              ancho="300"
+              alto={300}
+              ancho={300}
               animacion={tipo == "i" ? vacioverde : vaciorojo}
             />
           )}

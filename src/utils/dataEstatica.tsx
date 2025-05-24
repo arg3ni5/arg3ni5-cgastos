@@ -76,6 +76,17 @@ export const DataDesplegableMovimientos = [
   },
 ];
 
+const titulosPorTipo = {
+  g: "Gastos",
+  i: "Ingresos",
+  b: "Balance",
+} as const;
+
+export const obtenerTitulo = (tipo: keyof typeof titulosPorTipo, estado: "pendientes" | "pagados") => {
+  return `${titulosPorTipo[tipo]} ${estado}`;
+}
+
+
 //data SIDEBAR
 export const LinksArray = [
   {
