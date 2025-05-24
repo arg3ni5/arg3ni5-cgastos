@@ -40,8 +40,8 @@ interface MovimientosState {
 
 export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
   rptParams: {} as RptMovimientosMesAnioParams,
-  datamovimientos: { i: [], g: [] },
-  dataRptMovimientosAñoMes: { i: [], g: [] },
+  datamovimientos: {} as DataMovimientos,
+  dataRptMovimientosAñoMes: {} as DataRptMovimientosAñoMes,
   totalMesAño: 0,
   totalMesAñoPagados: 0,
   totalMesAñoPendientes: 0,
@@ -55,7 +55,10 @@ export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
       await MostrarMovimientosPorMesAño({ ...p, tipocategoria: "g" }) || [] : [];
     const response = { i, g };
 
-    const { calcularTotales } = get();
+    
+    
+    const { calcularTotales, datamovimientos } = get();
+    console.log('mostrarMovimientos', datamovimientos);
     if (response) calcularTotales(response);
     set({ datamovimientos: { i: i || [], g: g || [] } });
     return response;

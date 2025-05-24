@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export const Movimientos = () => {
   const { tipo, date } = useOperaciones();
-  const { mostrarMovimientos } = useMovimientosStore();
+  const { mostrarMovimientos, datamovimientos } = useMovimientosStore();
   const { datausuarios } = useUsuariosStore();
 
   // Cargar movimientos
@@ -23,7 +23,7 @@ export const Movimientos = () => {
         iduser: datausuarios?.id ?? 0,
         tipocategoria: tipo,
       }),
-    enabled: !!datausuarios?.id && !!(date.month() + 1) && !!date.year(),
+    enabled: datamovimientos == null || !!datausuarios?.id && !!(date.month() + 1) && !!date.year(),
   });
 
   if (loadingMovimientos) return <SpinnerLoader />;
