@@ -71,7 +71,7 @@ export const InsertarUsuarios = async (
  */
 export const obtenerUsuarioActual = async (): Promise<Usuario> => {
   const idAuthSupabase = await ObtenerIdAuthSupabase();
-  if (!idAuthSupabase) throw new Error("ID auth no disponible");
+  if (!idAuthSupabase) return {} as Usuario;
 
   const { data, error } = await supabase
     .from("usuarios")
