@@ -1,27 +1,40 @@
-import React, { useState } from "react";
+import { JSX, useState } from "react";
 import { v } from "../../../styles/variables";
 import styled from "styled-components";
 import { useOperaciones } from "../../../index";
-export const Paginacion = ({ pagina, setPagina, maximo }) => {
+interface PaginacionProps {
+  color?: string;
+  pagina: number;
+  setPagina: (pagina: number) => void;
+  maximo: number;
+}
+
+interface ContainerProps {
+  $bgCategoria: string;
+  $colorCategoria: string;
+}
+
+export const Paginacion = ({ pagina, setPagina, maximo, color}: PaginacionProps): JSX.Element => {
   const { bgCategoria, colorCategoria } = useOperaciones();
-  const [input, setInput] = useState(1);
+  const [input, setInput] = useState<number>(1);
 
-  const nextPage = () => {
-    setInput(parseInt(input) + 1);
-    setPagina(parseInt(pagina) + 1);
+  const nextPage = (): void => {
+    setInput(parseInt(input.toString()) + 1);
+    setPagina(parseInt(pagina.toString()) + 1);
   };
 
-  const previousPage = () => {
-    setInput(parseInt(input) - 1);
-    setPagina(parseInt(pagina) - 1);
+  const previousPage = (): void => {
+    setInput(parseInt(input.toString()) - 1);
+    setPagina(parseInt(pagina.toString()) - 1);
   };
-  const inicio = () => {
+
+  const inicio = (): void => {
     setInput(1);
     setPagina(1);
   };
 
   return (
-    <Container $bgCategoria={bgCategoria} $colorCategoria={colorCategoria}>
+    <Container $bgCategoria={bgCategoria} $colorCategoria={color || colorCategoria}>
       <button onClick={inicio}>
         <span>{<v.iconotodos />}</span>
       </button>
@@ -40,7 +53,7 @@ export const Paginacion = ({ pagina, setPagina, maximo }) => {
   );
 };
 
-const Container = styled.div`
+const Container = styled.div<ContainerProps>`
   display: flex;
   align-items: center;
   justify-content: center;

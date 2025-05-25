@@ -13,19 +13,19 @@ import {
 import { useState } from "react";
 
 export function ConfiguracionTemplate() {
-  const { datausuarios, editartemamonedauser } = useUsuariosStore();
+  const { usuario, editartemamonedauser } = useUsuariosStore();
   const [select, setSelect] = useState([]);
   const [selectTema, setSelecttema] = useState([]);
   const [state, setState] = useState(false);
   const [stateListaPaises, setStateListaPaises] = useState(false);
   const [stateListaTemas, setStateListaTemas] = useState(false);
   //pais moneda
-  const moneda = select.symbol ? select.symbol : datausuarios.moneda;
-  const pais = select.countryName ? select.countryName : datausuarios.pais;
+  const moneda = select.symbol ? select.symbol : usuario.moneda;
+  const pais = select.countryName ? select.countryName : usuario.pais;
   const paisSeleccionado = "🐷 " + moneda + " " + pais;
   //tema
-  const iconobd = datausuarios.tema === "0" ? "🌞" : "🌚";
-  const temabd = datausuarios.tema === "0" ? "light" : "dark";
+  const iconobd = usuario.tema === "0" ? "🌞" : "🌚";
+  const temabd = usuario.tema === "0" ? "light" : "dark";
   const temainicial = selectTema.tema ? selectTema.tema : temabd;
   const iconoinicial = selectTema.icono ? selectTema.icono : iconobd;
   const temaSeleccionado = iconoinicial + " " + temainicial;
@@ -36,7 +36,7 @@ export function ConfiguracionTemplate() {
       tema: themeElegido,
       moneda: moneda,
       pais: pais,
-      id: datausuarios.id,
+      id: usuario.id,
     };
     await editartemamonedauser(p);
   };

@@ -12,7 +12,7 @@ interface CuentasTemplateProps {
 export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 	const [state, setState] = useState(false);
 	const [openRegistro, setOpenRegistro] = useState(false);
-	const { datausuarios } = useUsuariosStore();
+	const { usuario } = useUsuariosStore();
 	const { mostrarCuentas, insertarCuenta, actualizarCuenta, eliminarCuenta } = useCuentaStore();
 	const [accion, setAccion] = useState("");
 	const [dataSelect, setDataSelect] = useState<CuentaInsert | CuentaUpdate>();
@@ -47,14 +47,14 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 	};
 
 	const { isLoading, error } = useQuery({
-		queryKey: ["mostrar cuentas", datausuarios?.id],
+		queryKey: ["mostrar cuentas", usuario?.id],
 		queryFn: () => {
-			if (!datausuarios?.id) {
+			if (!usuario?.id) {
 				throw new Error('User ID is not available');
 			}
-			return mostrarCuentas({ idusuario: datausuarios.id });
+			return mostrarCuentas({ idusuario: usuario.id });
 		},
-		enabled: !!datausuarios?.id,
+		enabled: !!usuario?.id,
 	});
 
 	const handleUpdate = async (cuenta: CuentaUpdate) => {
@@ -160,7 +160,7 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 									<span className="icon">{cuenta.icono}</span>
 									<h3>{cuenta.descripcion}</h3>
 								</div>
-								<p className="balance">{datausuarios?.moneda} {cuenta.saldo_actual?.toFixed(2)}</p>
+								<p className="balance">{usuario?.moneda} {cuenta.saldo_actual?.toFixed(2)}</p>
 								<div className="card-actions">
 									<button onClick={() => handleUpdate(cuenta)}>✏️</button>
 									<button onClick={() => handleDelete(cuenta.id)}>🗑️</button>

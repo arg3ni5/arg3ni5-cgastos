@@ -16,10 +16,7 @@ import img2 from "../../assets/Ruleta/ruleta8.png";
 import img3 from "../../assets/Ruleta/ruleta5.png";
 import img4 from "../../assets/Ruleta/ruleta6.png";
 import img5 from "../../assets/Ruleta/ruleta7.png";
-import Arrow from "../../assets/Arrow.svg";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-console.log("Ruta del Arrow SVG:", Arrow);
-
 
 export const Carousel: FC = () => {
   const prevRef = useRef(null);

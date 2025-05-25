@@ -13,6 +13,9 @@ import { JSX, useState } from "react";
 import { convertToMovimiento } from '../../../supabase/crudMovimientos';
 
 interface TablaMovimientosProps {
+  titulo?: string;
+  tipo: string;
+  color: string;
   data: MovimientosMesAnio | null;
   setOpenRegistro: (value: boolean) => void;
   setDataSelect: (data: Movimiento) => void;
@@ -20,6 +23,9 @@ interface TablaMovimientosProps {
 }
 
 export const TablaMovimientos = ({
+  titulo,
+  tipo,
+  color,
   data,
   setOpenRegistro,
   setDataSelect,
@@ -54,13 +60,14 @@ export const TablaMovimientos = ({
 
   const editar = (data: Movimiento): void => {
     setOpenRegistro(true);
-    setDataSelect(data);
+    setDataSelect({...data, tipo: tipo});
     setAccion("Editar");
   };
 
   return (
     <>
       <Container>
+        {titulo && (<h2>{titulo}</h2>)}
         <table className="responsive-table">
           <thead>
             <tr>
@@ -100,7 +107,7 @@ export const TablaMovimientos = ({
             })}
           </tbody>
         </table>
-        <Paginacion pagina={pagina} setPagina={setPagina} maximo={maximo} />
+        <Paginacion pagina={pagina} setPagina={setPagina} maximo={maximo} color={color}/>
       </Container>
     </>
   );
