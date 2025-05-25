@@ -1,21 +1,24 @@
-import Swal from "sweetalert2";
-import { supabase, ObtenerIdAuthSupabase, Database } from "../index";
+import { supabase } from "../index";
+import { ObtenerIdAuthSupabase } from "./authHelpers";
+import { Database } from "../types/supabase"; // Ajustá el path si es distinto
 
-type Usuario = Database["public"]["Tables"]["usuarios"]["Row"];
-type UsuarioInsert = Database["public"]["Tables"]["usuarios"]["Insert"];
+export type Usuario = Database["public"]["Tables"]["usuarios"]["Row"];
+export type UsuarioInsert = Database["public"]["Tables"]["usuarios"]["Insert"];
+export type UsuarioUpdate = Database["public"]["Tables"]["usuarios"]["Update"];
 
-
+/**
+ * Consulta un usuario por su ID auth.
+ */
 export const ConsultarUsuario = async (
-  idAuthSupabase: string | undefined
+  idAuthSupabase?: string
 ): Promise<{ data: Usuario | null; error: string | null }> => {
   try {
-    if (idAuthSupabase === undefined) {
-      const id = await ObtenerIdAuthSupabase();
-      if (id !== null) {
-        idAuthSupabase = id;
-      }
+    if (!idAuthSupabase) {
+      const authId = await ObtenerIdAuthSupabase();
+      idAuthSupabase = authId ?? undefined;
     }
-    if (idAuthSupabase === null || idAuthSupabase === undefined) {
+
+    if (!idAuthSupabase) {
       return { data: null, error: "No se pudo obtener el idAuthSupabase" };
     }
 
@@ -27,18 +30,16 @@ export const ConsultarUsuario = async (
 
     return { data, error: error?.message || null };
   } catch (error) {
-    console.log(
-      "ConsultarUsuario",
-      (error as Error).message || "An unknown error occurred"
-    );
     return { data: null, error: (error as Error).message };
   }
 };
 
-
+/**
+ * Inserta un usuario si no existe.
+ */
 export const InsertarUsuarios = async (
   p: UsuarioInsert,
-  idAuthSupabase: string | undefined
+  idAuthSupabase?: string
 ): Promise<Usuario | null> => {
   try {
     const { data: existingUser, error } = await ConsultarUsuario(idAuthSupabase);
@@ -58,66 +59,40 @@ export const InsertarUsuarios = async (
       return newUser;
     }
 
-    console.log("El usuario ya existe en la base de datos");
     return existingUser;
   } catch (error) {
-    console.log(
-      "InsertarUsuarios",
-      (error as any).error_description ||
-      (error as Error).message ||
-      "An unknown error occurred"
-    );
+    console.error("InsertarUsuarios", error);
     return null;
   }
 };
 
+/**
+ * Retorna el usuario actual desde la tabla.
+ */
+export const obtenerUsuarioActual = async (): Promise<Usuario> => {
+  const idAuthSupabase = await ObtenerIdAuthSupabase();
+  if (!idAuthSupabase) throw new Error("ID auth no disponible");
 
-export const MostrarUsuarios = async (): Promise<Usuario | null> => {
-  try {
-    const idAuthSupabase = await ObtenerIdAuthSupabase();
-    if (!idAuthSupabase) {
-      return null;
-    }
+  const { data, error } = await supabase
+    .from("usuarios")
+    .select()
+    .eq("idauth_supabase", idAuthSupabase)
+    .maybeSingle();
 
-    const { error, data } = await supabase
-      .from("usuarios")
-      .select()
-      .eq("idauth_supabase", idAuthSupabase)
-      .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("Usuario no encontrado");
 
-    if (error) {
-      console.error("MostrarUsuarios", error);
-    }
-
-    return data || null;
-  } catch (error) {
-    alert(
-      ((error as any).error_description || (error as Error).message) +
-      " MostrarUsuarios"
-    );
-    return null;
-  }
+  return data as Usuario;
 };
 
-
-export async function EditarTemaMonedaUser(p: Partial<Usuario> & { id: number }): Promise<void> {
-  try {
-    const { error } = await supabase.from("usuarios").update(p).eq("id", p.id);
-    if (error) {
-      alert(`Error al editar usuarios: ${error.message}`);
-      return;
-    }
-
-    Swal.fire({
-      icon: "success",
-      title: "Datos modificados",
-      showConfirmButton: false,
-      timer: 1500,
-    });
-  } catch (error) {
-    alert(
-      ((error as any).error_description || (error as Error).message) +
-      " EditarTemaMonedaUser"
-    );
+/**
+ * Edita el tema o moneda de un usuario.
+ */
+export const editarTemaMonedaUser = async (
+  p: Partial<Usuario> & { id: number }
+): Promise<void> => {
+  const { error } = await supabase.from("usuarios").update(p).eq("id", p.id);
+  if (error) {
+    throw new Error(`Error al editar usuarios: ${error.message}`);
   }
-}
+};

@@ -80,7 +80,7 @@ export * from './supabase/crudConexiones';
 export * from './supabase/crudCuentas';
 export * from './supabase/crudMovimientos';
 export * from './supabase/crudUsuarios';
-export * from './supabase/globalSupabase';
+export * from './supabase/authHelpers';
 export * from './supabase/supabase.config';
 export * from './types/supabase';
 export * from './types/types';

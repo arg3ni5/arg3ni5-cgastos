@@ -1,8 +1,7 @@
 // @barrel ignore
-
-import { MyRoutes, Sidebar, Device, Light, Dark, AuthContextProvider, Menuambur, useUsuariosStore, Login, SpinnerLoader } from "./index";
+import { MyRoutes, Sidebar, Device, Light, Dark, AuthContextProvider, Menuambur, useUsuariosStore, Login, SpinnerLoader, obtenerUsuarioActual } from "./index";
 import { useLocation } from "react-router-dom";
-import { createContext, JSX, useState } from "react";
+import { createContext, JSX, useEffect, useState } from "react";
 import { ThemeProvider } from "styled-components";
 import { styled } from "styled-components";
 import { useQuery } from "@tanstack/react-query";
@@ -10,26 +9,33 @@ import { LoadingProvider } from "./context/LoadingContext";
 
 type ThemeContextType = typeof Dark | null;
 
+
+
 export const ThemeContext = createContext<ThemeContextType>(null);
 function App(): JSX.Element {
-  const { mostrarUsuarios, datausuarios } = useUsuariosStore();
-
-  const { pathname } = useLocation();
-  // const [theme, setTheme] = useState("dark");
-  const theme = datausuarios?.tema === "0" ? "light" : "dark";
-  const themeStyle = theme === "light" ? Light : Dark;
+  const { setUsuario } = useUsuariosStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { pathname } = useLocation();
 
-  const { isLoading, error } = useQuery({ queryKey: ["mostrar usuarios"], queryFn: () => mostrarUsuarios() });
+  const { data: usuario, isLoading, error } = useQuery({
+    queryKey: ["mostrar usuarios"],
+    queryFn: obtenerUsuarioActual,
+  });  
 
-  if (isLoading) {
-    console.log(isLoading);
+  useEffect(() => {
+    if (usuario) {
+      setUsuario(usuario);
+    }
+  }, [usuario]);
+  
 
-    return <SpinnerLoader />;
-  }
-  if (error) {
-    return <h1>Error..</h1>;
-  }
+  if (pathname !== "/login" && isLoading) return <SpinnerLoader />;
+  if (error) return <h1>Error: {error.message}</h1>;
+
+  const theme = usuario?.tema === "0" ? "light" : "dark";
+
+  const themeStyle = theme === "light" ? Light : Dark;
+
 
   return (
     <>
