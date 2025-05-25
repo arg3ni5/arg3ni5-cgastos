@@ -95,7 +95,7 @@ export const CategoriasTemplate = ({ data }: CategoriasTemplateProps): JSX.Eleme
             )}
           </div>
         </ContentFiltros>
-        
+
         <ContentFiltro>
           <Btnfiltro
             funcion={nuevoRegistro}
@@ -114,12 +114,15 @@ export const CategoriasTemplate = ({ data }: CategoriasTemplateProps): JSX.Eleme
           />
         )}
 
-        <TablaCategorias
-          data={data}
-          setOpenRegistro={setOpenRegistro}
-          setdataSelect={setDataSelect}
-          setAccion={setAccion}
-        />
+        {Array.isArray(data) && data.length > 0 && (
+          <TablaCategorias
+            data={data}
+            setOpenRegistro={setOpenRegistro}
+            setdataSelect={setDataSelect}
+            setAccion={setAccion}
+          />
+        )}
+
       </section>
     </Container>
   );
