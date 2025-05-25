@@ -14,7 +14,7 @@ interface CategoriaStore {
   datacategoria: Categoria[] | null;
   categoriaItemSelect: Categoria | null;
   parametros: Record<string, any>;
-  mostrarCategorias: (p: any) => Promise<Categoria[]>;
+  mostrarCategorias: (p: CategoriaQueryParams) => Promise<Categoria[]>;
   selectCategoria: (p: Categoria) => void;
   insertarCategorias: (p: CategoriaInsert) => Promise<void>;
   eliminarCategoria: (p: CategoriaQueryParams) => Promise<void>;
@@ -42,24 +42,24 @@ export const useCategoriasStore = create<CategoriaStore>((set, get) => ({
   insertarCategorias: async (p) => {
     await InsertarCategorias(p);
     const { mostrarCategorias, parametros } = get();
-    await mostrarCategorias(parametros);
+    await mostrarCategorias(parametros as CategoriaQueryParams);
   },
 
   eliminarCategoria: async (p: CategoriaQueryParams) => {
     await EliminarCategorias(p);
     const { mostrarCategorias, parametros } = get();
-    await mostrarCategorias(parametros);
+    await mostrarCategorias(parametros as CategoriaQueryParams);
   },
 
   eliminarCategoriasTodas: async (p: CategoriaQueryParams) => {
     await EliminarCategoriasTodas(p);
     const { mostrarCategorias, parametros } = get();
-    await mostrarCategorias(parametros);
+    await mostrarCategorias(parametros as CategoriaQueryParams);
   },
 
   editarCategoria: async (p: CategoriaUpdate) => {
     await EditarCategorias(p);
     const { mostrarCategorias, parametros } = get();
-    await mostrarCategorias(parametros);
+    await mostrarCategorias(parametros as CategoriaQueryParams);
   },
 }));

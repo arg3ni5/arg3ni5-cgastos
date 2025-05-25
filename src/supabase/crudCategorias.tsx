@@ -67,6 +67,10 @@ export const EliminarCategorias = async (p: CategoriaQueryParams): Promise<void>
       showErrorMessage("ID is required");
       throw new Error("ID is required");
     }
+    if (!p.idusuario) {
+      showErrorMessage("ID usuario is required");
+      throw new Error("ID usuario is required");
+    }
     const { error } = await supabase
       .from("categorias")
       .delete()
