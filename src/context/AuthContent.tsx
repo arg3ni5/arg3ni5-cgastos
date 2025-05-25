@@ -1,48 +1,38 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { supabase, InsertarUsuarios, Database } from "../index";
-import { useLocation, useNavigate } from "react-router-dom";
 
 type UsuarioInsert = Database["public"]["Tables"]["usuarios"]["Insert"];
 
-
 interface AuthContextType {
   user: { name: string; picture: string } | null;
+  loading: boolean;
 }
-
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
 
 export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AuthContextType["user"]>(null);
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const [loading, setLoading] = useState(true);
 
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
-        if (session == null) {
+        if (!session) {
           setUser(null);
-          navigate("/login");
-        } else {
-          const metadata = session.user.user_metadata;
-
-          const user = {
-            name: metadata.name,
-            idauth_supabase: session.user.id,
-            picture: metadata.picture
-          };
-          
-          setUser(user);
-
-          await insertarUsuarios(user, session.user.id);
-          
-          if (pathname === "/login") {
-            navigate("/");
-            return; 
-          }
+          setLoading(false);
+          return;
         }
+
+        const metadata = session.user.user_metadata;
+        const user = {
+          name: metadata.name,
+          idauth_supabase: session.user.id,
+          picture: metadata.picture,
+        };
+
+        setUser(user);
+        await insertarUsuarios(user, session.user.id);
+        setLoading(false);
       }
     );
 
@@ -65,7 +55,7 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user }}>
+    <AuthContext.Provider value={{ user, loading }}>
       {children}
     </AuthContext.Provider>
   );
@@ -78,3 +68,4 @@ export const useUserAuth = (): AuthContextType => {
   }
   return context;
 };
+
