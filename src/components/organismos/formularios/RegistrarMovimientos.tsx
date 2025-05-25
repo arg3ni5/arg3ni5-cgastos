@@ -19,7 +19,11 @@ import {
   showErrorMessage,
   MovimientoUpdate,
   useUsuariosStore,
+  DataDesplegableMovimientos,
+  Tipo,
+  DataDesplegableMovimientosObj,
 } from "../../../index";
+import { useQuery } from "@tanstack/react-query";
 interface RegistrarMovimientosProps {
   setState: () => void;
   state: boolean;
@@ -34,16 +38,19 @@ interface FormInputs {
 }
 
 export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movimiento, accion }: RegistrarMovimientosProps): JSX.Element => {
+
+  const { tipo } = useOperaciones();
   const { cuentas, cuentaItemSelect, mostrarCuentas, selectCuenta } = useCuentaStore();
   const { idusuario } = useUsuariosStore();
-  const { datacategoria, categoriaItemSelect, selectCategoria, mostrarCategorias } = useCategoriasStore();
-  const { tipo } = useOperaciones();
+  const { categoriaItemSelect, selectCategoria, mostrarCategorias } = useCategoriasStore();
   const { insertarMovimientos, actualizarMovimientos } = useMovimientosStore();
 
   const [estado, setEstado] = useState<boolean>(true);
   //const [ignorar, setIgnorar] = useState<boolean>(false);
   const [stateCategorias, setStateCategorias] = useState<boolean>(false);
   const [stateCuenta, setStateCuenta] = useState<boolean>(false);
+  const [stateTipo, setStateTipo] = useState<boolean>(false);
+  const [tipoMovimiento, setTipoMovimiento] = useState<Tipo>(DataDesplegableMovimientosObj[dataSelect.tipo!] || { text: "", icono: "" });
   const fechaactual = new Date();
 
   const {
@@ -124,18 +131,22 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
     setEstado(e.target.checked);
   };
 
+  const cambiarTipo = (p: Tipo): void => {
+    setTipoMovimiento(p);
+    setStateTipo(!stateTipo);
+  };
+
   useEffect(() => {
     if (!cuentas?.length) {
       mostrarCuentas({ idusuario });
     }
   }, [cuentas, mostrarCuentas]);
 
-  useEffect(() => {
-    if (!datacategoria?.length) {
-      mostrarCategorias({ tipo: dataSelect.tipo || tipo, idusuario });
-    }
-  }, [dataSelect.tipo, datacategoria, mostrarCategorias]);
-
+  const { data: categorias, isLoading, isError } = useQuery({
+    queryKey: ["categorias", tipoMovimiento?.tipo, idusuario],
+    queryFn: () => mostrarCategorias({ tipo: tipoMovimiento?.tipo, idusuario }),
+    enabled: !!idusuario && !!tipoMovimiento?.tipo,
+  });
 
   return (
     <Container onClick={setState}>
@@ -144,7 +155,7 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
         onClick={(e) => { e.stopPropagation(); }}>
         <div className="encabezado">
           <div>
-            <h1>{accion} {tipo == "i" ? "ingreso" : "gasto"}</h1>
+            <h1>{accion} {tipoMovimiento.tipo == "i" ? "ingreso" : (tipoMovimiento.tipo === "g" ? "gasto" : "")}</h1>
           </div>
           <div>
             <span onClick={setState}>{<v.iconocerrar />}</span>
@@ -153,6 +164,31 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
 
         <form onSubmit={accion == "Nuevo" ? handleSubmit(insertar) : handleSubmit(actualizar)} className="formulario">
           <section>
+
+
+            <ContenedorDropdown>
+              <label>Tipo Movimiento: </label>
+              <Selector
+                color="#e14e19"
+                texto1={(tipoMovimiento?.tipo ? DataDesplegableMovimientosObj[tipoMovimiento.tipo].icono : tipoMovimiento?.text) || undefined}
+                texto2={(categoriaItemSelect?.tipo ? DataDesplegableMovimientosObj[categoriaItemSelect.tipo].text : tipoMovimiento?.text) || "Selecciones un tipo"}
+                funcion={() => setStateTipo(!stateTipo)}
+              />
+
+              {stateTipo && (
+                <ListaGenerica
+                  top="100%"
+                  btnClose={false}
+                  scroll="hidden"
+                  setState={() => setStateTipo(!stateTipo)}
+                  data={DataDesplegableMovimientos.filter(item => item.tipo != "b").map(item => ({
+                    descripcion: item.text,
+                    ...item,
+                  }))}
+                  funcion={cambiarTipo}
+                />
+              )}
+            </ContenedorDropdown>
             <WrapperPagoFecha>
 
               <ContainerFuepagado>
@@ -185,7 +221,6 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
               />
             </ContainerMonto>
 
-
             <div>
               <label>Descripción:</label>
               <InputText
@@ -196,7 +231,7 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
               />
             </div>
 
-            <ContainerCategoria>
+            <ContenedorDropdown>
               <label>Cuenta: </label>
               <Selector
                 color="#e14e19"
@@ -204,18 +239,18 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
                 texto2={cuentaItemSelect?.descripcion || "Seleccionar Cuenta"}
                 funcion={() => setStateCuenta(!stateCuenta)}
               />
-            </ContainerCategoria>
-            {stateCuenta && (
-              <ListaGenerica
-                bottom="23%"
-                scroll="scroll"
-                setState={() => setStateCuenta(!stateCuenta)}
-                data={cuentas}
-                funcion={selectCuenta}
-              />
-            )}
+              {stateCuenta && (
+                <ListaGenerica
+                  top="100%"
+                  scroll="auto"
+                  setState={() => setStateCuenta(!stateCuenta)}
+                  data={cuentas}
+                  funcion={selectCuenta}
+                />
+              )}
+            </ContenedorDropdown>
 
-            <ContainerCategoria>
+            <ContenedorDropdown>
               <label>Categoria: </label>
               <Selector
                 color="#e14e19"
@@ -223,21 +258,22 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
                 texto2={categoriaItemSelect?.descripcion || "Seleccionar Categoria"}
                 funcion={() => setStateCategorias(!stateCategorias)}
               />
-            </ContainerCategoria>
+
+              {stateCategorias && (
+                <ListaGenerica
+                  bottom="100%"
+                  scroll="auto"
+                  setState={() => setStateCategorias(!stateCategorias)}
+                  data={categorias?.map(cat => ({
+                    ...cat,
+                    descripcion: cat.descripcion || '',
+                    icono: cat.icono || ''
+                  })) || []}
+                  funcion={selectCategoria}
+                />
+              )}
+            </ContenedorDropdown>
           </section>
-          {stateCategorias && (
-            <ListaGenerica
-              bottom="23%"
-              scroll="scroll"
-              setState={() => setStateCategorias(!stateCategorias)}
-              data={datacategoria?.map(cat => ({
-                ...cat,
-                descripcion: cat.descripcion || '',
-                icono: cat.icono || ''
-              })) || []}
-              funcion={selectCategoria}
-            />
-          )}
 
           <div className="contentBtnsave">
             <Btnsave
@@ -383,7 +419,10 @@ const ContainerFuepagado = styled.div`
   min-width: 205px;
 `;
 
-const ContainerCategoria = styled.div`
+const ContenedorDropdown = styled.div`
+  position: relative;
+  width: 100%;
+  flex: 1;
   display: flex;  
   gap: 10px;
   flex-direction: row;
@@ -398,7 +437,7 @@ const ContainerCategoria = styled.div`
     white-space: nowrap;
   }
 
-  > *:last-child {
+  > *:not(label) {
     flex: 1;
     width: 100%;
   }
