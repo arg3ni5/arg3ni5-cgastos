@@ -116,13 +116,13 @@ export const MovimientosTemplate = (): JSX.Element => {
       <section className="totales">
         <CardTotales
           total={totalMesAñoPendientes}
-          title={obtenerTitulo(tipo, "pendientes")}
+          title={obtenerTitulo(tipo as "i" | "g" | "b", "pendientes")}
           color={colorCategoria}
           icono={<v.flechaarribalarga />}
         />
         <CardTotales
           total={totalMesAñoPagados}
-          title={obtenerTitulo(tipo, "pagados")}
+          title={obtenerTitulo(tipo as "i" | "g" | "b", "pagados")}
           color={colorCategoria}
           icono={<v.flechaabajolarga />}
         />

@@ -61,21 +61,26 @@ export const DataDesplegableMovimientos = [
     color: v.colorGastos,
     tipo: "g",
     bgcolor: v.colorbgGastos,
+    icono: "🧮"
   },
   {
     text: "Ingresos",
     color: v.colorIngresos,
     tipo: "i",
     bgcolor: v.colorbgingresos,
+    icono: "💵"
   },
   {
     text: "Balance",
     color: v.colorBalance,
     tipo: "b",
     bgcolor: v.colorbgBalance,
+    icono: "📊"
   },
 ];
-
+export const DataDesplegableMovimientosObj = Object.fromEntries(
+  DataDesplegableMovimientos.map(item => [item.tipo, item])
+);
 const titulosPorTipo = {
   g: "Gastos",
   i: "Ingresos",

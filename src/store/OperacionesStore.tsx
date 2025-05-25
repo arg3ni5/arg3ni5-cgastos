@@ -3,14 +3,15 @@ import { v } from "../styles/variables";
 import dayjs, { Dayjs } from 'dayjs';
 
 export type TipoMovimiento = "g" | "i" | "b";
+
 export interface Tipo {
-  tipo: TipoMovimiento;
+  tipo: string;
   text: string;
   color: string;
   bgcolor: string;
 }
 interface OperacionesState {
-  tipo: TipoMovimiento;
+  tipo: string;
   tipoMovimiento: string;
   tipoCuenta: string;
   tituloBtnDes: string;
