@@ -108,8 +108,8 @@ export const CategoriasTemplate = ({ data }: CategoriasTemplateProps): JSX.Eleme
       <section className="main">
         {data.length == 0 && (
           <Lottieanimacion
-            alto="300"
-            ancho="300"
+            alto={300}
+            ancho={300}
             animacion={tipo == "i" ? vacioverde : vaciorojo}
           />
         )}

@@ -143,6 +143,8 @@ export const MovimientosTemplate = (): JSX.Element => {
         {(tipo == "i" || tipo == "b")
           && datamovimientos.i?.length > 0 &&
           <TablaMovimientos
+            tipo={"i"}
+            color={v.colorIngresos}
             data={datamovimientos.i}
             setOpenRegistro={setOpenRegistro}
             setDataSelect={setDataSelect}
@@ -150,8 +152,10 @@ export const MovimientosTemplate = (): JSX.Element => {
         }
 
         {(tipo == "g" || tipo == "b")
-          && datamovimientos.g.length > 0 &&
+          && datamovimientos.g?.length > 0 &&
           <TablaMovimientos
+            tipo={"g"}
+            color={v.colorGastos}
             data={datamovimientos.g}
             setOpenRegistro={setOpenRegistro}
             setDataSelect={setDataSelect}
@@ -159,8 +163,8 @@ export const MovimientosTemplate = (): JSX.Element => {
         }
 
         {(
-          tipo == "i" && datamovimientos.i.length == 0 ||
-          tipo == "g" && datamovimientos.g.length == 0
+          tipo == "i" && datamovimientos.i?.length == 0 ||
+          tipo == "g" && datamovimientos.g?.length == 0
         ) && (
             <Lottieanimacion
               alto={300}

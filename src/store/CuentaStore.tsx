@@ -2,8 +2,9 @@ import { create } from "zustand";
 import { MostrarCuentas, InsertarCuenta, ActualizarCuenta, EliminarCuenta, Cuenta, CuentaInsert } from "../index";
 
 interface CuentaStore {
-  cuentaItemSelect: Cuenta;
   cuentas: Cuenta[];
+  cuentaItemSelect: Cuenta;
+  selectCuenta: (p: Cuenta) => void;
   mostrarCuentas: (p: { idusuario: number }) => Promise<Cuenta[]>;
   insertarCuenta: (cuenta: CuentaInsert) => Promise<Cuenta | null>;
   actualizarCuenta: (id: number, cuenta: Partial<Cuenta>) => Promise<Cuenta | null>;
@@ -21,6 +22,10 @@ export const useCuentaStore = create<CuentaStore>((set, get) => ({
       set({ cuentaItemSelect: response.filter(item => item.descripcion === "Billetera")[0] });
     }
     return response || [];
+  },
+
+  selectCuenta: (p) => {
+    set({ cuentaItemSelect: p });
   },
 
   insertarCuenta: async (cuenta) => {

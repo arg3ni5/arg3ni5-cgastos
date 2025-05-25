@@ -9,16 +9,16 @@ import { useQuery } from "@tanstack/react-query";
 export function Cuentas() {
   const { tipo } = useOperaciones();
   const { cuentas, mostrarCuentas } = useCuentaStore();
-  const { datausuarios } = useUsuariosStore();
+  const { usuario } = useUsuariosStore();
 
   const { isLoading, error } = useQuery<Cuenta[], Error>({
     queryKey: ["mostrar categorias", tipo],
     queryFn: () =>
       mostrarCuentas({
-        idusuario: datausuarios?.id,
+        idusuario: usuario?.id,
         tipo
       } as CuentasQueryParams),
-    enabled: !!datausuarios?.id,
+    enabled: !!usuario?.id,
   });
 
   if (isLoading) {

@@ -16,16 +16,16 @@ interface QueryParams {
 export const Categorias = () => {
   const { tipo } = useOperaciones();
   const { datacategoria, mostrarCategorias } = useCategoriasStore();
-  const { datausuarios } = useUsuariosStore();
+  const { usuario } = useUsuariosStore();
 
   const { isLoading, error } = useQuery<Categoria[], Error>({
     queryKey: ["mostrar cuentas", tipo],
     queryFn: () =>
       mostrarCategorias({
-        idusuario: datausuarios?.id,
+        idusuario: usuario?.id,
         tipo
       } as QueryParams),
-    enabled: !!datausuarios?.id,
+    enabled: !!usuario?.id,
   });
 
   if (isLoading) {

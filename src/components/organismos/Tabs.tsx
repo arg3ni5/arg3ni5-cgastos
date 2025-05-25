@@ -47,9 +47,9 @@ export const Tabs = (): JSX.Element => {
   const { idusuario } = useUsuariosStore();
   const { date, tipo, tituloBtnDesMovimientos } = useOperaciones();
   const { dataRptMovimientosAñoMes, rptMovimientosAñoMes, rptParams } = useMovimientosStore();
-
+  
   const datagraficaG: DataGrafica = {
-    labels: dataRptMovimientosAñoMes?.g.map((item) => item.descripcion),
+    labels: dataRptMovimientosAñoMes?.g?.map((item) => item.descripcion) || [],
     datasets: [
       {
         tension: 0.3,
@@ -58,7 +58,7 @@ export const Tabs = (): JSX.Element => {
         borderRadius: 5,
         cutout: 30,
         minBarLength: "100px",
-        data: dataRptMovimientosAñoMes?.g.map((item) => item.total),
+        data: dataRptMovimientosAñoMes?.g?.map((item) => item.total),
         backgroundColor: [
           "rgba(255, 99, 132, 0.2)",
           "rgba(54, 162, 235, 0.2)",
@@ -83,7 +83,7 @@ export const Tabs = (): JSX.Element => {
   };
 
   const datagraficaI: DataGrafica = {
-    labels: dataRptMovimientosAñoMes?.i.map((item) => item.descripcion),
+    labels: dataRptMovimientosAñoMes.i?.map((item) => item.descripcion) || [],
     datasets: [
       {
         tension: 0.3,
@@ -92,7 +92,7 @@ export const Tabs = (): JSX.Element => {
         borderRadius: 5,
         cutout: 30,
         minBarLength: "100px",
-        data: dataRptMovimientosAñoMes?.i.map((item) => item.total),
+        data: dataRptMovimientosAñoMes.i?.map((item) => item.total) || [],
         backgroundColor: [
           "rgba(255, 99, 132, 0.2)",
           "rgba(54, 162, 235, 0.2)",

@@ -32,7 +32,7 @@ interface FormInputs {
 
 export const RegistrarCuentas = ({ onClose, dataSelect, accion }: RegistrarCuentasProps) => {
 	const { insertarCuenta, actualizarCuenta } = useCuentaStore();
-	const { datausuarios } = useUsuariosStore();
+	const { usuario } = useUsuariosStore();
 	const [showPicker, setShowPicker] = useState<boolean>(false);
 	const [emojiselect, setEmojiselect] = useState<string>("💰");
 	const [estadoProceso, setEstadoproceso] = useState<boolean>(false);
@@ -50,7 +50,7 @@ export const RegistrarCuentas = ({ onClose, dataSelect, accion }: RegistrarCuent
 	} = useForm<FormInputs>();
 
 	const insertar = async (formData: FormInputs): Promise<void> => {
-		if (!datausuarios?.id) {
+		if (!usuario?.id) {
 			return;
 		}
 
@@ -58,7 +58,7 @@ export const RegistrarCuentas = ({ onClose, dataSelect, accion }: RegistrarCuent
 			descripcion: formData.descripcion,
 			saldo_actual: Number(formData.saldo_actual),
 			icono: emojiselect,
-			idusuario: datausuarios.id,
+			idusuario: usuario.id,
 			tipo: tipo
 		};
 
