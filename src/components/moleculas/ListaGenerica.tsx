@@ -11,25 +11,30 @@ interface ListaGenericaProps {
   setState: () => void;
   funcion: (item: any) => void;
   scroll?: string;
+  top?: string;
   bottom?: string;
+  btnClose?: boolean;
 }
 
 interface ContainerProps {
   scroll?: string;
   $bottom?: string;
+  $top?: string;
 }
 
-export const ListaGenerica = ({ data, setState, funcion, scroll, bottom }: ListaGenericaProps): JSX.Element => {
+export const ListaGenerica = ({ data, setState, funcion, scroll, bottom, top, btnClose = true }: ListaGenericaProps): JSX.Element => {
   const seleccionar = (p: any): void => {
     funcion(p);
     setState();
   };
 
   return (
-    <Container scroll={scroll} $bottom={bottom}>
-      <section className="contentClose">
-        <BtnCerrar funcion={setState} />
-      </section>
+    <Container scroll={scroll} $bottom={bottom} $top={top}>
+      {btnClose && (
+        <section className="contentClose">
+          <BtnCerrar funcion={setState} />
+        </section>
+      )}
       <section className="contentItems">
         {data.map((item, index) => (
           <ItemContainer key={index} onClick={() => seleccionar(item)}>
@@ -49,7 +54,7 @@ const Container = styled.div<ContainerProps>`
   color: ${({ theme }) => theme.text};
   position: absolute;
   margin-bottom: 15px;
-  bottom: ${(props)=>props.$bottom};
+  bottom: ${(props) => props.$bottom};
   width: 100%;
   padding: 10px;
   border-radius: 10px;
@@ -58,7 +63,20 @@ const Container = styled.div<ContainerProps>`
   @media ${() => Device.tablet} {
     width: 400px;
   }
+  .contentClose {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0;
+    margin: 0;
+  }
+  .contentClose > * {
+    margin: 0;
+    padding: 2px;
+  }
+
+
   .contentItems {
+    padding-top: 0;
     overflow-y: ${(props) => props.scroll};
   }
 `;

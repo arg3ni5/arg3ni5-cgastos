@@ -11,9 +11,12 @@ interface UsuariosStore {
 }
 
 export const useUsuariosStore = create<UsuariosStore>((set) => ({
-  usuario: null,
-  idusuario: 0,
-  setUsuario: (u) => set({ usuario: u, idusuario: u.id }),
+  usuario: JSON.parse(localStorage.getItem("usuario") || "null"),
+  idusuario: JSON.parse(localStorage.getItem("usuario") || "null")?.id || 0,
+  setUsuario: (u) => {
+    localStorage.setItem("usuario", JSON.stringify(u));
+    set({ usuario: u, idusuario: u.id });
+  },
   clearUsuario: () => set({ usuario: null, idusuario: 0 }),
 
   editartemamonedauser: async (p) => {

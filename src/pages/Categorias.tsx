@@ -20,15 +20,22 @@ export const Categorias = () => {
   const { usuario } = useUsuariosStore();
   const { setIsLoading } = useLoading();
 
-  const { isLoading, error } = useQuery<Categoria[], Error>({
-    queryKey: ["mostrar cuentas", tipo],
+  const { isLoading, error, refetch } = useQuery<Categoria[], Error>({
+    queryKey: ["mostrar cuentas", tipo, usuario?.id],
     queryFn: () =>
       mostrarCategorias({
         idusuario: usuario?.id,
-        tipo
+        tipo,
       } as QueryParams),
-    enabled: !!usuario?.id,
+    enabled: false, // desactivar ejecución automática
   });
+  
+  useEffect(() => {
+    if (usuario?.id) {
+      refetch(); // ejecutar manualmente cuando esté disponible
+    }
+  }, [usuario?.id, tipo, refetch]);
+  
 
   useEffect(() => {
     setIsLoading(isLoading);
