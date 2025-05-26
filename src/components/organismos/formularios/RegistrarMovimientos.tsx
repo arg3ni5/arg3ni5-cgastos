@@ -153,44 +153,37 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
       <div
         className="sub-contenedor"
         onClick={(e) => { e.stopPropagation(); }}>
+        <div>
+          <span onClick={setState}>{<v.iconocerrar />}</span>
+        </div>
         <div className="encabezado">
-          <div>
-            <h1>{accion} {tipoMovimiento.tipo == "i" ? "ingreso" : (tipoMovimiento.tipo === "g" ? "gasto" : "")}</h1>
-          </div>
-          <div>
-            <span onClick={setState}>{<v.iconocerrar />}</span>
-          </div>
+          <ContenedorDropdown>
+            <Selector
+              color="#e14e19"
+              texto1={(categoriaItemSelect?.tipo ? DataDesplegableMovimientosObj[categoriaItemSelect.tipo].text : tipoMovimiento?.text) ? accion + " " : ""}
+              texto2={(categoriaItemSelect?.tipo ? DataDesplegableMovimientosObj[categoriaItemSelect.tipo].text : tipoMovimiento?.text) || "Selecciones un tipo"}
+              funcion={() => setStateTipo(!stateTipo)}
+            />
+
+            {stateTipo && (
+              <ListaGenerica
+                top="100%"
+                btnClose={false}
+                scroll="hidden"
+                setState={() => setStateTipo(!stateTipo)}
+                data={DataDesplegableMovimientos.filter(item => item.tipo != "b").map(item => ({
+                  descripcion: item.text,
+                  ...item,
+                }))}
+                funcion={cambiarTipo}
+              />
+            )}
+          </ContenedorDropdown>
         </div>
 
         <form onSubmit={accion == "Nuevo" ? handleSubmit(insertar) : handleSubmit(actualizar)} className="formulario">
           <section>
-
-
-            <ContenedorDropdown>
-              <label>Tipo Movimiento: </label>
-              <Selector
-                color="#e14e19"
-                texto1={(tipoMovimiento?.tipo ? DataDesplegableMovimientosObj[tipoMovimiento.tipo].icono : tipoMovimiento?.text) || undefined}
-                texto2={(categoriaItemSelect?.tipo ? DataDesplegableMovimientosObj[categoriaItemSelect.tipo].text : tipoMovimiento?.text) || "Selecciones un tipo"}
-                funcion={() => setStateTipo(!stateTipo)}
-              />
-
-              {stateTipo && (
-                <ListaGenerica
-                  top="100%"
-                  btnClose={false}
-                  scroll="hidden"
-                  setState={() => setStateTipo(!stateTipo)}
-                  data={DataDesplegableMovimientos.filter(item => item.tipo != "b").map(item => ({
-                    descripcion: item.text,
-                    ...item,
-                  }))}
-                  funcion={cambiarTipo}
-                />
-              )}
-            </ContenedorDropdown>
             <WrapperPagoFecha>
-
               <ContainerFuepagado>
                 <span>{<v.iconocheck />}</span>
                 <label>Fue pagado:</label>
@@ -331,12 +324,12 @@ const Container = styled.div`
     }
     .formulario {
       .contentBtnsave {
-        padding-top: 20px;
+        padding-top: 10px;
         display: flex;
         justify-content: center;
       }
       section {
-        padding-top: 20px;
+        padding-top: 10px;
         gap: 20px;
         display: flex;
         flex-direction: column;
