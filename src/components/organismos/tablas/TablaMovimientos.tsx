@@ -60,7 +60,7 @@ export const TablaMovimientos = ({
 
   const editar = (data: Movimiento): void => {
     setOpenRegistro(true);
-    setDataSelect({...data, tipo: tipo});
+    setDataSelect({ ...data, tipo: tipo });
     setAccion("Editar");
   };
 
@@ -81,33 +81,38 @@ export const TablaMovimientos = ({
             </tr>
           </thead>
           <tbody>
-            {data.map((item, index) => {
-              return (
-                <tr key={index}>
-                  <th scope="row">
-                    <Situacion
-                      $bgcolor={item.estado == "1" ? "#69e673" : "#b3b3b3"}
-                    ></Situacion>
-                  </th>
-                  <td  data-title="Fecha" >{item.fecha}</td>
-                  <td data-title="Descripcion" >
-                    {item.descripcion}
-                  </td>
-                  <td data-title="Categoria" >{item.categoria}</td>
-                  <td data-title="Cuenta">{item.cuenta}</td>
-                  <td data-title="Monto">{item.valorymoneda}</td>
-                  <td data-title="Acciones" >
-                    <ContentAccionesTabla
-                      funcionEditar={() => editar(convertToMovimiento(item))}
-                      funcionEliminar={() => eliminar(convertToMovimiento(item))}
-                    />
-                  </td>
-                </tr>
-              );
-            })}
+            {data
+              .slice(
+                (pagina - 1) * porPagina,
+                (pagina - 1) * porPagina + porPagina
+              )
+              .map((item) => {
+                return (
+                  <tr key={item.id}>
+                    <th scope="row">
+                      <Situacion
+                        $bgcolor={item.estado == "1" ? "#69e673" : "#b3b3b3"}
+                      ></Situacion>
+                    </th>
+                    <td data-title="Fecha" >{item.fecha}</td>
+                    <td data-title="Descripcion" >
+                      {item.descripcion}
+                    </td>
+                    <td data-title="Categoria" >{item.categoria}</td>
+                    <td data-title="Cuenta">{item.cuenta}</td>
+                    <td data-title="Monto">{item.valorymoneda}</td>
+                    <td data-title="Acciones" >
+                      <ContentAccionesTabla
+                        funcionEditar={() => editar(convertToMovimiento(item))}
+                        funcionEliminar={() => eliminar(convertToMovimiento(item))}
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
           </tbody>
         </table>
-        <Paginacion pagina={pagina} setPagina={setPagina} maximo={maximo} color={color}/>
+        <Paginacion pagina={pagina} setPagina={setPagina} maximo={maximo} color={color} />
       </Container>
     </>
   );

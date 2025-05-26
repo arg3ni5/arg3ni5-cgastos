@@ -313,6 +313,7 @@ const Container = styled.div`
       font-weight: 550;
     }
     .encabezado {
+      padding-top: 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -334,7 +335,7 @@ const Container = styled.div`
         justify-content: center;
       }
       section {
-        padding-top: 10px;
+        padding-top: 5px;
         gap: 20px;
         display: flex;
         flex-direction: column;
