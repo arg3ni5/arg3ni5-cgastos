@@ -153,9 +153,6 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
       <div
         className="sub-contenedor"
         onClick={(e) => { e.stopPropagation(); }}>
-        <div>
-          <span onClick={setState}>{<v.iconocerrar />}</span>
-        </div>
         <div className="encabezado">
           <ContenedorDropdown>
             <Selector
@@ -267,15 +264,23 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
               )}
             </ContenedorDropdown>
           </section>
-
-          <div className="contentBtnsave">
-            <Btnsave
-              type="submit"
-              titulo="Guardar"
-              bgcolor="#DAC1FF"
-              icono={<v.iconoguardar />}
-            />
-          </div>
+          <ContenedorBotones>
+            <StickyFooter>
+              <Btnsave
+                type="submit"
+                titulo="Guardar"
+                bgcolor="#DAC1FF"
+                icono={<v.iconoguardar />}
+              />
+              <Btnsave
+                funcion={setState}
+                type="button"
+                titulo="Cancelar"
+                bgcolor="#ff4d4f"
+                icono={<v.iconocerrar />}
+              />
+            </StickyFooter>
+          </ContenedorBotones>
         </form>
       </div>
     </Container>
@@ -341,6 +346,22 @@ const Container = styled.div`
         }
       }
     }
+
+    @media (max-width: 500px) {
+      .sub-contenedor {
+        padding: 12px 20px !important;
+      }
+
+      input {
+        padding: 8px !important;
+        font-size: 15px;
+      }
+
+      label {
+        font-size: 14px;
+      }
+    }
+
   }
   @keyframes scale-up-bottom {
     0% {
@@ -462,3 +483,24 @@ const ContainerFecha = styled.div`
     }
   }
 `;
+
+const ContenedorBotones = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+`;
+
+const StickyFooter = styled.div`
+  position: sticky;
+  bottom: 0;
+  background: ${({ theme }) => theme.bgtotal};
+  padding: 10px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  position: relative;
+`;
+
