@@ -12,7 +12,7 @@ import {
   InputText,
   useCuentaStore,
   v,
-  Btnsave,
+  BtnForm,
   Accion,
   Movimiento,
   MovimientoInsert,
@@ -266,13 +266,13 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
           </section>
           <ContenedorBotones>
             <StickyFooter>
-              <Btnsave
+              <BtnForm
                 type="submit"
                 titulo="Guardar"
                 bgcolor="#DAC1FF"
                 icono={<v.iconoguardar />}
               />
-              <Btnsave
+              <BtnForm
                 funcion={setState}
                 type="button"
                 titulo="Cancelar"
