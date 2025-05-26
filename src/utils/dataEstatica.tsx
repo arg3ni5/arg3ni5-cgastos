@@ -79,7 +79,7 @@ export const DataDesplegableMovimientos = [
   },
 ];
 export const DataDesplegableMovimientosObj = Object.fromEntries(
-  DataDesplegableMovimientos.map(item => [item.tipo, item])
+  DataDesplegableMovimientos.map(item => [item.tipo, {...item, text: item.text.replace(/s$/, "")}])
 );
 const titulosPorTipo = {
   g: "Gastos",
