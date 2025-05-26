@@ -177,7 +177,8 @@ export const MovimientosTemplate = (): JSX.Element => {
   );
 }
 const Container = styled.div`
-  min-height: 100vh;
+  max-width: 100%;
+  overflow-x: hidden;
   padding: 15px;
   width: 100%;
   background: ${({ theme }) => theme.bgtotal};

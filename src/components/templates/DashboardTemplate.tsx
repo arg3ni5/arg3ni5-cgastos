@@ -72,7 +72,8 @@ export const DashboardTemplate = () => {
 };
 
 const Container = styled.div`
-  min-height: 100vh;
+  max-width: 100%;
+  overflow-x: hidden;
   width: 100%;
   padding: 15px;
   background: ${({ theme }) => theme.bgtotal};
@@ -82,7 +83,7 @@ const Container = styled.div`
   grid-template:
     "header" 100px
     "filtros" 100px
-    "totales" 300px
+    "totales" 360px
     "graficos" auto;
 
   @media ${Device.tablet} {
