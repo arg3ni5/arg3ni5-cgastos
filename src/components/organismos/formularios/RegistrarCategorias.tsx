@@ -5,7 +5,7 @@ import {
   InputText,
   Spinner,
   useOperaciones,
-  Btnsave,
+  BtnForm,
   useUsuariosStore,
   useCategoriasStore,
   CategoriaUpdate,
@@ -167,7 +167,7 @@ export const RegistrarCategorias = ({ onClose, dataSelect, accion }: RegistrarCa
               )}
             </div>
             <div className="btnguardarContent">
-              <Btnsave
+              <BtnForm
                 // funcion={handleSubmit(insertar)}
                 type="submit"
                 icono={<v.iconoguardar />}

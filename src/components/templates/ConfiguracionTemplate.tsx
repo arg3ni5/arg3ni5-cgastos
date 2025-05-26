@@ -7,7 +7,7 @@ import {
   useUsuariosStore,
   ListaGenerica,
   TemasData,
-  Btnsave,CardEliminarData
+  BtnForm,CardEliminarData
 
 } from "../../index";
 import { useState } from "react";
@@ -52,7 +52,7 @@ export function ConfiguracionTemplate() {
       <section className="area2">
         <h1>AJUSTES</h1>
 
-        <Btnsave
+        <BtnForm
           titulo="Conexiones"
           icono={<v.iconovercuenta />} // el ícono que quieras
           bgcolor={v.colorselector}
@@ -90,7 +90,7 @@ export function ConfiguracionTemplate() {
             />
           )}
         </ContentCard>
-        <Btnsave
+        <BtnForm
           titulo="Guardar"
           bgcolor={v.colorselector}
           icono={<v.iconoguardar />}

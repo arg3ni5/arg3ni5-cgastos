@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { v, Btnsave } from "../../../index";
+import { v, BtnForm } from "../../../index";
 import { JSX } from "react";
 export const SidebarCard = (): JSX.Element => {
   return (
@@ -10,7 +10,7 @@ export const SidebarCard = (): JSX.Element => {
         <div className="circle2"></div>
         <h3>Centro de ayuda</h3>
         <div className="contentBtn">
-          <Btnsave titulo="Contactar" bgcolor="#f8f2fd" url="https://t.me/htmlycss369"/>
+          <BtnForm titulo="Contactar" bgcolor="#f8f2fd" url="https://t.me/htmlycss369"/>
         </div>
       </div>
     </Container>

@@ -5,7 +5,7 @@ import {
 	InputText,
 	Spinner,
 	useOperaciones,
-	Btnsave,
+	BtnForm,
 	useUsuariosStore,
 	useCuentaStore,
 	CuentaInsert,
@@ -141,7 +141,7 @@ export const RegistrarCuentas = ({ onClose, dataSelect, accion }: RegistrarCuent
 							)}
 						</div>
 						<div className="btnguardarContent">
-							<Btnsave
+							<BtnForm
 								type="submit"
 								icono={<v.iconoguardar />}
 								titulo="Guardar"
