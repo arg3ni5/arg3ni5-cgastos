@@ -13,11 +13,11 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 	const [state, setState] = useState(false);
 	const [openRegistro, setOpenRegistro] = useState(false);
 	const { usuario } = useUsuariosStore();
-	const { eliminarCuenta } = useCuentaStore();
+	const { mostrarCuentas, insertarCuenta, actualizarCuenta, eliminarCuenta } = useCuentaStore();
 	const [accion, setAccion] = useState<Accion>("Nuevo");
 	const [dataSelect, setDataSelect] = useState<CuentaInsert | CuentaUpdate>({});
 	const [stateTipo, setStateTipo] = useState(false);
-	const { selectTipoCuenta, setTipoCuenta } = useOperaciones();
+	const { colorCategoriaCuentaActual, tituloBtnDesCuentasActual, bgCategoriaCuentaActual, setTipoCuenta } = useOperaciones();
 
 	const cambiarTipo = (p: Tipo) => {
 		setTipoCuenta(p);
@@ -51,6 +51,17 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 		setDataSelect(cuenta);
 		setOpenRegistro(true);
 	};
+
+	const { isLoading, error } = useQuery({
+		queryKey: ["mostrar cuentas", usuario?.id],
+		queryFn: () => {
+			if (!usuario?.id) {
+				throw new Error('User ID is not available');
+			}
+			return mostrarCuentas({ idusuario: usuario.id });
+		},
+		enabled: !!usuario?.id,
+	});
 
 	const handleDelete = async (id: number) => {
 		const result = await Swal.fire({
@@ -96,9 +107,9 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 						}}
 					>
 						<Btndesplegable
-							textcolor={selectTipoCuenta.color}
-							bgcolor={selectTipoCuenta.bgcolor}
-							text={selectTipoCuenta.text}
+							textcolor={colorCategoriaCuentaActual}
+							bgcolor={bgCategoriaCuentaActual}
+							text={tituloBtnDesCuentasActual}
 							funcion={openTipo}
 						/>
 						{stateTipo && (
@@ -114,8 +125,8 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 				<ContentFiltro>
 					<Btnfiltro
 						funcion={nuevoRegistro}
-						bgcolor={selectTipoCuenta.bgcolor}
-						textcolor={selectTipoCuenta.color}
+						bgcolor={bgCategoriaCuentaActual}
+						textcolor={colorCategoriaCuentaActual}
 						icono={<v.agregar />}
 					/>
 				</ContentFiltro>
