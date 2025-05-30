@@ -19,6 +19,10 @@ interface OperacionesState {
   tituloBtnDesMovimientos: string;
   colorCategoria: string;
   bgCategoria: string;
+  tipoActualCuenta: string;
+  tituloBtnDesCuentasActual: string;
+  colorCategoriaCuentaActual: string;
+  bgCategoriaCuentaActual: string;
   date: Dayjs;
   setToday: () => void;
   addMonth: () => void;
@@ -38,6 +42,10 @@ export const useOperaciones = create<OperacionesState>((set, get) => ({
   tituloBtnDesCuentas: "Categorias Debito",
   colorCategoria: v.colorIngresos,
   bgCategoria: v.colorbgingresos,
+  tipoActualCuenta: "d",
+  tituloBtnDesCuentasActual: "Cuentas de Débito",
+  colorCategoriaCuentaActual: v.colorIngresos,
+  bgCategoriaCuentaActual: v.colorbgingresos,
   date: dayjs(),
   setToday: () => {
     set({ date: dayjs() });
@@ -75,6 +83,10 @@ export const useOperaciones = create<OperacionesState>((set, get) => ({
       tituloBtnDesCuentas: p.text,
       colorCategoria: p.color,
       bgCategoria: p.bgcolor,
+      tipoActualCuenta: p.tipo,
+      tituloBtnDesCuentasActual: p.text,
+      colorCategoriaCuentaActual: p.color,
+      bgCategoriaCuentaActual: p.bgcolor,
     })
   },
 }));
