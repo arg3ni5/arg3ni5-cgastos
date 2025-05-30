@@ -32,7 +32,7 @@ export const Dona = ({ datagrafica, data, titulo }: DonaProps): JSX.Element => {
       </section>
       <section>
         <h2>{titulo} por categoria</h2>
-        {data.map((item, index) => (
+        {data?.map((item, index) => (
           <ContentCars key={index}>
             <div className="contentDescripcion">
               <span>{item.icono}</span>

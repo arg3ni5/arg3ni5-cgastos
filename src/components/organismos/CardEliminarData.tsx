@@ -1,11 +1,11 @@
 import styled from "styled-components";
-import { Btnsave } from "../moleculas/Btnsave";
+import { BtnForm } from "../moleculas/BtnForm";
 import { v } from "../../styles/variables";
 import { useCategoriasStore, useUsuariosStore } from "../../index";
 import Swal from "sweetalert2";
 export function CardEliminarData() {
   const { eliminarCategoriasTodas } = useCategoriasStore();
-  const { datausuarios } = useUsuariosStore();
+  const { usuario } = useUsuariosStore();
   const eliminar = async () => {
     Swal.fire({
       title: "¿Estás seguro(a)(e)?",
@@ -18,7 +18,7 @@ export function CardEliminarData() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         const p = {
-          idusuario: datausuarios.id,
+          idusuario: usuario?.id,
         };
         await eliminarCategoriasTodas(p);
       }
@@ -33,7 +33,7 @@ export function CardEliminarData() {
         registradas. <br />
         *Se reseteara tambien los saldos acumulados en tus cuentas.
       </span>
-      <Btnsave
+      <BtnForm
         titulo="resetear"
         bgcolor="rgba(247, 92, 92, 0.87)"
         funcion={eliminar}

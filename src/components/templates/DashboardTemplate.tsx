@@ -7,14 +7,13 @@ import {
   useMovimientosStore,
   v,
   Tabs,
-	DataDesplegableMovimientos,
+  DataDesplegableMovimientos,
+  Tipo,
 } from "../../index";
 import { useEffect, useState } from "react";
-import dayjs from "dayjs";
 import { Device } from "../../styles/breakpoints";
 
 export const DashboardTemplate = () => {
-  const [value, setValue] = useState(dayjs(Date.now()));
   const [state, setState] = useState(false); // agregado para stateConfig del Header
 
   const {
@@ -28,8 +27,8 @@ export const DashboardTemplate = () => {
     totalMesAñoPendientes,
   } = useMovimientosStore();
 
-	useEffect(() => {
-    setTipoMovimientos(DataDesplegableMovimientos[2]);
+  useEffect(() => {
+    setTipoMovimientos(DataDesplegableMovimientos[2] as Tipo);
   }, [setTipoMovimientos]);
 
   return (
@@ -41,21 +40,21 @@ export const DashboardTemplate = () => {
       </header>
 
       <section className="filtros">
-        <CalendarioLineal value={value} setValue={setValue} />
+        <CalendarioLineal />
       </section>
 
       <section className="totales">
         <CardTotales
-          total={totalMesAñoPagados}
-          title="Ingresos pagados / Gastos pagados"
-          color={colorCategoria}
-          icono={<v.flechaabajolarga />}
-        />
-        <CardTotales
           total={totalMesAñoPendientes}
-          title="Pendientes"
+          title="Ingresos / Gastos pendientes"
           color={colorCategoria}
           icono={<v.flechaarribalarga />}
+        />
+        <CardTotales
+          total={totalMesAñoPagados}
+          title="Ingresos / Gastos pagados"
+          color={colorCategoria}
+          icono={<v.flechaabajolarga />}
         />
         <CardTotales
           total={totalMesAño}
@@ -73,7 +72,8 @@ export const DashboardTemplate = () => {
 };
 
 const Container = styled.div`
-  min-height: 100vh;
+  max-width: 100%;
+  overflow-x: hidden;
   width: 100%;
   padding: 15px;
   background: ${({ theme }) => theme.bgtotal};
@@ -83,7 +83,7 @@ const Container = styled.div`
   grid-template:
     "header" 100px
     "filtros" 100px
-    "totales" 300px
+    "totales" 360px
     "graficos" auto;
 
   @media ${Device.tablet} {

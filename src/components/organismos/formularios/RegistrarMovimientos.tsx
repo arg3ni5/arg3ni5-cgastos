@@ -1,4 +1,4 @@
-import { JSX, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import { Switch } from "@mui/material";
@@ -12,13 +12,18 @@ import {
   InputText,
   useCuentaStore,
   v,
-  Btnsave,
+  BtnForm,
   Accion,
   Movimiento,
   MovimientoInsert,
   showErrorMessage,
-  MovimientoUpdate
+  MovimientoUpdate,
+  useUsuariosStore,
+  DataDesplegableMovimientos,
+  Tipo,
+  DataDesplegableMovimientosObj,
 } from "../../../index";
+import { useQuery } from "@tanstack/react-query";
 interface RegistrarMovimientosProps {
   setState: () => void;
   state: boolean;
@@ -33,21 +38,34 @@ interface FormInputs {
 }
 
 export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movimiento, accion }: RegistrarMovimientosProps): JSX.Element => {
-  const { cuentaItemSelect } = useCuentaStore();
-  const { datacategoria, categoriaItemSelect, selectCategoria } = useCategoriasStore();
+
   const { tipo } = useOperaciones();
+  const { cuentas, cuentaItemSelect, mostrarCuentas, selectCuenta } = useCuentaStore();
+  const { idusuario } = useUsuariosStore();
+  const { categoriaItemSelect, selectCategoria, mostrarCategorias } = useCategoriasStore();
   const { insertarMovimientos, actualizarMovimientos } = useMovimientosStore();
 
   const [estado, setEstado] = useState<boolean>(true);
-  const [ignorar, setIgnorar] = useState<boolean>(false);
+  //const [ignorar, setIgnorar] = useState<boolean>(false);
   const [stateCategorias, setStateCategorias] = useState<boolean>(false);
+  const [stateCuenta, setStateCuenta] = useState<boolean>(false);
+  const [stateTipo, setStateTipo] = useState<boolean>(false);
+  const [tipoMovimiento, setTipoMovimiento] = useState<Tipo>(DataDesplegableMovimientosObj[dataSelect.tipo!] || { text: "", icono: "" });
   const fechaactual = new Date();
 
   const {
     register,
     formState: { errors },
     handleSubmit,
-  } = useForm<FormInputs>();
+  } = useForm<FormInputs>(
+    {
+      defaultValues: {
+        monto: dataSelect.valor || 0,
+        descripcion: dataSelect.descripcion || "",
+        fecha: dataSelect.fecha || fechaactual.toISOString().slice(0, 10),
+      },
+    }
+  );
 
   const insertar = async (formData: FormInputs): Promise<void> => {
     const estadoText = estado ? 1 : 0;
@@ -65,7 +83,6 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
       descripcion: formData.descripcion,
       estado: estadoText.toString(),
       fecha: formData.fecha,
-      id: dataSelect.id,
       idcategoria: categoriaItemSelect.id,
       idcuenta: cuentaItemSelect.id,
       tipo,
@@ -114,6 +131,22 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
     setEstado(e.target.checked);
   };
 
+  const cambiarTipo = (p: Tipo): void => {
+    setTipoMovimiento(p);
+    setStateTipo(!stateTipo);
+  };
+
+  useEffect(() => {
+    if (!cuentas?.length) {
+      mostrarCuentas({ idusuario });
+    }
+  }, [cuentas, mostrarCuentas]);
+
+  const { data: categorias, isLoading, isError } = useQuery({
+    queryKey: ["categorias", tipoMovimiento?.tipo, idusuario],
+    queryFn: () => mostrarCategorias({ tipo: tipoMovimiento?.tipo, idusuario }),
+    enabled: !!idusuario && !!tipoMovimiento?.tipo,
+  });
 
   return (
     <Container onClick={setState}>
@@ -121,48 +154,63 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
         className="sub-contenedor"
         onClick={(e) => { e.stopPropagation(); }}>
         <div className="encabezado">
-          <div>
-            <h1>{accion} {tipo == "i" ? "ingreso" : "gasto"}</h1>
-          </div>
-          <div>
-            <span onClick={setState}>{<v.iconocerrar />}</span>
-          </div>
+          <ContenedorDropdown>
+            <Selector
+              color="#e14e19"
+              texto1={(categoriaItemSelect?.tipo ? DataDesplegableMovimientosObj[categoriaItemSelect.tipo].text : tipoMovimiento?.text) ? accion + " " : ""}
+              texto2={(categoriaItemSelect?.tipo ? DataDesplegableMovimientosObj[categoriaItemSelect.tipo].text : tipoMovimiento?.text) || "Selecciones un tipo"}
+              funcion={() => setStateTipo(!stateTipo)}
+            />
+
+            {stateTipo && (
+              <ListaGenerica
+                top="100%"
+                btnClose={false}
+                scroll="hidden"
+                setState={() => setStateTipo(!stateTipo)}
+                data={DataDesplegableMovimientos.filter(item => item.tipo != "b").map(item => ({
+                  descripcion: item.text,
+                  ...item,
+                }))}
+                funcion={cambiarTipo}
+              />
+            )}
+          </ContenedorDropdown>
         </div>
 
         <form onSubmit={accion == "Nuevo" ? handleSubmit(insertar) : handleSubmit(actualizar)} className="formulario">
           <section>
-            <div>
-              <label>Monto:</label>
-              <div>
-                <InputNumber
-                  defaultValue={dataSelect.valor!}
-                  register={register}
-                  placeholder="Ingrese monto"
-                  errors={errors}
-                  icono={<v.iconocalculadora />}
+            <WrapperPagoFecha>
+              <ContainerFuepagado>
+                <span>{<v.iconocheck />}</span>
+                <label>Fue pagado:</label>
+                <Switch
+                  onChange={estadoControl}
+                  checked={estado}
+                  color="warning"
                 />
-              </div>
-            </div>
-            <ContainerFuepagado>
-              <span>{<v.iconocheck />}</span>
-              <label>Fue pagado:</label>
-              <Switch
-                onChange={estadoControl}
-                checked={estado}
-                color="warning"
-              />
-            </ContainerFuepagado>
-            <ContainerFecha>
-              <label>Fecha:</label>
+              </ContainerFuepagado>
+              <ContainerFecha>
+                <label>Fecha:</label>
+                <input
+                  type="date"
+                  {...register("fecha", { required: true })}
+                ></input>
+                {errors.fecha?.type === "required" && (<p>El campo es requerido</p>)}
+              </ContainerFecha>
+            </WrapperPagoFecha>
 
-              <input defaultValue={dataSelect.fecha || fechaactual.toJSON().slice(0, 10)}
-                type="date"
-                {...register("fecha", { required: true })}
-              ></input>
-              {errors.fecha?.type === "required" && (
-                <p>El campo es requerido</p>
-              )}
-            </ContainerFecha>
+            <ContainerMonto>
+              <label>Monto:</label>
+              <InputNumber
+                defaultValue={dataSelect.valor!}
+                register={register}
+                placeholder="Ingrese monto"
+                errors={errors}
+                icono={<v.iconocalculadora />}
+              />
+            </ContainerMonto>
+
             <div>
               <label>Descripción:</label>
               <InputText
@@ -170,37 +218,69 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
                 register={register}
                 placeholder="Ingrese una descripcion"
                 errors={errors}
-                style={{ textTransform: "capitalize" }}
               />
             </div>
-            <ContainerCategoria>
+
+            <ContenedorDropdown>
+              <label>Cuenta: </label>
+              <Selector
+                color="#e14e19"
+                texto1={cuentaItemSelect?.icono}
+                texto2={cuentaItemSelect?.descripcion || "Seleccionar Cuenta"}
+                funcion={() => setStateCuenta(!stateCuenta)}
+              />
+              {stateCuenta && (
+                <ListaGenerica
+                  top="100%"
+                  scroll="auto"
+                  setState={() => setStateCuenta(!stateCuenta)}
+                  data={cuentas}
+                  funcion={selectCuenta}
+                />
+              )}
+            </ContenedorDropdown>
+
+            <ContenedorDropdown>
               <label>Categoria: </label>
               <Selector
                 color="#e14e19"
                 texto1={categoriaItemSelect?.icono}
-                texto2={categoriaItemSelect?.descripcion}
+                texto2={categoriaItemSelect?.descripcion || "Seleccionar Categoria"}
                 funcion={() => setStateCategorias(!stateCategorias)}
               />
-            </ContainerCategoria>
-          </section>
-          {stateCategorias && (
-            <ListaGenerica
-              bottom="23%"
-              scroll="scroll"
-              setState={() => setStateCategorias(!stateCategorias)}
-              data={datacategoria}
-              funcion={selectCategoria}
-            />
-          )}
 
-          <div className="contentBtnsave">
-            <Btnsave
-              type="submit"
-              titulo="Guardar"
-              bgcolor="#DAC1FF"
-              icono={<v.iconoguardar />}
-            />
-          </div>
+              {stateCategorias && (
+                <ListaGenerica
+                  bottom="100%"
+                  scroll="auto"
+                  setState={() => setStateCategorias(!stateCategorias)}
+                  data={categorias?.map(cat => ({
+                    ...cat,
+                    descripcion: cat.descripcion || '',
+                    icono: cat.icono || ''
+                  })) || []}
+                  funcion={selectCategoria}
+                />
+              )}
+            </ContenedorDropdown>
+          </section>
+          <ContenedorBotones>
+            <StickyFooter>
+              <BtnForm
+                type="submit"
+                titulo="Guardar"
+                bgcolor="#DAC1FF"
+                icono={<v.iconoguardar />}
+              />
+              <BtnForm
+                funcion={setState}
+                type="button"
+                titulo="Cancelar"
+                bgcolor="#ff4d4f"
+                icono={<v.iconocerrar />}
+              />
+            </StickyFooter>
+          </ContenedorBotones>
         </form>
       </div>
     </Container>
@@ -233,6 +313,7 @@ const Container = styled.div`
       font-weight: 550;
     }
     .encabezado {
+      padding-top: 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -249,12 +330,12 @@ const Container = styled.div`
     }
     .formulario {
       .contentBtnsave {
-        padding-top: 20px;
+        padding-top: 10px;
         display: flex;
         justify-content: center;
       }
       section {
-        padding-top: 20px;
+        padding-top: 5px;
         gap: 20px;
         display: flex;
         flex-direction: column;
@@ -266,6 +347,22 @@ const Container = styled.div`
         }
       }
     }
+
+    @media (max-width: 500px) {
+      .sub-contenedor {
+        padding: 12px 20px !important;
+      }
+
+      input {
+        padding: 8px !important;
+        font-size: 15px;
+      }
+
+      label {
+        font-size: 14px;
+      }
+    }
+
   }
   @keyframes scale-up-bottom {
     0% {
@@ -280,7 +377,7 @@ const Container = styled.div`
 `;
 const ItemContainer = styled.section`
   gap: 10px;
-  width: 50%;
+  width: 100%;
   display: flex;
   padding: 10px;
   border-radius: 10px;
@@ -290,21 +387,83 @@ const ItemContainer = styled.section`
   &:hover {
     background-color: ${(props) => props.color};
   }
+  > *:last-child {
+    flex: 1;
+    width: 100%;
+  }
 `;
+
+const WrapperPagoFecha = styled.div`
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  flex-wrap: nowrap;
+
+  > div {
+    flex: 1;
+    min-width: 0; // evita que el contenido fuerce wrapping
+  }
+
+  @media (max-width: 500px) {
+    flex-direction: column;
+    flex-wrap: wrap;
+  }
+`;
+const ContainerMonto = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  label {
+    margin-bottom: 5px;
+    font-weight: 550;
+  }
+
+  @media (max-width: 500px) {
+    width: 100%;
+  }
+`;
+
+
+
 const ContainerFuepagado = styled.div`
   display: flex;
   gap: 10px;
   align-items: center;
+  flex: 1;
+  min-width: 205px;
 `;
-const ContainerCategoria = styled.div`
-  display: flex;
+
+const ContenedorDropdown = styled.div`
+  position: relative;
+  width: 100%;
+  flex: 1;
+  display: flex;  
   gap: 10px;
+  flex-direction: row;
   align-items: center;
+
+  @media (max-width: 500px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  label {
+    white-space: nowrap;
+  }
+
+  > *:not(label) {
+    flex: 1;
+    width: 100%;
+  }
 `;
+
 const ContainerFecha = styled.div`
   display: flex;
+  flex: 1;
   gap: 10px;
   align-items: center;
+  min-width: 205px;
   input {
     appearance: none;
     color: ${({ theme }) => theme.text};
@@ -325,3 +484,24 @@ const ContainerFecha = styled.div`
     }
   }
 `;
+
+const ContenedorBotones = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+`;
+
+const StickyFooter = styled.div`
+  position: sticky;
+  bottom: 0;
+  background: ${({ theme }) => theme.bgtotal};
+  padding: 10px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  position: relative;
+`;
+

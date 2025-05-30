@@ -8,6 +8,7 @@ import {
   useOperaciones,
   useUsuariosStore,
   Barras,
+  DataRptMovimientosAñoMes,
 } from "../../index";
 import { useQuery } from "@tanstack/react-query";
 interface ContainerProps {
@@ -44,11 +45,11 @@ export const Tabs = (): JSX.Element => {
   };
 
   const { idusuario } = useUsuariosStore();
-  const { año, mes, tipo, tituloBtnDesMovimientos } = useOperaciones();
+  const { date, tipo, tituloBtnDesMovimientos } = useOperaciones();
   const { dataRptMovimientosAñoMes, rptMovimientosAñoMes, rptParams } = useMovimientosStore();
 
   const datagraficaG: DataGrafica = {
-    labels: dataRptMovimientosAñoMes?.g.map((item) => item.descripcion),
+    labels: dataRptMovimientosAñoMes?.g?.map((item) => item.descripcion) || [],
     datasets: [
       {
         tension: 0.3,
@@ -57,7 +58,7 @@ export const Tabs = (): JSX.Element => {
         borderRadius: 5,
         cutout: 30,
         minBarLength: "100px",
-        data: dataRptMovimientosAñoMes?.g.map((item) => item.total),
+        data: dataRptMovimientosAñoMes?.g?.map((item) => item.total),
         backgroundColor: [
           "rgba(255, 99, 132, 0.2)",
           "rgba(54, 162, 235, 0.2)",
@@ -82,7 +83,7 @@ export const Tabs = (): JSX.Element => {
   };
 
   const datagraficaI: DataGrafica = {
-    labels: dataRptMovimientosAñoMes?.i.map((item) => item.descripcion),
+    labels: dataRptMovimientosAñoMes.i?.map((item) => item.descripcion) || [],
     datasets: [
       {
         tension: 0.3,
@@ -91,7 +92,7 @@ export const Tabs = (): JSX.Element => {
         borderRadius: 5,
         cutout: 30,
         minBarLength: "100px",
-        data: dataRptMovimientosAñoMes?.i.map((item) => item.total),
+        data: dataRptMovimientosAñoMes.i?.map((item) => item.total) || [],
         backgroundColor: [
           "rgba(255, 99, 132, 0.2)",
           "rgba(54, 162, 235, 0.2)",
@@ -115,47 +116,47 @@ export const Tabs = (): JSX.Element => {
     ],
   };
 
-  const { isLoading, error } = useQuery({
-    queryKey: ["reporte movimientos", {
-      año,
-      mes,
-      tipocategoria: tipo,
-      idusuario,
-    }],
+  const { isLoading, error } = useQuery<DataRptMovimientosAñoMes | null, Error>({
+    queryKey: ['rptMovimientos', tipo, idusuario, date.format('YYYY-MM')],
     queryFn: () => rptMovimientosAñoMes({
-      anio: año,
-      mes,
+      anio: date.year(),
+      mes: date.month() + 1,
       tipocategoria: tipo,
       iduser: idusuario,
-    })
+    }),
+    enabled: date.month() + 1 !== rptParams.mes || date.year() !== rptParams.anio
   });
 
-  if (isLoading) return <h1>cargando</h1>;
+  if (isLoading) return <h1>Cargando</h1>;
   if (error) return <h1>Error</h1>;
 
   return (
-    <Container className="container" $activetab={`${activeTab}00%`}>  {/* Changed prop name here */}
-      <ul className="tabs">
-        <li
-          className={activeTab == 0 ? "active" : ""}
-          onClick={() => handleClick(0)}
-        >
-          {<v.iconopie />}
-        </li>
-        <li
-          className={activeTab === 1 ? "active" : ""}
-          onClick={() => handleClick(1)}
-        >
-          {<v.iconolineal />}
-        </li>
-        <li
-          className={activeTab === 2 ? "active" : ""}
-          onClick={() => handleClick(2)}
-        >
-          {<v.iconobars />}
-        </li>
-        <span className="glider"></span>
-      </ul>
+    <Container className="container" $activetab={`${activeTab * 75}px`}>
+      <div className="tabs-wrapper">
+        <ul className="tabs">
+          <li
+            className={activeTab == 0 ? "active" : ""}
+            onClick={() => handleClick(0)}
+          >
+            {<v.iconopie />}
+          </li>
+          <li
+            className={activeTab === 1 ? "active" : ""}
+            onClick={() => handleClick(1)}
+          >
+            {<v.iconolineal />}
+          </li>
+          <li
+            className={activeTab === 2 ? "active" : ""}
+            onClick={() => handleClick(2)}
+          >
+            {<v.iconobars />}
+          </li>
+          <span className="glider"></span>
+        </ul>
+      </div>
+
+
 
       <div className="tab-content">
         {activeTab === 0 && (
@@ -188,8 +189,15 @@ const Container = styled.div<ContainerProps>`
   justify-content: center;
   flex-direction: column;
   width: 100%;
-
   height: 100%;
+  box-sizing: border-box;
+
+  .tabs-wrapper {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+
   .tabs {
     list-style: none;
     display: flex;
@@ -198,6 +206,8 @@ const Container = styled.div<ContainerProps>`
     position: relative;
     border-radius: 100px;
     justify-content: space-between;
+
+
     top: 0;
     left: 0;
     * {
@@ -208,7 +218,7 @@ const Container = styled.div<ContainerProps>`
       align-items: center;
       justify-content: center;
       height: 54px;
-      width: 150px;
+      width: 75px;
       font-size: 1.25rem;
       font-weight: 500;
       border-radius: 99px;
@@ -220,7 +230,7 @@ const Container = styled.div<ContainerProps>`
       color: "#fff";
       display: flex;
       height: 54px;
-      width: 150px;
+      width: 75px;
       background-color: ${(props) => props.theme.carouselColor};
       z-index: 1;
       border-radius: 99px;
@@ -235,7 +245,7 @@ const Container = styled.div<ContainerProps>`
     /* border: 1px solid red; */
     border-radius: 6px;
     margin-top: 20px;
-    width: 100%;
+    width: 80%;
     height: 100%;
     display: flex;
     justify-content: center;

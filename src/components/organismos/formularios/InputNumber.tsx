@@ -50,32 +50,36 @@ export const InputNumber = ({
 };
 const Container = styled.div`
   position: relative;
-  display:flex;
-  align-items:start;
-  flex-direction:column;
-  justify-content:start;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
   input {
     background: ${({ theme }) => theme.bgtotal};
     font-size: 16px;
-    padding: 10px 10px 10px 5px;
-    display: block;
+    padding: 10px;
     width: 100%;
     border: none;
     border-bottom: solid 1px grey;
     color: ${({ theme }) => theme.text};
     outline: none;
+
     &:focus {
-      border-bottom: none;
+      border-bottom: solid 2px ${({ theme }) => theme.primary || "#6A1B9A"};
     }
+
     &::placeholder {
       color: #c8c8c8;
     }
   }
+
   p {
     color: #ff6d00;
     font-size: 12px;
+    margin-top: 4px;
   }
 `;
+
 
 const ContainerTextoicono = styled.div`
   display:flex;

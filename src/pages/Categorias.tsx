@@ -1,10 +1,11 @@
+import { useEffect } from "react";
 import {
   CategoriasTemplate,
   useCategoriasStore,
   useOperaciones,
   useUsuariosStore,
-  SpinnerLoader,
   Categoria,
+  useLoading,
 } from "../index";
 import { useQuery } from "@tanstack/react-query";
 
@@ -16,21 +17,29 @@ interface QueryParams {
 export const Categorias = () => {
   const { tipo } = useOperaciones();
   const { datacategoria, mostrarCategorias } = useCategoriasStore();
-  const { datausuarios } = useUsuariosStore();
+  const { usuario } = useUsuariosStore();
+  const { setIsLoading } = useLoading();
 
-  const { isLoading, error } = useQuery<Categoria[], Error>({
-    queryKey: ["mostrar cuentas", tipo],
+  const { isLoading, error, refetch } = useQuery<Categoria[], Error>({
+    queryKey: ["mostrar cuentas", tipo, usuario?.id],
     queryFn: () =>
       mostrarCategorias({
-        idusuario: datausuarios?.id,
-        tipo
+        idusuario: usuario?.id,
+        tipo,
       } as QueryParams),
-    enabled: !!datausuarios?.id,
+    enabled: false, // desactivar ejecución automática
   });
+  
+  useEffect(() => {
+    if (usuario?.id) {
+      refetch(); // ejecutar manualmente cuando esté disponible
+    }
+  }, [usuario?.id, tipo, refetch]);
+  
 
-  if (isLoading) {
-    return <SpinnerLoader />;
-  }
+  useEffect(() => {
+    setIsLoading(isLoading);
+  }, [isLoading, setIsLoading]);
 
   if (error) {
     return <h1>Error: {error.message}</h1>;

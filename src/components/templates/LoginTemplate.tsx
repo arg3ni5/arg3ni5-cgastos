@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { Btnsave, v, useAuthStore } from "../../index";
+import { BtnForm, v, useAuthStore } from "../../index";
 
 export const LoginTemplate: React.FC = () => {
   const { signInWithGoogle }: { signInWithGoogle: () => void } = useAuthStore();
@@ -15,7 +15,7 @@ export const LoginTemplate: React.FC = () => {
         <Titulo>Cerdyn</Titulo>
         <p className="frase">Toma el control de tus 💵gastos e 💰ingresos</p>
         <ContainerBtn>
-          <Btnsave
+          <BtnForm
             titulo="Iniciar con google"
             icono={<v.iconogoogle />}
             bgcolor={v.colorSecundario}

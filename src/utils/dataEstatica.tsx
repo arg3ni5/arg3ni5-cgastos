@@ -61,20 +61,36 @@ export const DataDesplegableMovimientos = [
     color: v.colorGastos,
     tipo: "g",
     bgcolor: v.colorbgGastos,
+    icono: "🧮"
   },
   {
     text: "Ingresos",
     color: v.colorIngresos,
     tipo: "i",
     bgcolor: v.colorbgingresos,
+    icono: "💵"
   },
   {
     text: "Balance",
     color: v.colorBalance,
     tipo: "b",
     bgcolor: v.colorbgBalance,
+    icono: "📊"
   },
 ];
+export const DataDesplegableMovimientosObj = Object.fromEntries(
+  DataDesplegableMovimientos.map(item => [item.tipo, {...item, text: item.text.replace(/s$/, "")}])
+);
+const titulosPorTipo = {
+  g: "Gastos",
+  i: "Ingresos",
+  b: "Balance",
+} as const;
+
+export const obtenerTitulo = (tipo: keyof typeof titulosPorTipo, estado: "pendientes" | "pagados") => {
+  return `${titulosPorTipo[tipo]} ${estado}`;
+}
+
 
 //data SIDEBAR
 export const LinksArray = [

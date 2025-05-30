@@ -16,8 +16,8 @@ export const LoadingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   return (
     <LoadingContext.Provider value={{ isLoading, loadingText, setIsLoading, setLoadingText }}>
+      {children}
       {isLoading && <SpinnerLoader />}
-      {!isLoading && children}
     </LoadingContext.Provider>
   );
 };

@@ -5,7 +5,7 @@ import {
   InputText,
   Spinner,
   useOperaciones,
-  Btnsave,
+  BtnForm,
   useUsuariosStore,
   useCategoriasStore,
   CategoriaUpdate,
@@ -24,7 +24,7 @@ interface RegistrarCategoriasProps {
 
 export const RegistrarCategorias = ({ onClose, dataSelect, accion }: RegistrarCategoriasProps) => {
   const { insertarCategorias, editarCategoria } = useCategoriasStore();
-  const { datausuarios } = useUsuariosStore();
+  const { usuario } = useUsuariosStore();
   const [showPicker, setShowPicker] = useState<boolean>(false);
   const [emojiselect, setEmojiselect] = useState<string>("😻");
   const [currentColor, setColor] = useState<string>("#F44336");
@@ -68,7 +68,7 @@ export const RegistrarCategorias = ({ onClose, dataSelect, accion }: RegistrarCa
   
   // Update the insertar function
   const insertar = async (formData: FormInputs): Promise<void> => {
-    if (datausuarios?.id == undefined) {
+    if (usuario?.id == undefined) {
       return;
     }
   
@@ -76,7 +76,7 @@ export const RegistrarCategorias = ({ onClose, dataSelect, accion }: RegistrarCa
       descripcion: formData.descripcion,
       color: currentColor,
       icono: emojiselect,
-      idusuario: datausuarios.id,
+      idusuario: usuario.id,
       tipo: tipo,
     };
   
@@ -167,7 +167,7 @@ export const RegistrarCategorias = ({ onClose, dataSelect, accion }: RegistrarCa
               )}
             </div>
             <div className="btnguardarContent">
-              <Btnsave
+              <BtnForm
                 // funcion={handleSubmit(insertar)}
                 type="submit"
                 icono={<v.iconoguardar />}

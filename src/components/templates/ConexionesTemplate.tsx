@@ -9,23 +9,23 @@ interface HeaderStateConfig {
 }
 
 export const ConexionesTemplate: React.FC = () => {
-  const { datausuarios } = useUsuariosStore();
+  const { usuario } = useUsuariosStore();
   const { mostrarConexiones, conexiones, eliminarConexion } = useConexionesStore();
   const queryClient = useQueryClient();
 
-  if (!datausuarios) {
+  if (!usuario) {
     return <div>Loading...</div>;
   }
 
   const { isLoading, error } = useQuery({
-    queryKey: ["mostrar conexiones", datausuarios?.id],
+    queryKey: ["mostrar conexiones", usuario?.id],
     queryFn: () => {
-      if (datausuarios?.id === undefined) {
+      if (usuario?.id === undefined) {
         throw new Error('User ID is required');
       }
-      return mostrarConexiones({ usuario_id: datausuarios.id } as ConexionQueryParams);
+      return mostrarConexiones({ usuario_id: usuario.id } as ConexionQueryParams);
     },
-    enabled: !!datausuarios?.id,
+    enabled: !!usuario?.id,
   });
 
   const confirmarEliminacion = async (conexion: Conexion) => {
@@ -43,9 +43,9 @@ export const ConexionesTemplate: React.FC = () => {
     if (result.isConfirmed) {
       try {
         await eliminarConexion({ usuario_id: conexion.id } as ConexionQueryParams);
-        if (datausuarios?.id !== undefined) {
+        if (usuario?.id !== undefined) {
           queryClient.invalidateQueries({
-            queryKey: ["mostrar conexiones", datausuarios.id],
+            queryKey: ["mostrar conexiones", usuario.id],
           });
         }
         Swal.fire("✅ Eliminado", "Conexión eliminada correctamente", "success");

@@ -12,7 +12,7 @@ interface Conexion {
 }
 
 export const VincularTemplate: React.FC = () => {
-  const { datausuarios } = useUsuariosStore();
+  const { usuario } = useUsuariosStore();
   const { conexiones, insertarConexion, mostrarConexiones } = useConexionesStore();
   const [status, setStatus] = useState<'loading' | 'no-session' | 'success' | 'already' | 'error'>('loading');
   const [msgError, setMsgError] = useState<string>('');
@@ -24,14 +24,14 @@ export const VincularTemplate: React.FC = () => {
   const canal_username = urlParams.get('username') || '';
 
   const { isLoading, error } = useQuery({
-    queryKey: ['mostrar conexiones', datausuarios?.id],
+    queryKey: ['mostrar conexiones', usuario?.id],
     queryFn: () => {
-      if (!datausuarios?.id) {
+      if (!usuario?.id) {
         throw new Error('User ID is required');
       }
-      return mostrarConexiones({ usuario_id: datausuarios.id });
+      return mostrarConexiones({ usuario_id: usuario.id });
     },
-    enabled: !!datausuarios,
+    enabled: !!usuario,
   });
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export const VincularTemplate: React.FC = () => {
         return;
       }
 
-      if(datausuarios?.id === undefined) {
+      if(usuario?.id === undefined) {
         setStatus("error");
         setMsgError("No se encontró el ID de usuario.");
         return;
@@ -59,7 +59,7 @@ export const VincularTemplate: React.FC = () => {
       if (!conexiones) return; // espera a que estén las conexiones
 
       const p = {
-        usuario_id: datausuarios.id,
+        usuario_id: usuario.id,
         canal,
         canal_user_id,
         canal_username,
@@ -86,10 +86,10 @@ export const VincularTemplate: React.FC = () => {
       }
     };
 
-    if (!isLoading && !error && datausuarios?.id) {
+    if (!isLoading && !error && usuario?.id) {
       vincular();
     }
-  }, [isLoading, error, conexiones, datausuarios, canal_user_id]);
+  }, [isLoading, error, conexiones, usuario, canal_user_id]);
 
   return (
     <Container>

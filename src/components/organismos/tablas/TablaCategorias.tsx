@@ -57,7 +57,9 @@ export const TablaCategorias = ({
       confirmButtonText: "Si, eliminar",
     }).then(async (result) => {
       if (result.isConfirmed && p.id && p.idusuario) {
-        await eliminarCategoria({ id: p.id } as CategoriaQueryParams);
+        console.log("Eliminando categoría...", p);
+
+        await eliminarCategoria({ id: p.id, idusuario: p.idusuario } as CategoriaQueryParams);
       }
     });
   };
@@ -86,7 +88,7 @@ export const TablaCategorias = ({
                 (pagina - 1) * porPagina,
                 (pagina - 1) * porPagina + porPagina
               )
-              .map((item, index) => {
+              .map((item) => {
                 return (
                   <tr key={item.id}>
                     <th scope="row">{item.descripcion}</th>

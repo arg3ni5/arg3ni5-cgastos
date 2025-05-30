@@ -7,6 +7,8 @@ export type MovimientoUpdate = Database["public"]["Tables"]["movimientos"]["Upda
 
 export const InsertarMovimientos = async (p: MovimientoInsert): Promise<void> => {
   try {
+    console.log("InsertarMovimientos", p);
+
     const { data, error } = await supabase
       .from("movimientos")
       .insert(p)
@@ -51,8 +53,6 @@ export const ActualizarMovimientos = async (p: MovimientoUpdate): Promise<void> 
     showErrorMessage(error.error_description || error.message + " insertar movimientos");
   }
 }
-
-
 
 export type MovimientosMesAnioParams = Database["public"]["Functions"]["mmovimientosmesanio"]["Args"];
 export type MovimientosMesAnio = Database["public"]["Functions"]["mmovimientosmesanio"]["Returns"];

@@ -1,35 +1,32 @@
 import { create } from "zustand";
-import { Database, EditarTemaMonedaUser, MostrarUsuarios } from "../index";
+import { editarTemaMonedaUser, obtenerUsuarioActual, Usuario } from "../index";
 
-type Usuario = Database["public"]["Tables"]["usuarios"]["Row"];
 type UsuarioUpdate = Partial<Omit<Usuario, "id">> & { id: number };
-
 interface UsuariosStore {
+  usuario: Usuario | null;
   idusuario: number;
-  datausuarios: Usuario | null;
-  mostrarUsuarios: () => Promise<Usuario | null>;
+  setUsuario: (u: Usuario) => void;
+  clearUsuario: () => void;
   editartemamonedauser: (p: UsuarioUpdate) => Promise<void>;
 }
 
-export const useUsuariosStore = create<UsuariosStore>((set, get) => ({
-  idusuario: 0,
-  datausuarios: null,
-
-  mostrarUsuarios: async () => {
-    const response = await MostrarUsuarios();
-    set({ datausuarios: response });
-
-    if (response) {
-      set({ idusuario: response.id });      
-      return response;
-    }
-
-    return null;
+export const useUsuariosStore = create<UsuariosStore>((set) => ({
+  usuario: JSON.parse(localStorage.getItem("usuario") || "null"),
+  idusuario: JSON.parse(localStorage.getItem("usuario") || "null")?.id || 0,
+  setUsuario: (u) => {
+    localStorage.setItem("usuario", JSON.stringify(u));
+    set({ usuario: u, idusuario: u.id });
   },
+  clearUsuario: () => set({ usuario: null, idusuario: 0 }),
 
   editartemamonedauser: async (p) => {
-    await EditarTemaMonedaUser(p);
-    await get().mostrarUsuarios(); // Refrescar datos después del update
+    await editarTemaMonedaUser(p);
+    // Refrescar datos después del update
+    const nuevoUsuario = await obtenerUsuarioActual();
+    set({
+      usuario: nuevoUsuario,
+      idusuario: nuevoUsuario.id,
+    });
   },
 }));
 

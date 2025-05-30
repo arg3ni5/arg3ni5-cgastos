@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 
-interface BtnsaveProps {
+interface BtnFormProps {
   funcion?: () => void;
   className?: string;
   titulo: string;
@@ -12,18 +12,22 @@ interface BtnsaveProps {
   type?: "button" | "submit" | "reset";
 }
 
-export const Btnsave: React.FC<BtnsaveProps> = ({ 
-  funcion, 
-  className, 
-  titulo, 
-  bgcolor, 
-  icono, 
+export const BtnForm: React.FC<BtnFormProps> = ({
+  funcion,
+  className,
+  titulo,
+  bgcolor,
+  icono,
   url,
-  type = "button" 
+  type = "button"
 }) => {
   const navigate = useNavigate();
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (type === "submit") return; // permite que el formulario maneje el submit
+
+    e.preventDefault(); // evita que se dispare el submit por accidente
+
     if (url) {
       navigate(url);
     } else if (funcion) {

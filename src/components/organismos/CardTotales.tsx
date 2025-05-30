@@ -1,7 +1,17 @@
 import styled from "styled-components";
 import { v, useUsuariosStore, BtnCircular } from "../../index";
-export function CardTotales({ color, total, title, icono }) {
-  const { datausuarios } = useUsuariosStore();
+import { JSX } from "react";
+
+interface CardTotalesProps {
+  color: string;
+  total: number | string;
+  title: string;
+  icono: React.ReactNode;
+}
+
+export const CardTotales = ({ color, total, title, icono }: CardTotalesProps): JSX.Element => {
+  const { usuario } = useUsuariosStore();
+
   return (
     <Container>
       <div className="contentTextos">
@@ -10,7 +20,7 @@ export function CardTotales({ color, total, title, icono }) {
           <b>{<v.iconoFlechabajo />}</b>
         </section>
         <span className="total">
-          {datausuarios.moneda} {total}
+          {usuario?.moneda} {total}
         </span>
       </div>
       <div className="contentIcono">
@@ -23,12 +33,12 @@ export function CardTotales({ color, total, title, icono }) {
           textcolor="#ffffff"
           translatex="-45px"
           translatey="-15px"
-         
         />
       </div>
     </Container>
   );
-}
+};
+
 const Container = styled.div`
   display: flex;
   align-items: center;
