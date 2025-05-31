@@ -4,13 +4,9 @@ import { useEffect } from "react";
 export const Dashboard = () => {
   const { tipoMovimiento, date, setTipoMovimientos } = useOperaciones();
   const { mostrarMovimientos, datamovimientos } = useMovimientosStore();
-  const { usuario } = useUsuariosStore();
-
-  
+  const { usuario } = useUsuariosStore();  
 
   useEffect(() => {
-    console.log(DataDesplegableMovimientosObj['b']);
-
     setTipoMovimientos(DataDesplegableMovimientosObj['b']);
   }, [setTipoMovimientos]);
 

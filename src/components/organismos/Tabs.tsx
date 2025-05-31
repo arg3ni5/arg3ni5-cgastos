@@ -158,7 +158,7 @@ export const Tabs = (): JSX.Element => {
   if (isLoading) return <h1>Cargando</h1>;
   if (error) return <h1>Error</h1>;
 
-  const tabIcons = [<v.iconopie />, <v.iconolineal />, <v.iconobars />];
+  const tabIcons = [<v.iconopie />, <v.iconobars />];
 
   return (
     <Container className="container">
@@ -185,42 +185,45 @@ export const Tabs = (): JSX.Element => {
         {activeTab === 0 && (
           <ChartGrid>
             {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && (
-              <ChartContainer>
-                <Dona datagrafica={datagraficaG} data={dataRptMovimientosAñoMes.g} titulo={'Gastos'} />
-              </ChartContainer>
-            ))}
-            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && (
-              <ChartContainer>
-                <Dona datagrafica={datagraficaI} data={dataRptMovimientosAñoMes.i} titulo={"Ingresos"} />
-              </ChartContainer>
+              <>
+                <ChartContainer>
+                  <Dona data={dataRptMovimientosAñoMes} tipo={"g"} />
+                </ChartContainer>
+
+                <ChartContainer>
+                  <Dona data={dataRptMovimientosAñoMes} tipo={"i"} />
+                </ChartContainer>
+              </>
             ))}
           </ChartGrid>
         )}
         {activeTab === 1 && (
           <ChartGrid>
             {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && (
-              <ChartContainer>
-                <Lineal datagrafica={datagraficaG} data={dataRptMovimientosAñoMes.g} titulo={'Gastos'} />
-              </ChartContainer>
-            ))}
-            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && (
-              <ChartContainer>
-                <Lineal datagrafica={datagraficaI} data={dataRptMovimientosAñoMes.i} titulo={"Ingresos"} />
-              </ChartContainer>
+              <>
+                <ChartContainer>
+                  <Barras datagrafica={datagraficaG} data={dataRptMovimientosAñoMes} tipo={"g"} horizontal/>
+                </ChartContainer>
+
+                <ChartContainer>
+                  <Barras datagrafica={datagraficaG} data={dataRptMovimientosAñoMes} tipo={"i"} horizontal/>
+                </ChartContainer>
+              </>
             ))}
           </ChartGrid>
         )}
+        
         {activeTab === 2 && (
           <ChartGrid>
             {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && (
-              <ChartContainer>
-                <Barras datagrafica={datagraficaG} data={dataRptMovimientosAñoMes.g} titulo={'Gastos'} />
-              </ChartContainer>
-            ))}
-            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && (
-              <ChartContainer>
-                <Barras datagrafica={datagraficaI} data={dataRptMovimientosAñoMes.i} titulo={"Ingresos"} />
-              </ChartContainer>
+              <>
+                <ChartContainer>
+                  <Lineal data={dataRptMovimientosAñoMes} tipo={'g'} />
+                </ChartContainer>
+                <ChartContainer>
+                  <Lineal data={dataRptMovimientosAñoMes} tipo={'i'} />
+                </ChartContainer>
+              </>
             ))}
           </ChartGrid>
         )}

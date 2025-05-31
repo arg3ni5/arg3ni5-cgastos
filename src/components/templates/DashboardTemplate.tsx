@@ -8,7 +8,7 @@ import {
   v,
   Tabs
 } from "../../index";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Device } from "../../styles/breakpoints";
 
 export const DashboardTemplate = () => {

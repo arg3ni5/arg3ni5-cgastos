@@ -25,7 +25,7 @@ export interface DataMovimientos {
 interface MovimientosState {
   datamovimientos: DataMovimientos;
   rptParams: RptMovimientosMesAnioParams;
-  dataRptMovimientosAñoMes: { i: RptMovimientosMesAnio, g: RptMovimientosMesAnio };
+  dataRptMovimientosAñoMes: DataRptMovimientosAñoMes;
   totalMesAño: number;
   totalMesAñoPagados: number;
   totalMesAñoPendientes: number;
