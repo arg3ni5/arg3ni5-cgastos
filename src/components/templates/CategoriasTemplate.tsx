@@ -16,6 +16,7 @@ import {
   CategoriaUpdate,
   Categoria,
   Accion,
+  useLoading,
 } from "../../index";
 import { JSX, useState } from "react";
 import vacioverde from "../../assets/vacioverde.json";
@@ -27,6 +28,7 @@ interface CategoriasTemplateProps {
 
 
 export const CategoriasTemplate = ({ data }: CategoriasTemplateProps): JSX.Element => {
+  const { isLoading } = useLoading();
   const [openRegistro, setOpenRegistro] = useState(false);
   const [accion, setAccion] = useState("");
   const [dataSelect, setDataSelect] = useState<CategoriaInsert | CategoriaUpdate>();
@@ -106,7 +108,7 @@ export const CategoriasTemplate = ({ data }: CategoriasTemplateProps): JSX.Eleme
         </ContentFiltro>
       </section>
       <section className="main">
-        {data.length == 0 && (
+        {data.length == 0 && !isLoading && (
           <Lottieanimacion
             alto={300}
             ancho={300}
