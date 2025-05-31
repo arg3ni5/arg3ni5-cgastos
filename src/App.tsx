@@ -6,6 +6,7 @@ import { ThemeProvider } from "styled-components";
 import { styled } from "styled-components";
 import { useQuery } from "@tanstack/react-query";
 import { LoadingProvider } from "./context/LoadingContext";
+import { GlobalStyles } from "./styles/GlobalStyles";
 
 type ThemeContextType = typeof Dark | null;
 
@@ -42,6 +43,7 @@ function App(): JSX.Element {
       <ThemeContext.Provider value={Dark}>
         <LoadingProvider>
           <ThemeProvider theme={themeStyle}>
+            <GlobalStyles />
             <AuthContextProvider>
               {pathname != "/login" ? (
                 <Container className={sidebarOpen ? "active" : ""}>
@@ -69,6 +71,7 @@ function App(): JSX.Element {
   );
 }
 const Container = styled.div`
+  min-height: 100vh;
   display: grid;
   grid-template-columns: 1fr;
   background: ${({ theme }) => theme.bgtotal};
