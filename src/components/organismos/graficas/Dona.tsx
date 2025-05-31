@@ -21,14 +21,16 @@ interface DonaProps {
 }
 
 export const Dona = ({ datagrafica, data, titulo }: DonaProps): JSX.Element => {
-  const style = {
-    width: "400px"
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: "60%"
   };
 
   return (
     <Container>
       <section>
-        <Doughnut data={datagrafica} style={style} />
+        <Doughnut data={datagrafica} options={options} />
       </section>
       <section>
         <h2>{titulo} por categoria</h2>

@@ -37,14 +37,16 @@ interface BarrasProps {
 }
 
 export const Barras = ({ datagrafica, data, titulo }: BarrasProps): JSX.Element => {
-  const style = {
-    width: "400px"
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: "60%"
   };
 
   return (
     <Container>
       <section>
-        <Bar data={datagrafica} style={style} />
+        <Bar data={datagrafica} options={options} />
       </section>
       <section>
         <h2>{titulo} por categoria</h2>

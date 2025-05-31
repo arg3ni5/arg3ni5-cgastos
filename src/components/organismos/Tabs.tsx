@@ -1,4 +1,4 @@
-import { JSX, useState } from "react";
+import { JSX, useLayoutEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import {
   v,
@@ -12,7 +12,6 @@ import {
 } from "../../index";
 import { useQuery } from "@tanstack/react-query";
 interface ContainerProps {
-  $activetab: string;
   theme: {
     bg: string;
     carouselColor: string;
@@ -39,13 +38,42 @@ interface DataGrafica {
 
 export const Tabs = (): JSX.Element => {
   const [activeTab, setActiveTab] = useState<number>(0);
+  const [gliderStyle, setGliderStyle] = useState<{ left: string; width: string }>({
+    left: "0px",
+    width: "75px"
+  });
+
+  const tabRefs = useRef<Array<HTMLLIElement | null>>([]);
 
   const handleClick = (index: number): void => {
     setActiveTab(index);
   };
 
+
+  useLayoutEffect(() => {
+    const updateGlider = () => {
+      const current = tabRefs.current[activeTab];
+      if (current) {
+        const { offsetLeft, clientWidth } = current;
+        setGliderStyle({
+          left: `${offsetLeft}px`,
+          width: `${clientWidth}px`,
+        });
+      }
+    };
+
+    const raf = requestAnimationFrame(updateGlider);
+    window.addEventListener("resize", updateGlider);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", updateGlider);
+    };
+  }, [activeTab]);
+
+
   const { idusuario } = useUsuariosStore();
-  const { date, tipo, tituloBtnDesMovimientos } = useOperaciones();
+  const { date, tipo } = useOperaciones();
   const { dataRptMovimientosAñoMes, rptMovimientosAñoMes, rptParams } = useMovimientosStore();
 
   const datagraficaG: DataGrafica = {
@@ -130,52 +158,71 @@ export const Tabs = (): JSX.Element => {
   if (isLoading) return <h1>Cargando</h1>;
   if (error) return <h1>Error</h1>;
 
+  const tabIcons = [<v.iconopie />, <v.iconolineal />, <v.iconobars />];
+
   return (
-    <Container className="container" $activetab={`${activeTab * 75}px`}>
+    <Container className="container">
       <div className="tabs-wrapper">
         <ul className="tabs">
-          <li
-            className={activeTab == 0 ? "active" : ""}
-            onClick={() => handleClick(0)}
-          >
-            {<v.iconopie />}
-          </li>
-          <li
-            className={activeTab === 1 ? "active" : ""}
-            onClick={() => handleClick(1)}
-          >
-            {<v.iconolineal />}
-          </li>
-          <li
-            className={activeTab === 2 ? "active" : ""}
-            onClick={() => handleClick(2)}
-          >
-            {<v.iconobars />}
-          </li>
-          <span className="glider"></span>
+          {tabIcons.map((icono, index) => (
+            <li
+              key={index}
+              ref={(el: HTMLLIElement | null): void => { tabRefs.current[index] = el }}
+              className={activeTab === index ? "active" : ""}
+              onClick={() => handleClick(index)}
+            >
+              {icono}
+            </li>
+          ))}
+          <span className="glider" style={gliderStyle}></span>
         </ul>
+
       </div>
 
 
 
       <div className="tab-content">
         {activeTab === 0 && (
-          <>
-            {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && <Dona datagrafica={datagraficaG} data={dataRptMovimientosAñoMes.g} titulo={'Gastos'} />)}
-            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && <Dona datagrafica={datagraficaI} data={dataRptMovimientosAñoMes.i} titulo={"Ingresos"} />)}
-          </>
+          <ChartGrid>
+            {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && (
+              <ChartContainer>
+                <Dona datagrafica={datagraficaG} data={dataRptMovimientosAñoMes.g} titulo={'Gastos'} />
+              </ChartContainer>
+            ))}
+            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && (
+              <ChartContainer>
+                <Dona datagrafica={datagraficaI} data={dataRptMovimientosAñoMes.i} titulo={"Ingresos"} />
+              </ChartContainer>
+            ))}
+          </ChartGrid>
         )}
         {activeTab === 1 && (
-          <>
-            {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && <Lineal datagrafica={datagraficaG} data={dataRptMovimientosAñoMes.g} titulo={'Gastos'} />)}
-            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && <Lineal datagrafica={datagraficaI} data={dataRptMovimientosAñoMes.i} titulo={"Ingresos"} />)}
-          </>
+          <ChartGrid>
+            {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && (
+              <ChartContainer>
+                <Lineal datagrafica={datagraficaG} data={dataRptMovimientosAñoMes.g} titulo={'Gastos'} />
+              </ChartContainer>
+            ))}
+            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && (
+              <ChartContainer>
+                <Lineal datagrafica={datagraficaI} data={dataRptMovimientosAñoMes.i} titulo={"Ingresos"} />
+              </ChartContainer>
+            ))}
+          </ChartGrid>
         )}
         {activeTab === 2 && (
-          <>
-            {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && <Barras datagrafica={datagraficaG} data={dataRptMovimientosAñoMes.g} titulo={'Gastos'} />)}
-            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && <Barras datagrafica={datagraficaI} data={dataRptMovimientosAñoMes.i} titulo={"Ingresos"} />)}
-          </>
+          <ChartGrid>
+            {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && (
+              <ChartContainer>
+                <Barras datagrafica={datagraficaG} data={dataRptMovimientosAñoMes.g} titulo={'Gastos'} />
+              </ChartContainer>
+            ))}
+            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && (
+              <ChartContainer>
+                <Barras datagrafica={datagraficaI} data={dataRptMovimientosAñoMes.i} titulo={"Ingresos"} />
+              </ChartContainer>
+            ))}
+          </ChartGrid>
         )}
       </div>
     </Container>
@@ -193,7 +240,8 @@ const Container = styled.div<ContainerProps>`
 
   .tabs-wrapper {
     width: 100%;
-    overflow-x: auto;
+    overflow: visible;
+    padding: 5px 0;
     margin-bottom: 1rem;
 
     &::-webkit-scrollbar {
@@ -203,13 +251,20 @@ const Container = styled.div<ContainerProps>`
     scrollbar-width: none;
   }
 
+  .tabs li {
+    z-index: 2;
+  }
+  .tabs .glider {
+    z-index: 1;
+  }
   .tabs {
+    width: fit-content;
     list-style: none;
     display: flex;
     flex-wrap: nowrap;
     justify-content: center;
     gap: 10px;
-    padding: 5px 10px;
+    padding: 5px 0;
     margin: 0 auto;
     position: relative;
     border-radius: 100px;
@@ -233,16 +288,16 @@ const Container = styled.div<ContainerProps>`
     .glider {
       position: absolute;
       top: 0;
-      left: 0;
-      height: 54px;
-      width: 75px;
+      height: 64px;
       background-color: ${(props) => props.theme.carouselColor};
       border-radius: 99px;
-      transition: transform 0.25s ease-out;
-      transform: translateX(${(props) => props.$activetab});
       z-index: 1;
+      transition: all 0.25s ease-out;
       box-shadow: 0px 10px 20px -3px ${(props) => props.theme.carouselColor};
+      left: 0; 
+      width: 75px;
     }
+
   }
 
   .tab-content {
@@ -251,8 +306,39 @@ const Container = styled.div<ContainerProps>`
     padding: 0 15px;
     box-sizing: border-box;
     display: flex;
+    flex-direction: row;
     justify-content: center;
     align-items: stretch;
+    gap: 20px;
+
+    @media (min-width: 768px) {
+      flex-direction: row !important; /* En pantallas más grandes: lado a lado */
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+  }
+
+`;
+const ChartGrid = styled.div`
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+
+  @media (min-width: 850px) {
+    flex-direction: row;
+    align-items: flex-start;
   }
 `;
 
+const ChartContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: auto;  
+  padding-bottom: 40px;
+`;

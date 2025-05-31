@@ -41,14 +41,16 @@ interface LinealProps {
 }
 
 export const Lineal = ({ datagrafica, data, titulo }: LinealProps): JSX.Element => {
-  const style = {
-    width: "400px"
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: "60%"
   };
 
   return (
     <Container>
       <section>
-        <Line data={datagrafica} style={style} />
+        <Line data={datagrafica} options={options} />
       </section>
       <section>
         <h2>{titulo} por categoria</h2>
