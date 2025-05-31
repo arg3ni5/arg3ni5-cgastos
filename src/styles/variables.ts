@@ -42,7 +42,7 @@ export const v = {
   emoji: BsEmojiLaughing,
   iconeditarTabla: RiEditLine,
   iconeliminarTabla: RiDeleteBin2Line,
-  colorBalance: `#3E43D6`,
+  colorBalance: `#9955ff`,
   colorbgBalance: `#B3B5FF`,
   colorIngresos: `#53B257`,
   colorbgingresos: `#e6ffe7`,

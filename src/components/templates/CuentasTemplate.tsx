@@ -13,11 +13,11 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 	const [state, setState] = useState(false);
 	const [openRegistro, setOpenRegistro] = useState(false);
 	const { usuario } = useUsuariosStore();
-	const { mostrarCuentas, insertarCuenta, actualizarCuenta, eliminarCuenta } = useCuentaStore();
+	const { eliminarCuenta } = useCuentaStore();
 	const [accion, setAccion] = useState<Accion>("Nuevo");
 	const [dataSelect, setDataSelect] = useState<CuentaInsert | CuentaUpdate>({});
 	const [stateTipo, setStateTipo] = useState(false);
-	const { colorCategoriaCuentaActual, tituloBtnDesCuentasActual, bgCategoriaCuentaActual, setTipoCuenta } = useOperaciones();
+	const { selectTipoCuenta, setTipoCuenta } = useOperaciones();
 
 	const cambiarTipo = (p: Tipo) => {
 		setTipoCuenta(p);
@@ -51,17 +51,6 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 		setDataSelect(cuenta);
 		setOpenRegistro(true);
 	};
-
-	const { isLoading, error } = useQuery({
-		queryKey: ["mostrar cuentas", usuario?.id],
-		queryFn: () => {
-			if (!usuario?.id) {
-				throw new Error('User ID is not available');
-			}
-			return mostrarCuentas({ idusuario: usuario.id });
-		},
-		enabled: !!usuario?.id,
-	});
 
 	const handleDelete = async (id: number) => {
 		const result = await Swal.fire({
@@ -107,9 +96,9 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 						}}
 					>
 						<Btndesplegable
-							textcolor={colorCategoriaCuentaActual}
-							bgcolor={bgCategoriaCuentaActual}
-							text={tituloBtnDesCuentasActual}
+							textcolor={selectTipoCuenta.color}
+							bgcolor={selectTipoCuenta.bgcolor}
+							text={selectTipoCuenta.text}
 							funcion={openTipo}
 						/>
 						{stateTipo && (
@@ -125,16 +114,14 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 				<ContentFiltro>
 					<Btnfiltro
 						funcion={nuevoRegistro}
-						bgcolor={bgCategoriaCuentaActual}
-						textcolor={colorCategoriaCuentaActual}
+						bgcolor={selectTipoCuenta.bgcolor}
+						textcolor={selectTipoCuenta.color}
 						icono={<v.agregar />}
 					/>
 				</ContentFiltro>
 			</section>
 
 			<section className="main">
-				{isLoading && <p>Cargando cuentas...</p>}
-				{error && <p>Error al cargar las cuentas</p>}
 				{data?.length > 0 ? (
 					<div className="accounts-grid">
 						{data.map((cuenta) => (
@@ -152,7 +139,7 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 						))}
 					</div>
 				) : (
-					!isLoading && <p>No hay cuentas registradas</p>
+					<p>No hay cuentas registradas</p>
 				)}
 			</section>
 		</Container>

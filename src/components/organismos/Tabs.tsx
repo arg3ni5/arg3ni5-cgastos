@@ -73,7 +73,7 @@ export const Tabs = (): JSX.Element => {
 
 
   const { idusuario } = useUsuariosStore();
-  const { date, tipo } = useOperaciones();
+  const { date, selectTipoMovimiento: tipo } = useOperaciones();
   const { dataRptMovimientosAñoMes, rptMovimientosAñoMes, rptParams } = useMovimientosStore();
 
   const datagraficaG: DataGrafica = {
@@ -149,7 +149,7 @@ export const Tabs = (): JSX.Element => {
     queryFn: () => rptMovimientosAñoMes({
       anio: date.year(),
       mes: date.month() + 1,
-      tipocategoria: tipo,
+      tipocategoria: tipo.tipo,
       iduser: idusuario,
     }),
     enabled: date.month() + 1 !== rptParams.mes || date.year() !== rptParams.anio

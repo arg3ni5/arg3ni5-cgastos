@@ -1,5 +1,5 @@
 // @barrel ignore
-import { MyRoutes, Sidebar, Device, Light, Dark, AuthContextProvider, Menuambur, useUsuariosStore, Login, SpinnerLoader, obtenerUsuarioActual } from "./index";
+import { MyRoutes, Sidebar, Device, Light, Dark, AuthContextProvider, Menuambur, useUsuariosStore, Login, SpinnerLoader } from "./index";
 import { useLocation } from "react-router-dom";
 import { createContext, JSX, useEffect, useState } from "react";
 import { ThemeProvider } from "styled-components";
@@ -14,13 +14,13 @@ type ThemeContextType = typeof Dark | null;
 
 export const ThemeContext = createContext<ThemeContextType>(null);
 function App(): JSX.Element {
-  const { setUsuario } = useUsuariosStore();
+  const { setUsuario, ObtenerUsuarioActual } = useUsuariosStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { pathname } = useLocation();
 
   const { data: usuario, isLoading, error } = useQuery({
     queryKey: ["mostrar usuarios"],
-    queryFn: obtenerUsuarioActual,
+    queryFn: ObtenerUsuarioActual,
   });  
 
   useEffect(() => {
@@ -61,8 +61,6 @@ function App(): JSX.Element {
               ) : (
                 <Login />
               )}
-
-              {/* <ReactQueryDevtools initialIsOpen={true} /> */}
             </AuthContextProvider>
           </ThemeProvider>
         </LoadingProvider>

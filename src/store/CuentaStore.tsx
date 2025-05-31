@@ -5,7 +5,7 @@ interface CuentaStore {
   cuentas: Cuenta[];
   cuentaItemSelect: Cuenta;
   selectCuenta: (p: Cuenta) => void;
-  mostrarCuentas: (p: { idusuario: number }) => Promise<Cuenta[]>;
+  mostrarCuentas: (p: Cuenta) => Promise<Cuenta[]>;
   insertarCuenta: (cuenta: CuentaInsert) => Promise<Cuenta | null>;
   actualizarCuenta: (id: number, cuenta: Partial<Cuenta>) => Promise<Cuenta | null>;
   eliminarCuenta: (id: number) => Promise<boolean>;

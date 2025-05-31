@@ -15,17 +15,17 @@ interface QueryParams {
 }
 
 export const Categorias = () => {
-  const { tipo } = useOperaciones();
+  const { selectTipoCategoria } = useOperaciones();
   const { datacategoria, mostrarCategorias } = useCategoriasStore();
   const { usuario } = useUsuariosStore();
   const { setIsLoading } = useLoading();
 
   const { isLoading, error, refetch } = useQuery<Categoria[], Error>({
-    queryKey: ["mostrar cuentas", tipo, usuario?.id],
+    queryKey: ["mostrar cuentas", selectTipoCategoria, usuario?.id],
     queryFn: () =>
       mostrarCategorias({
         idusuario: usuario?.id,
-        tipo,
+        tipo: selectTipoCategoria.tipo,
       } as QueryParams),
     enabled: false, // desactivar ejecución automática
   });
@@ -34,7 +34,7 @@ export const Categorias = () => {
     if (usuario?.id) {
       refetch(); // ejecutar manualmente cuando esté disponible
     }
-  }, [usuario?.id, tipo, refetch]);
+  }, [usuario?.id, selectTipoCategoria, refetch]);
   
 
   useEffect(() => {

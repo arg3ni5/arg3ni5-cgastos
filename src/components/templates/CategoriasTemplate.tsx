@@ -34,10 +34,10 @@ export const CategoriasTemplate = ({ data }: CategoriasTemplateProps): JSX.Eleme
   const [dataSelect, setDataSelect] = useState<CategoriaInsert | CategoriaUpdate>();
   const [state, setState] = useState(false);
   const [stateTipo, setStateTipo] = useState(false);
-  const { colorCategoria, tituloBtnDes, bgCategoria, setTipo, tipo } = useOperaciones();
+  const { setTipoCategoria, selectTipoCategoria } = useOperaciones();
 
   const cambiarTipo = (p: Tipo): void => {
-    setTipo(p);
+    setTipoCategoria(p);
     setStateTipo(!stateTipo);
     setState(false);
   };
@@ -83,9 +83,9 @@ export const CategoriasTemplate = ({ data }: CategoriasTemplateProps): JSX.Eleme
             }}
           >
             <Btndesplegable
-              textcolor={colorCategoria}
-              bgcolor={bgCategoria}
-              text={tituloBtnDes}
+              textcolor={selectTipoCategoria.color}
+              bgcolor={selectTipoCategoria.bgcolor}
+              text={selectTipoCategoria.text}
               funcion={openTipo}
             />
             {stateTipo && (
@@ -101,8 +101,8 @@ export const CategoriasTemplate = ({ data }: CategoriasTemplateProps): JSX.Eleme
         <ContentFiltro>
           <Btnfiltro
             funcion={nuevoRegistro}
-            bgcolor={bgCategoria}
-            textcolor={colorCategoria}
+            bgcolor={selectTipoCategoria.bgcolor}
+            textcolor={selectTipoCategoria.color}
             icono={<v.agregar />}
           />
         </ContentFiltro>
@@ -112,7 +112,7 @@ export const CategoriasTemplate = ({ data }: CategoriasTemplateProps): JSX.Eleme
           <Lottieanimacion
             alto={300}
             ancho={300}
-            animacion={tipo == "i" ? vacioverde : vaciorojo}
+            animacion={selectTipoCategoria.tipo == "i" ? vacioverde : vaciorojo}
           />
         )}
 

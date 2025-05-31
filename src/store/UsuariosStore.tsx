@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { editarTemaMonedaUser, obtenerUsuarioActual, Usuario } from "../index";
+import { editarTemaMonedaUser, ConsultarUsuario, Usuario } from "../index";
 
 type UsuarioUpdate = Partial<Omit<Usuario, "id">> & { id: number };
 interface UsuariosStore {
@@ -8,6 +8,7 @@ interface UsuariosStore {
   setUsuario: (u: Usuario) => void;
   clearUsuario: () => void;
   editartemamonedauser: (p: UsuarioUpdate) => Promise<void>;
+  ObtenerUsuarioActual: () => Promise<Usuario>;
 }
 
 export const useUsuariosStore = create<UsuariosStore>((set) => ({
@@ -22,11 +23,28 @@ export const useUsuariosStore = create<UsuariosStore>((set) => ({
   editartemamonedauser: async (p) => {
     await editarTemaMonedaUser(p);
     // Refrescar datos después del update
-    const nuevoUsuario = await obtenerUsuarioActual();
-    set({
-      usuario: nuevoUsuario,
-      idusuario: nuevoUsuario.id,
-    });
+    const { data: nuevoUsuario } = await ConsultarUsuario();
+    if (nuevoUsuario) {
+      set({
+        usuario: nuevoUsuario,
+        idusuario: nuevoUsuario.id,
+      });
+    }
   },
+  ObtenerUsuarioActual: async () => {
+    if (localStorage.getItem("usuario")) {
+      const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
+      return usuario;
+    }
+    const { data, error } = await ConsultarUsuario();
+    if (error) {
+      throw new Error(`Error al obtener usuario actual: ${error}`);
+    }
+    if (!data) {
+      throw new Error("Usuario no encontrado");
+    }
+    set({ usuario: data, idusuario: data.id });
+    return data;
+  }
 }));
 
