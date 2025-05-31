@@ -74,7 +74,6 @@ export const DashboardTemplate = () => {
 const Container = styled.div`
   max-width: 100%;
   overflow-x: hidden;
-  width: 100%;
   padding: 15px;
   background: ${({ theme }) => theme.bgtotal};
   color: ${({ theme }) => theme.text};
@@ -122,5 +121,7 @@ const Container = styled.div`
   .graficos {
     grid-area: graficos;
     margin-top: 20px;
+    overflow-x: auto;
+    max-width: 100%;
   }
 `;
