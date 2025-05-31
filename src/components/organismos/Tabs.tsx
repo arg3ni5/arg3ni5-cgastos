@@ -183,36 +183,39 @@ export const Tabs = (): JSX.Element => {
 };
 
 const Container = styled.div<ContainerProps>`
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
   width: 100%;
-  height: 100%;
-  box-sizing: border-box;
+  max-width: 100%;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
 
   .tabs-wrapper {
     width: 100%;
     overflow-x: auto;
-  }
+    margin-bottom: 1rem;
 
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 
   .tabs {
     list-style: none;
     display: flex;
-    box-shadow: 0px 10px 20px -3px rgba(0, 0, 0, 0.1);
-    background-color: ${(props) => props.theme.bg};
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 5px 10px;
+    margin: 0 auto;
     position: relative;
     border-radius: 100px;
-    justify-content: space-between;
+    background-color: ${(props) => props.theme.bg};
+    box-shadow: 0px 10px 20px -3px rgba(0, 0, 0, 0.1);
 
-
-    top: 0;
-    left: 0;
-    * {
-      z-index: 2;
-    }
     li {
       display: flex;
       align-items: center;
@@ -224,30 +227,32 @@ const Container = styled.div<ContainerProps>`
       border-radius: 99px;
       cursor: pointer;
       transition: color 0.15s ease-in;
+      flex-shrink: 0;
     }
+
     .glider {
       position: absolute;
-      color: "#fff";
-      display: flex;
+      top: 0;
+      left: 0;
       height: 54px;
       width: 75px;
       background-color: ${(props) => props.theme.carouselColor};
-      z-index: 1;
       border-radius: 99px;
-      transition: 0.25s ease-out;
-      transform: translateX(${(props) => props.$activetab});  // Changed here
+      transition: transform 0.25s ease-out;
+      transform: translateX(${(props) => props.$activetab});
+      z-index: 1;
       box-shadow: 0px 10px 20px -3px ${(props) => props.theme.carouselColor};
     }
   }
 
   .tab-content {
-    position: relative;
-    /* border: 1px solid red; */
-    border-radius: 6px;
-    margin-top: 20px;
-    width: 80%;
-    height: 100%;
+    width: 100%;
+    max-width: 100%;
+    padding: 0 15px;
+    box-sizing: border-box;
     display: flex;
     justify-content: center;
+    align-items: stretch;
   }
 `;
+

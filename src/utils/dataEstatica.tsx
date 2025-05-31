@@ -79,7 +79,7 @@ export const DataDesplegableMovimientos = [
   },
 ];
 export const DataDesplegableMovimientosObj = Object.fromEntries(
-  DataDesplegableMovimientos.map(item => [item.tipo, {...item, text: item.text.replace(/s$/, "")}])
+  DataDesplegableMovimientos.map(item => [item.tipo, { ...item, text: item.text.replace(/s$/, "") }])
 );
 const titulosPorTipo = {
   g: "Gastos",
@@ -100,15 +100,15 @@ export const LinksArray = [
     to: "/",
   },
   {
-    label: "Cuentas",
-    icon: <MdAccountBalance  />,
-    to: "/cuentas",
+    label: "Dashboard",
+    icon: <AiOutlineDashboard />,
+    to: "/dashboard",
   },
   {
-    label: "Dashboard",
-    icon: <AiOutlineDashboard  />,
-    to: "/dashboard",
-  },   
+    label: "Cuentas",
+    icon: <MdAccountBalance />,
+    to: "/cuentas",
+  },
   {
     label: "Categorias",
     icon: <MdOutlineAnalytics />,
