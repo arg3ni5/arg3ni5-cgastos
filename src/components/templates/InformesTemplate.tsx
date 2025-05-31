@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { CalendarioLineal, Header, Tabs, ContentFiltros, Btndesplegable, ListaMenuDesplegable, DataDesplegableMovimientos, useOperaciones, Btnfiltro, v, Tipo } from "../../index";
+import { CalendarioLineal, Header, Tabs, ContentFiltros, Btndesplegable, ListaMenuDesplegable, DataDesplegableMovimientos, useOperaciones, Tipo } from "../../index";
 import { JSX, useState } from "react";
 export const InformesTemplate = (): JSX.Element => {
   const {
