@@ -6,9 +6,7 @@ import {
   useOperaciones,
   useMovimientosStore,
   v,
-  Tabs,
-  DataDesplegableMovimientos,
-  Tipo,
+  Tabs
 } from "../../index";
 import { useEffect, useState } from "react";
 import { Device } from "../../styles/breakpoints";
@@ -18,7 +16,6 @@ export const DashboardTemplate = () => {
 
   const {
     colorCategoria,
-    setTipoMovimientos,
   } = useOperaciones();
 
   const {
@@ -26,10 +23,6 @@ export const DashboardTemplate = () => {
     totalMesAñoPagados,
     totalMesAñoPendientes,
   } = useMovimientosStore();
-
-  useEffect(() => {
-    setTipoMovimientos(DataDesplegableMovimientos[2] as Tipo);
-  }, [setTipoMovimientos]);
 
   return (
     <Container>
