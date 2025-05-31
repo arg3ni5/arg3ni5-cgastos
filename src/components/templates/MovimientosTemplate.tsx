@@ -30,7 +30,7 @@ export const MovimientosTemplate = (): JSX.Element => {
   const [accion, setAccion] = useState<Accion>("Nuevo");
   const [state, setState] = useState(false);
   const [stateTipo, setStateTipo] = useState(false);
-  const { colorCategoria, bgCategoria, setTipoMovimientos, tipo, tituloBtnDesMovimientos } = useOperaciones();
+  const { setTipoMovimientos, selectTipoMovimiento: tipo } = useOperaciones();
   const {
     totalMesAño,
     totalMesAñoPagados,
@@ -88,9 +88,9 @@ export const MovimientosTemplate = (): JSX.Element => {
             }}
           >
             <Btndesplegable
-              textcolor={colorCategoria}
-              bgcolor={bgCategoria}
-              text={tituloBtnDesMovimientos}
+              textcolor={tipo.color}
+              bgcolor={tipo.bgcolor}
+              text={tipo.text}
               funcion={openTipo}
             />
             {stateTipo && (
@@ -106,8 +106,8 @@ export const MovimientosTemplate = (): JSX.Element => {
         <ContentFiltro>
           <Btnfiltro
             funcion={nuevoRegistro}
-            bgcolor={bgCategoria}
-            textcolor={colorCategoria}
+            bgcolor={tipo.bgcolor}
+            textcolor={tipo.color}
             icono={<v.agregar />}
           />
         </ContentFiltro>
@@ -116,20 +116,20 @@ export const MovimientosTemplate = (): JSX.Element => {
       <section className="totales">
         <CardTotales
           total={totalMesAñoPendientes}
-          title={obtenerTitulo(tipo as "i" | "g" | "b", "pendientes")}
-          color={colorCategoria}
+          title={obtenerTitulo(tipo.tipo as "i" | "g" | "b", "pendientes")}
+          color={tipo.color}
           icono={<v.flechaarribalarga />}
         />
         <CardTotales
           total={totalMesAñoPagados}
-          title={obtenerTitulo(tipo as "i" | "g" | "b", "pagados")}
-          color={colorCategoria}
+          title={obtenerTitulo(tipo.tipo as "i" | "g" | "b", "pagados")}
+          color={tipo.color}
           icono={<v.flechaabajolarga />}
         />
         <CardTotales
           total={totalMesAño}
           title="Total"
-          color={colorCategoria}
+          color={tipo.color}
           icono={<v.balance />}
         />
       </section>
@@ -140,7 +140,7 @@ export const MovimientosTemplate = (): JSX.Element => {
 
       <section className="main">
 
-        {(tipo == "i" || tipo == "b")
+        {(tipo.tipo == "i" || tipo.tipo == "b")
           && datamovimientos.i?.length > 0 &&
           <TablaMovimientos
             tipo={"i"}
@@ -151,7 +151,7 @@ export const MovimientosTemplate = (): JSX.Element => {
             setAccion={setAccion} />
         }
 
-        {(tipo == "g" || tipo == "b")
+        {(tipo.tipo == "g" || tipo.tipo == "b")
           && datamovimientos.g?.length > 0 &&
           <TablaMovimientos
             tipo={"g"}
@@ -163,13 +163,13 @@ export const MovimientosTemplate = (): JSX.Element => {
         }
 
         {(
-          tipo == "i" && datamovimientos.i?.length == 0 ||
-          tipo == "g" && datamovimientos.g?.length == 0
+          tipo.tipo == "i" && datamovimientos.i?.length == 0 ||
+          tipo.tipo == "g" && datamovimientos.g?.length == 0
         ) && (
             <Lottieanimacion
               alto={300}
               ancho={300}
-              animacion={tipo == "i" ? vacioverde : vaciorojo}
+              animacion={tipo.tipo == "i" ? vacioverde : vaciorojo}
             />
           )}
       </section>

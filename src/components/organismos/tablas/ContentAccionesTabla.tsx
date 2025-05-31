@@ -25,4 +25,13 @@ const Container = styled.div`
   @media (max-width: 48em) {
     justify-content: end;
   }
+  // Increase button size on mobile devices
+  @media (max-width: 768px) { // Assuming 768px as a common breakpoint for mobile
+    gap: 15px; // Increase gap for better spacing
+
+    & > div { // Target the div element inside Container
+      font-size: 24px !important; // Increase font size for icons
+      padding: 8px !important; // Add padding for a larger touch target
+    }
+  }
 `;

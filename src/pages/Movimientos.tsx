@@ -1,37 +1,41 @@
+import { useEffect } from "react";
 import {
   useOperaciones,
   useUsuariosStore,
-  SpinnerLoader,
   MovimientosTemplate,
   useMovimientosStore,
   DataMovimientos,
+  useLoading,
 } from "../index";
 import { useQuery } from "@tanstack/react-query";
 
 export const Movimientos = () => {
-  const { tipo, date } = useOperaciones();
+  const { selectTipoMovimiento: tipo, date } = useOperaciones();
   const { mostrarMovimientos, datamovimientos } = useMovimientosStore();
   const { usuario } = useUsuariosStore();
+  const { setIsLoading } = useLoading();
 
 
-  
+
   // Cargar movimientos
-  const { isLoading: loadingMovimientos, error: errorMovimientos } = useQuery<DataMovimientos, Error>({
+  const { isLoading, error } = useQuery<DataMovimientos, Error>({
     queryKey: ["mostrar movimientos", date, tipo, usuario?.id],
     queryFn: () =>
       mostrarMovimientos({
         anio: date.year(),
         mes: date.month() + 1,
         iduser: usuario?.id ?? 0,
-        tipocategoria: tipo,
+        tipocategoria: tipo.tipo,
       }),
     enabled: datamovimientos == null || !!usuario?.id && !!(date.month() + 1) && !!date.year(),
   });
 
-  if (loadingMovimientos) return <SpinnerLoader />;
+  useEffect(() => {
+    setIsLoading(isLoading);
+  }, [isLoading, setIsLoading]);
 
-  if (errorMovimientos) {
-    return <h1>Error: {(errorMovimientos)?.message}</h1>;
+  if (error) {
+    return <h1>Error: {error.message}</h1>;
   }
 
   return (

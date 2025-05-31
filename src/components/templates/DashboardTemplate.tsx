@@ -12,11 +12,7 @@ import { useState } from "react";
 import { Device } from "../../styles/breakpoints";
 
 export const DashboardTemplate = () => {
-  const [state, setState] = useState(false); // agregado para stateConfig del Header
-
-  const {
-    colorCategoria,
-  } = useOperaciones();
+  const [state, setState] = useState(false);
 
   const {
     totalMesAño,
@@ -40,19 +36,19 @@ export const DashboardTemplate = () => {
         <CardTotales
           total={totalMesAñoPendientes}
           title="Ingresos / Gastos pendientes"
-          color={colorCategoria}
+          color={v.colorBalance}
           icono={<v.flechaarribalarga />}
         />
         <CardTotales
           total={totalMesAñoPagados}
           title="Ingresos / Gastos pagados"
-          color={colorCategoria}
+          color={v.colorBalance}
           icono={<v.flechaabajolarga />}
         />
         <CardTotales
           total={totalMesAño}
           title="Balance mensual"
-          color={colorCategoria}
+          color={v.colorBalance}
           icono={<v.balance />}
         />
       </section>

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { v } from "../styles/variables";
 import dayjs, { Dayjs } from 'dayjs';
+import { DataDesplegableMovimientosObj, DataDesplegables } from "../utils/dataEstatica";
 
 export type TipoMovimiento = "g" | "i" | "b";
 
@@ -11,41 +12,23 @@ export interface Tipo {
   bgcolor: string;
 }
 interface OperacionesState {
-  tipo: string;
-  tipoMovimiento: string;
-  tipoCuenta: string;
-  tituloBtnDes: string;
-  tituloBtnDesCuentas: string;
-  tituloBtnDesMovimientos: string;
-  colorCategoria: string;
-  bgCategoria: string;
-  tipoActualCuenta: string;
-  tituloBtnDesCuentasActual: string;
-  colorCategoriaCuentaActual: string;
-  bgCategoriaCuentaActual: string;
+  selectTipoMovimiento: Tipo;
+  selectTipoCuenta: Tipo;
+  selectTipoCategoria: Tipo;
   date: Dayjs;
   setToday: () => void;
   addMonth: () => void;
   substractMonth: () => void;
   setDate: (p: Dayjs) => void;
-  setTipoMovimientos: (p: Tipo) => void;
-  setTipoCuenta: (p: Tipo) => void;
-  setTipo: (p: Tipo) => void;
+  setTipoMovimientos: (t: Tipo) => void;
+  setTipoCuenta: (t: Tipo) => void;
+  setTipoCategoria: (t: Tipo) => void;
 }
 
 export const useOperaciones = create<OperacionesState>((set, get) => ({
-  tipo: "i",
-  tipoMovimiento: "i",
-  tipoCuenta: "d",
-  tituloBtnDes: "Categorias ingresos",
-  tituloBtnDesMovimientos: "Ingresos",
-  tituloBtnDesCuentas: "Categorias Debito",
-  colorCategoria: v.colorIngresos,
-  bgCategoria: v.colorbgingresos,
-  tipoActualCuenta: "d",
-  tituloBtnDesCuentasActual: "Cuentas de Débito",
-  colorCategoriaCuentaActual: v.colorIngresos,
-  bgCategoriaCuentaActual: v.colorbgingresos,
+  selectTipoMovimiento:  DataDesplegables.movimientos["g"] as Tipo,
+  selectTipoCuenta: DataDesplegables.cuentas["d"] as Tipo,
+  selectTipoCategoria: DataDesplegables.categorias["g"] as Tipo,
   date: dayjs(),
   setToday: () => {
     set({ date: dayjs() });
@@ -61,32 +44,19 @@ export const useOperaciones = create<OperacionesState>((set, get) => ({
   setDate: (d: Dayjs) => {
     set({ date: d });
   },
-  setTipoMovimientos: (p: Tipo) => {
+  setTipoMovimientos: (t: Tipo) => {
     set({
-      tipo: p.tipo,
-      tituloBtnDesMovimientos: p.text,
-      colorCategoria: p.color,
-      bgCategoria: p.bgcolor,
+      selectTipoMovimiento: t
     })
   },
-  setTipo: (p: Tipo) => {
+  setTipoCategoria: (p: Tipo) => {
     set({
-      tipo: p.tipo,
-      tituloBtnDes: p.text,
-      colorCategoria: p.color,
-      bgCategoria: p.bgcolor,
+      selectTipoCategoria: p,
     })
   },
   setTipoCuenta: (p: Tipo) => {
     set({
-      tipoCuenta: p.tipo,
-      tituloBtnDesCuentas: p.text,
-      colorCategoria: p.color,
-      bgCategoria: p.bgcolor,
-      tipoActualCuenta: p.tipo,
-      tituloBtnDesCuentasActual: p.text,
-      colorCategoriaCuentaActual: p.color,
-      bgCategoriaCuentaActual: p.bgcolor,
+      selectTipoCuenta: p,
     })
   },
 }));

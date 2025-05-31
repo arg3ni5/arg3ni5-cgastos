@@ -1,26 +1,25 @@
 import { useEffect } from "react";
-import { SpinnerLoader } from "../components/moleculas/SpinnerLoader";
 import { CuentasTemplate } from "../components/templates/CuentasTemplate";
 import { useLoading } from "../context/LoadingContext";
 import { useCuentaStore } from "../store/CuentaStore";
 import { useOperaciones } from "../store/OperacionesStore";
 import { useUsuariosStore } from "../store/UsuariosStore";
-import { Cuenta, CuentasQueryParams } from "../supabase/crudCuentas";
+import { Cuenta } from "../supabase/crudCuentas";
 import { useQuery } from "@tanstack/react-query";
 
 export function Cuentas() {
-  const { tipo } = useOperaciones();
+  const { selectTipoCuenta } = useOperaciones();
   const { cuentas, mostrarCuentas } = useCuentaStore();
   const { usuario } = useUsuariosStore();
   const { setIsLoading } = useLoading();
 
   const { isLoading, error } = useQuery<Cuenta[], Error>({
-    queryKey: ["mostrar categorias", tipo],
+    queryKey: ["mostrar categorias", selectTipoCuenta],
     queryFn: () =>
       mostrarCuentas({
         idusuario: usuario?.id,
-        tipo
-      } as CuentasQueryParams),
+        tipo: selectTipoCuenta.tipo
+      } as Cuenta),
     enabled: !!usuario?.id,
   });
 

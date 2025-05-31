@@ -7,34 +7,6 @@ export type UsuarioInsert = Database["public"]["Tables"]["usuarios"]["Insert"];
 export type UsuarioUpdate = Database["public"]["Tables"]["usuarios"]["Update"];
 
 /**
- * Consulta un usuario por su ID auth.
- */
-export const ConsultarUsuario = async (
-  idAuthSupabase?: string
-): Promise<{ data: Usuario | null; error: string | null }> => {
-  try {
-    if (!idAuthSupabase) {
-      const authId = await ObtenerIdAuthSupabase();
-      idAuthSupabase = authId ?? undefined;
-    }
-
-    if (!idAuthSupabase) {
-      return { data: null, error: "No se pudo obtener el idAuthSupabase" };
-    }
-
-    const { data, error } = await supabase
-      .from("usuarios")
-      .select()
-      .eq("idauth_supabase", idAuthSupabase)
-      .maybeSingle();
-
-    return { data, error: error?.message || null };
-  } catch (error) {
-    return { data: null, error: (error as Error).message };
-  }
-};
-
-/**
  * Inserta un usuario si no existe.
  */
 export const InsertarUsuarios = async (
@@ -66,24 +38,6 @@ export const InsertarUsuarios = async (
   }
 };
 
-/**
- * Retorna el usuario actual desde la tabla.
- */
-export const obtenerUsuarioActual = async (): Promise<Usuario> => {
-  const idAuthSupabase = await ObtenerIdAuthSupabase();
-  if (!idAuthSupabase) return {} as Usuario;
-
-  const { data, error } = await supabase
-    .from("usuarios")
-    .select()
-    .eq("idauth_supabase", idAuthSupabase)
-    .maybeSingle();
-
-  if (error) throw new Error(error.message);
-  if (!data) throw new Error("Usuario no encontrado");
-
-  return data as Usuario;
-};
 
 /**
  * Edita el tema o moneda de un usuario.
@@ -94,5 +48,34 @@ export const editarTemaMonedaUser = async (
   const { error } = await supabase.from("usuarios").update(p).eq("id", p.id);
   if (error) {
     throw new Error(`Error al editar usuarios: ${error.message}`);
+  }
+};
+
+
+/**
+ * Consulta un usuario por su ID auth.
+ */
+export const ConsultarUsuario = async (
+  idAuthSupabase?: string
+): Promise<{ data: Usuario | null; error: string | null }> => {
+  try {
+    if (!idAuthSupabase) {
+      const authId = await ObtenerIdAuthSupabase();
+      idAuthSupabase = authId ?? undefined;
+    }
+
+    if (!idAuthSupabase) {
+      return { data: null, error: "No se pudo obtener el idAuthSupabase" };
+    }
+
+    const { data, error } = await supabase
+      .from("usuarios")
+      .select()
+      .eq("idauth_supabase", idAuthSupabase)
+      .maybeSingle();
+
+    return { data, error: error?.message || null };
+  } catch (error) {
+    return { data: null, error: (error as Error).message };
   }
 };
