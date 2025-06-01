@@ -4,6 +4,7 @@ export * from './components/atomos/ContentFiltros';
 export * from './components/atomos/ContentHeader';
 export * from './components/atomos/Icono';
 export * from "./components/atomos/InputTextNumber";
+export * from './components/moleculas/BtnIcono';
 export * from './components/moleculas/BtnCircular';
 export * from './components/moleculas/Btndesplegable';
 export * from './components/moleculas/Btnfiltro';
