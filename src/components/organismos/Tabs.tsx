@@ -185,45 +185,43 @@ export const Tabs = (): JSX.Element => {
         {activeTab === 0 && (
           <ChartGrid>
             {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && (
-              <>
-                <ChartContainer>
-                  <Dona data={dataRptMovimientosAñoMes} tipo={"g"} />
-                </ChartContainer>
-
-                <ChartContainer>
-                  <Dona data={dataRptMovimientosAñoMes} tipo={"i"} />
-                </ChartContainer>
-              </>
+              <ChartContainer>
+                <Dona data={dataRptMovimientosAñoMes} tipo={"g"} />
+              </ChartContainer>
+            ))}
+            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && (
+              <ChartContainer>
+                <Dona data={dataRptMovimientosAñoMes} tipo={"i"} />
+              </ChartContainer>
             ))}
           </ChartGrid>
         )}
         {activeTab === 1 && (
           <ChartGrid>
             {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && (
-              <>
-                <ChartContainer>
-                  <Barras datagrafica={datagraficaG} data={dataRptMovimientosAñoMes} tipo={"g"} horizontal/>
-                </ChartContainer>
-
-                <ChartContainer>
-                  <Barras datagrafica={datagraficaG} data={dataRptMovimientosAñoMes} tipo={"i"} horizontal/>
-                </ChartContainer>
-              </>
+              <ChartContainer>
+                <Barras data={dataRptMovimientosAñoMes} tipo={"g"} horizontal />
+              </ChartContainer>
+            ))}
+            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && (
+              <ChartContainer>
+                <Barras data={dataRptMovimientosAñoMes} tipo={"i"} horizontal />
+              </ChartContainer>
             ))}
           </ChartGrid>
         )}
-        
+
         {activeTab === 2 && (
           <ChartGrid>
             {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && (
-              <>
-                <ChartContainer>
-                  <Lineal data={dataRptMovimientosAñoMes} tipo={'g'} />
-                </ChartContainer>
-                <ChartContainer>
-                  <Lineal data={dataRptMovimientosAñoMes} tipo={'i'} />
-                </ChartContainer>
-              </>
+              <ChartContainer>
+                <Lineal data={dataRptMovimientosAñoMes} tipo={'g'} />
+              </ChartContainer>
+            ))}
+            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && (
+              <ChartContainer>
+                <Lineal data={dataRptMovimientosAñoMes} tipo={'i'} />
+              </ChartContainer>
             ))}
           </ChartGrid>
         )}

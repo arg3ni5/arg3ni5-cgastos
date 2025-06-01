@@ -39,18 +39,6 @@ interface DataGrafica {
 }
 
 interface BarrasProps {
-  datagrafica: {
-    labels: string[];
-    datasets: {
-      tension: number;
-      fill: boolean;
-      label: string;
-      data: number[];
-      backgroundColor: string[];
-      borderColor: string[];
-      borderWidth: number;
-    }[];
-  };
   data: DataRptMovimientosAñoMes;
   tipo: string;
   horizontal?: boolean;
