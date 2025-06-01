@@ -3,7 +3,6 @@ import {
   Header,
   CalendarioLineal,
   CardTotales,
-  useOperaciones,
   useMovimientosStore,
   v,
   Tabs
