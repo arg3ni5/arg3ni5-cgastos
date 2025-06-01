@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { v } from "../../index";
 
 interface BtndesplegableProps {
+  icono?: string;
   text: string;
   bgcolor: string;
   textcolor: string;
@@ -13,11 +14,13 @@ interface ContainerProps {
   $textcolor: string;
 }
 
-export const Btndesplegable: React.FC<BtndesplegableProps> = ({ text, bgcolor, textcolor, funcion }) => {
+export const Btndesplegable: React.FC<BtndesplegableProps> = ({ icono, text, bgcolor, textcolor, funcion }) => {
   return (
     <Container $bgcolor={bgcolor} $textcolor={textcolor} onClick={funcion}>
       <span className="containerText">
         {<v.iconoFlechabajo />}
+
+        {icono}
         <h6>{text}</h6>
       </span>
     </Container>

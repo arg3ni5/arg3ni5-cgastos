@@ -26,7 +26,8 @@ interface OperacionesState {
 }
 
 export const useOperaciones = create<OperacionesState>((set, get) => ({
-  selectTipoMovimiento:  DataDesplegables.movimientos["g"] as Tipo,
+  selectTipoMovimiento: JSON.parse(localStorage.getItem("tipoMovimiento") || "null")
+    || DataDesplegables.movimientos["g"] as Tipo,
   selectTipoCuenta: DataDesplegables.cuentas["d"] as Tipo,
   selectTipoCategoria: DataDesplegables.categorias["g"] as Tipo,
   date: dayjs(),
@@ -45,6 +46,7 @@ export const useOperaciones = create<OperacionesState>((set, get) => ({
     set({ date: d });
   },
   setTipoMovimientos: (t: Tipo) => {
+    localStorage.setItem("tipoMovimiento", JSON.stringify(t));
     set({
       selectTipoMovimiento: t
     })

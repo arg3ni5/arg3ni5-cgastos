@@ -1,12 +1,13 @@
 import { JSX, useState } from "react";
 import { v } from "../../../styles/variables";
 import styled from "styled-components";
-import { useOperaciones } from "../../../index";
 interface PaginacionProps {
   color?: string;
   pagina: number;
   setPagina: (pagina: number) => void;
   maximo: number;
+  bgCategoria?: string; 
+  colorCategoria?: string;
 }
 
 interface ContainerProps {
@@ -14,8 +15,7 @@ interface ContainerProps {
   $colorCategoria: string;
 }
 
-export const Paginacion = ({ pagina, setPagina, maximo, color}: PaginacionProps): JSX.Element => {
-  const { bgCategoria, colorCategoria } = useOperaciones();
+export const Paginacion = ({ pagina, setPagina, maximo, color, bgCategoria, colorCategoria}: PaginacionProps): JSX.Element => {
   const [input, setInput] = useState<number>(1);
 
   const nextPage = (): void => {
@@ -34,7 +34,7 @@ export const Paginacion = ({ pagina, setPagina, maximo, color}: PaginacionProps)
   };
 
   return (
-    <Container $bgCategoria={bgCategoria} $colorCategoria={color || colorCategoria}>
+    <Container $bgCategoria={bgCategoria || ''} $colorCategoria={color || colorCategoria || ''}>
       <button onClick={inicio}>
         <span>{<v.iconotodos />}</span>
       </button>
