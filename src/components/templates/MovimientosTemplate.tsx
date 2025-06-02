@@ -19,6 +19,7 @@ import {
   CalendarioLineal,
   obtenerTitulo,
   BtnIcono,
+  FiltrosMovimientosResponsive, // Added import
 } from "../../index";
 import { JSX, useState } from "react";
 import vacioverde from "../../assets/vacioverde.json";
@@ -30,8 +31,8 @@ import { DataDesplegables } from '../../utils/dataEstatica';
 export const MovimientosTemplate = (): JSX.Element => {
   const [openRegistro, setOpenRegistro] = useState(false);
   const [accion, setAccion] = useState<Accion>("Nuevo");
-  const [state, setState] = useState(false);
-  const [stateTipo, setStateTipo] = useState(false);
+  const [state, setState] = useState(false); // state for openUser kept
+  // const [stateTipo, setStateTipo] = useState(false); // Removed stateTipo
   const { setTipoMovimientos, selectTipoMovimiento: tipo } = useOperaciones();
   const {
     totalMesAño,
@@ -44,22 +45,22 @@ export const MovimientosTemplate = (): JSX.Element => {
 
   const cambiarTipo = (p: Tipo): void => {
     setTipoMovimientos(p);
-    setStateTipo(!stateTipo);
-    setState(false);
+    // setStateTipo(!stateTipo); // Removed line related to stateTipo
+    setState(false); // Keep this if state is for other dropdowns like user menu
   };
 
   const cerrarDesplegables = (): void => {
-    setStateTipo(false);
-    setState(false);
+    // setStateTipo(false); // Removed line related to stateTipo
+    setState(false); // Keep this if state is for other dropdowns
   };
 
-  const openTipo = (): void => {
-    setStateTipo(!stateTipo);
-    setState(false);
-  };
+  // const openTipo = (): void => { // Removed openTipo function
+  //   setStateTipo(!stateTipo);
+  //   setState(false);
+  // };
   const openUser = (): void => {
     setState(!state);
-    setStateTipo(false);
+    // setStateTipo(false); // Removed line related to stateTipo
   };
 
   const gastos = DataDesplegables.movimientos['g'];
@@ -87,61 +88,19 @@ export const MovimientosTemplate = (): JSX.Element => {
       </header>
 
       <section className="tipo">
-        <ContentFiltros>
-
-          {tipo.tipo !== "b" &&
-            <BtnIcono
-              icono={balance.icono}
-              textcolor={balance.color}
-              bgcolor={balance.bgcolor}
-              text="Todos"
-              funcion={() => cambiarTipo(balance)}
-            />
-          }
-          {tipo.tipo == "i" &&
-            <BtnIcono
-              icono={gastos.icono}
-              textcolor={gastos.color}
-              bgcolor={gastos.bgcolor}
-              text={gastos.text}
-              funcion={() => cambiarTipo(gastos)}
-            />
-          }
-
-          {tipo.tipo == "g" &&
-            <BtnIcono
-              icono={ingresos.icono}
-              textcolor={ingresos.color}
-              bgcolor={ingresos.bgcolor}
-              text={ingresos.text}
-              funcion={() => cambiarTipo(ingresos)}
-            />
-          }
-
-          {tipo.tipo == "b" &&
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-            >
-              <Btndesplegable
-                icono={balance.icono}
-                textcolor={balance.color}
-                bgcolor={balance.bgcolor}
-                text={balance.text}
-                funcion={openTipo}
-              />
-              {stateTipo && (
-                <ListaMenuDesplegable
-                  data={[ingresos, gastos]}
-                  top="112%"
-                  funcion={(p) => cambiarTipo(p as Tipo)}
-                />
-              )}
-
-            </div>
-          }
-        </ContentFiltros>
+        <FiltrosContainer>
+          {/* Old filter logic removed, new component added below */}
+          <FiltrosMovimientosResponsive
+            currentTipo_tipo={tipo.tipo}
+            onFiltroChange={cambiarTipo}
+            dataDesplegables_movimientos={DataDesplegables.movimientos}
+            v_obj={v}
+            Device_obj={Device}
+            BtnIcono_comp={BtnIcono}
+            Btndesplegable_comp={Btndesplegable}
+            ListaMenuDesplegable_comp={ListaMenuDesplegable}
+          />
+        </FiltrosContainer>
         <ContentFiltro>
           <Btnfiltro
             funcion={nuevoRegistro}
@@ -280,4 +239,10 @@ const Container = styled.div`
 const ContentFiltro = styled.div`
   display: flex;
   flex-wrap: wrap;
+`;
+
+const FiltrosContainer = styled.div`
+  display: flex;
+  align-items: center; // Align items vertically
+  gap: ${v.spacingS}; // Use theme variable for gap
 `;
