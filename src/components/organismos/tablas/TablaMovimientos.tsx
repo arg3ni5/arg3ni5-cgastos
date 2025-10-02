@@ -143,7 +143,7 @@ const Container = styled.div<ContainerProps>`
     display: flex;
     justify-content: center;
     align-items: center;
-  }  
+  }
   @media (min-width: ${v.bpbart}) {
     margin: 0;
   }
@@ -263,7 +263,7 @@ const Container = styled.div<ContainerProps>`
           border-bottom: 1px solid rgba(161, 161, 161, 0.32);
           text-align: center;
         }
-        
+
       }
       td[data-type="currency"] {
         font-weight:600;
