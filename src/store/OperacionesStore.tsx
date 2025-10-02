@@ -10,6 +10,7 @@ export interface Tipo {
   text: string;
   color: string;
   bgcolor: string;
+  icono?: string;
 }
 interface OperacionesState {
   selectTipoMovimiento: Tipo;
