@@ -93,7 +93,7 @@ export const TablaMovimientos = ({
                   <tr key={item.id}>
                     <th scope="row">
                       <Pagado
-                        $bgcolor={item.estado == "1" ? "#69e673" : "#b3b3b3"}
+                        $bgcolor={item.estado ? "#69e673" : "#b3b3b3"}
                       ></Pagado>
                     </th>
                     <td data-title="Fecha" >{item.fecha}</td>
