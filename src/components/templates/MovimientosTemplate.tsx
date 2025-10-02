@@ -88,16 +88,16 @@ export const MovimientosTemplate = (): JSX.Element => {
 
       <section className="tipo">
         <ContentFiltros>
-
-          {tipo.tipo !== "b" &&
+          {(tipo.tipo == "i" || tipo.tipo == "g") &&
             <BtnIcono
-              icono={balance.icono}
-              textcolor={balance.color}
-              bgcolor={balance.bgcolor}
-              text="Todos"
-              funcion={() => cambiarTipo(balance)}
+              icono={tipo.tipo === "g" ? gastos.icono : ingresos.icono}
+              textcolor={tipo.tipo === "g" ? gastos.color : ingresos.color}
+              bgcolor={tipo.tipo === "g" ? gastos.bgcolor : ingresos.bgcolor}
+              text={tipo.tipo === "g" ? gastos.text : ingresos.text}
+              funcion={() => {}}
             />
           }
+
           {tipo.tipo == "i" &&
             <BtnIcono
               icono={gastos.icono}
@@ -115,6 +115,18 @@ export const MovimientosTemplate = (): JSX.Element => {
               bgcolor={ingresos.bgcolor}
               text={ingresos.text}
               funcion={() => cambiarTipo(ingresos)}
+            />
+          }
+
+
+
+          {tipo.tipo !== "b" &&
+            <BtnIcono
+              icono={balance.icono}
+              textcolor={balance.color}
+              bgcolor={balance.bgcolor}
+              text="Todos"
+              funcion={() => cambiarTipo(balance)}
             />
           }
 
