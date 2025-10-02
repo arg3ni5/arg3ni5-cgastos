@@ -1,27 +1,34 @@
 import styled from "styled-components";
+import { Tipo } from "../../store/OperacionesStore";
 
 interface BtnIconoProps {
-    icono: string;
-    text: string;
-    bgcolor: string;
-    textcolor: string;
-    funcion: () => void;
+  active?: boolean;
+  tipo?: Tipo;
+  icon?: string;
+  icono?: string;
+  text?: string;
+  bgcolor?: string;
+  textcolor?: string;
+  funcion: () => void;
 }
 
 interface ContainerProps {
-    $bgcolor: string;
-    $textcolor: string;
+  $bgcolor: string;
+  $textcolor: string;
 }
 
-export const BtnIcono: React.FC<BtnIconoProps> = ({ icono, text, bgcolor, textcolor, funcion }) => {
-    return (
-        <Container $bgcolor={bgcolor} $textcolor={textcolor} onClick={funcion}>
-            <span className="containerText">
-                {icono}
-                <h6>{text}</h6>
-            </span>
-        </Container>
-    );
+export const BtnIcono: React.FC<BtnIconoProps> = ({ active, tipo, icono, text, bgcolor, textcolor, funcion }) => {
+  return (
+    <Container
+      $bgcolor={tipo?.bgcolor || bgcolor || ''}
+      $textcolor={tipo?.color || textcolor || ''}
+      onClick={funcion}>
+      <span className="containerText">
+        {tipo?.icono || icono}
+        <h6>{tipo?.text || text}</h6>
+      </span>
+    </Container>
+  );
 };
 
 const Container = styled.div<ContainerProps>`
