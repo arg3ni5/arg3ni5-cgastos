@@ -1,7 +1,6 @@
 import { create } from "zustand";
-import { v } from "../styles/variables";
 import dayjs, { Dayjs } from 'dayjs';
-import { DataDesplegableMovimientosObj, DataDesplegables } from "../utils/dataEstatica";
+import { DataDesplegables } from "../utils/dataEstatica";
 
 export type TipoMovimiento = "g" | "i" | "b";
 
