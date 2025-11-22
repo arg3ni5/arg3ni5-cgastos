@@ -11,7 +11,7 @@ export const MyRoutes = ({ isLoading }: ProtectedRouteProps) => {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route element={<ProtectedRoute user={user} redirectTo="/" isLoading={isLoading} />}>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Login />} />
         <Route path="/home" element={<Home />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/cuentas" element={<Cuentas />} />
