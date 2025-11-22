@@ -14,7 +14,7 @@ export function Cuentas() {
   const { setIsLoading } = useLoading();
 
   const { isLoading, error } = useQuery<Cuenta[], Error>({
-    queryKey: ["mostrar categorias", selectTipoCuenta],
+    queryKey: ["mostrar cuentas", usuario?.id, selectTipoCuenta.tipo],
     queryFn: () =>
       mostrarCuentas({
         idusuario: usuario?.id,
