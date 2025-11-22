@@ -1,7 +1,6 @@
 import { Header, v, Btnfiltro, useOperaciones, Tipo, ContentFiltros, Btndesplegable, ListaMenuDesplegable, DataDesplegableCuenta, RegistrarCuentas, Cuenta, CuentaInsert, CuentaUpdate, Accion, showSuccessMessage, showErrorMessage } from "../../index";
 import { useState } from "react";
 import { useUsuariosStore, useCuentaStore } from "../../index";
-import { useQuery } from "@tanstack/react-query";
 import Swal from "sweetalert2";
 import { Container, ContentFiltro } from "./CuentasTemplate.styles";
 
@@ -12,11 +11,11 @@ interface CuentasTemplateProps {
 export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 	const [state, setState] = useState(false);
 	const [openRegistro, setOpenRegistro] = useState(false);
-	const { usuario } = useUsuariosStore();
-	const { mostrarCuentas, insertarCuenta, actualizarCuenta, eliminarCuenta } = useCuentaStore();
-	const [accion, setAccion] = useState<Accion>("Nuevo");
-	const [dataSelect, setDataSelect] = useState<CuentaInsert | CuentaUpdate>({});
-	const [stateTipo, setStateTipo] = useState(false);
+        const { usuario } = useUsuariosStore();
+        const { eliminarCuenta } = useCuentaStore();
+        const [accion, setAccion] = useState<Accion>("Nuevo");
+        const [dataSelect, setDataSelect] = useState<CuentaInsert | CuentaUpdate>({});
+        const [stateTipo, setStateTipo] = useState(false);
 	const { colorCategoriaCuentaActual, tituloBtnDesCuentasActual, bgCategoriaCuentaActual, setTipoCuenta } = useOperaciones();
 
 	const cambiarTipo = (p: Tipo) => {
@@ -52,19 +51,8 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 		setOpenRegistro(true);
 	};
 
-	const { isLoading, error } = useQuery({
-		queryKey: ["mostrar cuentas", usuario?.id],
-		queryFn: () => {
-			if (!usuario?.id) {
-				throw new Error('User ID is not available');
-			}
-			return mostrarCuentas({ idusuario: usuario.id });
-		},
-		enabled: !!usuario?.id,
-	});
-
-	const handleDelete = async (id: number) => {
-		const result = await Swal.fire({
+        const handleDelete = async (id: number) => {
+                const result = await Swal.fire({
 			title: '¿Estás seguro?',
 			text: "No podrás revertir esta acción",
 			icon: 'warning',
