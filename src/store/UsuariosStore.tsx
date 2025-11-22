@@ -22,7 +22,6 @@ export const useUsuariosStore = create<UsuariosStore>((set) => ({
     localStorage.removeItem("usuario");
     set({ usuario: null, idusuario: 0 });
   },
-
   editartemamonedauser: async (p) => {
     await editarTemaMonedaUser(p);
     // Refrescar datos después del update
@@ -35,19 +34,36 @@ export const useUsuariosStore = create<UsuariosStore>((set) => ({
     }
   },
   ObtenerUsuarioActual: async () => {
-    if (localStorage.getItem("usuario")) {
-      const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
-      return usuario;
+    // 1. Intentar leer desde localStorage
+    const stored = localStorage.getItem("usuario");
+
+    if (stored) {
+      const usuario: Usuario = JSON.parse(stored);
+
+      // Validar que el usuario local sea usable
+      if (usuario?.id && usuario?.idauth_supabase) {
+        set({ usuario, idusuario: usuario.id });
+        return usuario;
+      }
     }
+
+    // 2. Consultar a Supabase
     const { data, error } = await ConsultarUsuario();
+
     if (error) {
       throw new Error(`Error al obtener usuario actual: ${error}`);
     }
+
     if (!data) {
       throw new Error("Usuario no encontrado");
     }
+
+    // 3. Guardar usuario válido en store + localStorage
+    localStorage.setItem("usuario", JSON.stringify(data));
     set({ usuario: data, idusuario: data.id });
+
     return data;
   }
-}));
 
+
+}));
