@@ -19,7 +19,7 @@ function App(): JSX.Element {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  const { data: usuario, isLoading, error } = useQuery({
+  const { data: usuario, isLoading, error, fetchStatus } = useQuery({
     queryKey: ["mostrar usuarios"],
     queryFn: ObtenerUsuarioActual,
     enabled: pathname !== "/login",
@@ -32,11 +32,11 @@ function App(): JSX.Element {
   }, [usuario]);
 
   useEffect(() => {
-    if (error && pathname !== "/login") {
+    if (error && fetchStatus !== "fetching" && pathname !== "/login") {
       clearUsuario();
       navigate("/login");
     }
-  }, [clearUsuario, error, navigate, pathname]);
+  }, [clearUsuario, error, fetchStatus, navigate, pathname]);
 
 
   if (pathname !== "/login" && isLoading) return <SpinnerLoader />;
