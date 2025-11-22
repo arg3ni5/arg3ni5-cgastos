@@ -18,7 +18,10 @@ export const useUsuariosStore = create<UsuariosStore>((set) => ({
     localStorage.setItem("usuario", JSON.stringify(u));
     set({ usuario: u, idusuario: u.id });
   },
-  clearUsuario: () => set({ usuario: null, idusuario: 0 }),
+  clearUsuario: () => {
+    localStorage.removeItem("usuario");
+    set({ usuario: null, idusuario: 0 });
+  },
 
   editartemamonedauser: async (p) => {
     await editarTemaMonedaUser(p);
