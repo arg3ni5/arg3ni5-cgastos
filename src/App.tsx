@@ -33,6 +33,7 @@ function App(): JSX.Element {
     data: usuario,
     isLoading,
     error,
+    fetchStatus
   } = useQuery<Usuario, Error>({
     queryKey: ["usuarioActual"],
     queryFn: ObtenerUsuarioActual,
@@ -45,11 +46,11 @@ function App(): JSX.Element {
       setUsuario(usuario);
     }
 
-    if (error && pathname !== "/login") {
+    if (error && fetchStatus !== "fetching" && pathname !== "/login") {
       clearUsuario();
       navigate("/login");
     }
-  }, [usuario, error, pathname, setUsuario, clearUsuario, navigate]);
+  }, [usuario, error, fetchStatus, pathname, setUsuario, clearUsuario, navigate]);
 
   if (pathname !== "/login" && isLoading) return <SpinnerLoader />;
   if (error) console.log(error);
