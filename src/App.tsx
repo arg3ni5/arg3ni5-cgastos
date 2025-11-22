@@ -1,6 +1,6 @@
 // @barrel ignore
 import { MyRoutes, Sidebar, Device, Light, Dark, AuthContextProvider, Menuambur, useUsuariosStore, Login, SpinnerLoader } from "./index";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { createContext, JSX, useEffect, useState } from "react";
 import { ThemeProvider } from "styled-components";
 import { styled } from "styled-components";
@@ -14,24 +14,32 @@ type ThemeContextType = typeof Dark | null;
 
 export const ThemeContext = createContext<ThemeContextType>(null);
 function App(): JSX.Element {
-  const { setUsuario, ObtenerUsuarioActual } = useUsuariosStore();
+  const { setUsuario, clearUsuario, ObtenerUsuarioActual } = useUsuariosStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   const { data: usuario, isLoading, error } = useQuery({
     queryKey: ["mostrar usuarios"],
     queryFn: ObtenerUsuarioActual,
-  });  
+    enabled: pathname !== "/login",
+  });
 
   useEffect(() => {
     if (usuario) {
       setUsuario(usuario);
     }
   }, [usuario]);
-  
+
+  useEffect(() => {
+    if (error && pathname !== "/login") {
+      clearUsuario();
+      navigate("/login");
+    }
+  }, [clearUsuario, error, navigate, pathname]);
+
 
   if (pathname !== "/login" && isLoading) return <SpinnerLoader />;
-  if (error) return <h1>Error: {error.message}</h1>;
 
   const theme = usuario?.tema === "0" ? "light" : "dark";
 
