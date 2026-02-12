@@ -22,6 +22,8 @@ import {
   DataDesplegableMovimientos,
   Tipo,
   DataDesplegableMovimientosObj,
+  DataDesplegables,
+  Cuenta,
 } from "../../../index";
 import { useQuery } from "@tanstack/react-query";
 interface RegistrarMovimientosProps {
@@ -37,10 +39,8 @@ interface FormInputs {
   monto: number;
 }
 
-export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movimiento, accion }: RegistrarMovimientosProps): JSX.Element => {
-
-  const { tipo } = useOperaciones();
-  const { cuentas, cuentaItemSelect, mostrarCuentas, selectCuenta } = useCuentaStore();
+export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, accion }: RegistrarMovimientosProps): JSX.Element => {
+  const { cuentaItemSelect, mostrarCuentas, selectCuenta } = useCuentaStore();
   const { idusuario } = useUsuariosStore();
   const { categoriaItemSelect, selectCategoria, mostrarCategorias } = useCategoriasStore();
   const { insertarMovimientos, actualizarMovimientos } = useMovimientosStore();
@@ -50,7 +50,7 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
   const [stateCategorias, setStateCategorias] = useState<boolean>(false);
   const [stateCuenta, setStateCuenta] = useState<boolean>(false);
   const [stateTipo, setStateTipo] = useState<boolean>(false);
-  const [tipoMovimiento, setTipoMovimiento] = useState<Tipo>(DataDesplegableMovimientosObj[dataSelect.tipo!] || { text: "", icono: "" });
+  const [tipoMovimiento, setTipoMovimiento] = useState<Tipo>(DataDesplegables.movimientos[dataSelect.tipo!] || {} as Tipo);
   const fechaactual = new Date();
 
   const {
@@ -85,7 +85,7 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
       fecha: formData.fecha,
       idcategoria: categoriaItemSelect.id,
       idcuenta: cuentaItemSelect.id,
-      tipo,
+      tipo: tipoMovimiento.tipo,
       valor: parseFloat(formData.monto.toString()),
     } as MovimientoInsert;
     try {
@@ -115,7 +115,7 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
       id: dataSelect.id,
       idcategoria: categoriaItemSelect.id,
       idcuenta: cuentaItemSelect.id,
-      tipo,
+      tipo: tipoMovimiento.tipo,
       valor: parseFloat(formData.monto.toString()),
     } as MovimientoUpdate;
     try {
@@ -136,13 +136,13 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
     setStateTipo(!stateTipo);
   };
 
-  useEffect(() => {
-    if (!cuentas?.length) {
-      mostrarCuentas({ idusuario });
-    }
-  }, [cuentas, mostrarCuentas]);
+  const { data: cuentas } = useQuery({
+    queryKey: ["cuentas", idusuario],
+    queryFn: () => mostrarCuentas({ idusuario } as Cuenta),
+    enabled: !!idusuario,
+  });
 
-  const { data: categorias, isLoading, isError } = useQuery({
+  const { data: categorias } = useQuery({
     queryKey: ["categorias", tipoMovimiento?.tipo, idusuario],
     queryFn: () => mostrarCategorias({ tipo: tipoMovimiento?.tipo, idusuario }),
     enabled: !!idusuario && !!tipoMovimiento?.tipo,
@@ -157,8 +157,8 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
           <ContenedorDropdown>
             <Selector
               color="#e14e19"
-              texto1={(categoriaItemSelect?.tipo ? DataDesplegableMovimientosObj[categoriaItemSelect.tipo].text : tipoMovimiento?.text) ? accion + " " : ""}
-              texto2={(categoriaItemSelect?.tipo ? DataDesplegableMovimientosObj[categoriaItemSelect.tipo].text : tipoMovimiento?.text) || "Selecciones un tipo"}
+              texto1={(categoriaItemSelect?.tipo ? DataDesplegables.movimientos[categoriaItemSelect.tipo].text : tipoMovimiento?.text) ? accion + " " : ""}
+              texto2={(categoriaItemSelect?.tipo ? DataDesplegables.movimientos[categoriaItemSelect.tipo].text : tipoMovimiento?.text) || "Selecciones un tipo"}
               funcion={() => setStateTipo(!stateTipo)}
             />
 
@@ -234,7 +234,11 @@ export const RegistrarMovimientos = ({ setState, state, dataSelect = {} as Movim
                   top="100%"
                   scroll="auto"
                   setState={() => setStateCuenta(!stateCuenta)}
-                  data={cuentas}
+                  data={cuentas?.map(cuenta => ({
+                    ...cuenta,
+                    descripcion: cuenta.descripcion || '',
+                    icono: cuenta.icono || ''
+                  })) || []}
                   funcion={selectCuenta}
                 />
               )}
@@ -375,23 +379,6 @@ const Container = styled.div`
     }
   }
 `;
-const ItemContainer = styled.section`
-  gap: 10px;
-  width: 100%;
-  display: flex;
-  padding: 10px;
-  border-radius: 10px;
-  cursor: pointer;
-  border: 2px solid ${(props) => props.color};
-  transition: 0.3s;
-  &:hover {
-    background-color: ${(props) => props.color};
-  }
-  > *:last-child {
-    flex: 1;
-    width: 100%;
-  }
-`;
 
 const WrapperPagoFecha = styled.div`
   display: flex;
@@ -494,6 +481,7 @@ const ContenedorBotones = styled.div`
 `;
 
 const StickyFooter = styled.div`
+  margin-top: 20px;
   position: sticky;
   bottom: 0;
   background: ${({ theme }) => theme.bgtotal};

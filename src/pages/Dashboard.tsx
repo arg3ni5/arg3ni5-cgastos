@@ -1,19 +1,24 @@
 import { useQuery } from "@tanstack/react-query";
-import { DashboardTemplate, DataMovimientos, SpinnerLoader, useMovimientosStore, useOperaciones, useUsuariosStore } from "../index";
+import { DashboardTemplate, DataDesplegables, DataMovimientos, SpinnerLoader, useMovimientosStore, useOperaciones, useUsuariosStore } from "../index";
+import { useEffect } from "react";
 export const Dashboard = () => {
-  const { tipo, date } = useOperaciones();
+  const { date, setTipoMovimientos } = useOperaciones();
   const { mostrarMovimientos, datamovimientos } = useMovimientosStore();
-  const { usuario } = useUsuariosStore();
+  const { usuario } = useUsuariosStore();  
+
+  useEffect(() => {
+    setTipoMovimientos(DataDesplegables.movimientos['b']);
+  }, [setTipoMovimientos]);
 
   // Cargar movimientos
   const { isLoading: loadingMovimientos, error: errorMovimientos } = useQuery<DataMovimientos, Error>({
-    queryKey: ["mostrar movimientos", date, tipo, usuario?.id],
+    queryKey: ["mostrar movimientos", date, usuario?.id],
     queryFn: () =>
       mostrarMovimientos({
         anio: date.year(),
         mes: date.month() + 1,
         iduser: usuario?.id ?? 0,
-        tipocategoria: tipo,
+        tipocategoria: 'b',
       }),
     enabled: datamovimientos == null || !!usuario?.id && !!(date.month() + 1) && !!date.year(),
   });

@@ -5,9 +5,11 @@ import 'swiper/css';
 import {
   Accion,
   ContentAccionesTabla,
+  hexToRgba,
   Movimiento,
   MovimientosMesAnio,
   Paginacion,
+  Tipo,
   useMovimientosStore,
 } from "../../../index";
 import Swal from "sweetalert2";
@@ -22,7 +24,7 @@ import { convertToMovimiento } from '../../../supabase/crudMovimientos';
 
 interface TablaMovimientosProps {
   titulo?: string;
-  tipo: string;
+  tipo: Tipo;
   color: string;
   data: MovimientosMesAnio | null;
   setOpenRegistro: (value: boolean) => void;
@@ -80,18 +82,18 @@ export const TablaMovimientos = ({
 
   const editar = (data: Movimiento): void => {
     setOpenRegistro(true);
-    setDataSelect({ ...data, tipo: tipo });
+    setDataSelect({ ...data, tipo: tipo.tipo });
     setAccion("Editar");
   };
 
   return (
     <>
-      <Container>
+      <Container $bgcolor={tipo.bgcolor || ''} $color={tipo.color || ''}>
         {titulo && (<h2>{titulo}</h2>)}
         <table className="responsive-table">
           <thead>
             <tr>
-              <th scope="col">Situacion</th>
+              <th scope="col">Pagado</th>
               <th scope="col">Fecha</th>
               <th scope="col">Descripcion</th>
               <th scope="col">Categoria</th>
@@ -177,16 +179,37 @@ export const TablaMovimientos = ({
               })}
           </tbody>
         </table>
-        <Paginacion pagina={pagina} setPagina={setPagina} maximo={maximo} color={color} />
+        <div className="pagination">
+
+          {maximo > 1 && <Paginacion pagina={pagina} setPagina={setPagina} maximo={maximo} color={color} />}
+        </div>
       </Container>
     </>
   );
 }
-const Container = styled.div`
+interface ContainerProps {
+  $bgcolor: string;
+  $color: string;
+}
+const Container = styled.div<ContainerProps>`
+  border-radius: 25px;
+  width: 100%;
+  background-color: ${(props) => hexToRgba(props.$color, 0.14)};
+
   position: relative;
   margin: 5% 3%;
+
+  h2 {
+    padding: 20px;
+  }
+  .pagination{
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
   @media (min-width: ${v.bpbart}) {
-    margin: 2%;
+    margin: 0;
   }
   @media (min-width: ${v.bphomer}) {
     margin: 2em auto;
@@ -492,7 +515,7 @@ interface ColorcontentProps {
   color?: string;
 }
 
-interface SituacionProps {
+interface PagadoProps {
   $bgcolor: string;
 }
 
@@ -506,7 +529,7 @@ const Colorcontent = styled.div<ColorcontentProps>`
   text-align: center;
 `;
 
-const Situacion = styled.div<SituacionProps>`
+const Pagado = styled.div<PagadoProps>`
   display: flex;
   justify-content: center;
   &::before {

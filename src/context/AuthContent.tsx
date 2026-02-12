@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { supabase, InsertarUsuarios, Database } from "../index";
+import { supabase, InsertarUsuarios, Database, useUsuariosStore } from "../index";
 import { useLocation, useNavigate } from "react-router-dom";
 
 type UsuarioInsert = Database["public"]["Tables"]["usuarios"]["Insert"];
@@ -17,6 +17,7 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AuthContextType["user"]>(null);
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { setUsuario } = useUsuariosStore();
 
 
   useEffect(() => {
@@ -33,14 +34,14 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
             idauth_supabase: session.user.id,
             picture: metadata.picture
           };
-          
+
           setUser(user);
 
           await insertarUsuarios(user, session.user.id);
-          
+
           if (pathname === "/login") {
             navigate("/");
-            return; 
+            return;
           }
         }
       }
@@ -61,7 +62,11 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
       idauth_supabase: idAuthSupabase,
     };
 
-    await InsertarUsuarios(p, idAuthSupabase);
+    const usuario = await InsertarUsuarios(p, idAuthSupabase);
+    if (usuario == null) {
+      return;
+    }
+    setUsuario(usuario);
   };
 
   return (

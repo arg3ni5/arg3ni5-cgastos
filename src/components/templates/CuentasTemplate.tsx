@@ -1,4 +1,4 @@
-import { Header, v, Btnfiltro, useOperaciones, Tipo, ContentFiltros, Btndesplegable, ListaMenuDesplegable, DataDesplegableCuenta, RegistrarCuentas, Cuenta, CuentaInsert, CuentaUpdate, Accion } from "../../index";
+import { Header, v, Btnfiltro, useOperaciones, Tipo, ContentFiltros, Btndesplegable, ListaMenuDesplegable, DataDesplegableCuenta, RegistrarCuentas, Cuenta, CuentaInsert, CuentaUpdate, Accion, showSuccessMessage, showErrorMessage } from "../../index";
 import { useState } from "react";
 import { useUsuariosStore, useCuentaStore } from "../../index";
 import { useQuery } from "@tanstack/react-query";
@@ -13,11 +13,11 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 	const [state, setState] = useState(false);
 	const [openRegistro, setOpenRegistro] = useState(false);
 	const { usuario } = useUsuariosStore();
-	const { mostrarCuentas, insertarCuenta, actualizarCuenta, eliminarCuenta } = useCuentaStore();
-	const [accion, setAccion] = useState("");
-	const [dataSelect, setDataSelect] = useState<CuentaInsert | CuentaUpdate>();
+	const { eliminarCuenta } = useCuentaStore();
+	const [accion, setAccion] = useState<Accion>("Nuevo");
+	const [dataSelect, setDataSelect] = useState<CuentaInsert | CuentaUpdate>({});
 	const [stateTipo, setStateTipo] = useState(false);
-	const { colorCategoria, tituloBtnDesCuentas, bgCategoria, setTipoCuenta } = useOperaciones();
+	const { selectTipoCuenta, setTipoCuenta } = useOperaciones();
 
 	const cambiarTipo = (p: Tipo) => {
 		setTipoCuenta(p);
@@ -46,42 +46,10 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 		setDataSelect({});
 	};
 
-	const { isLoading, error } = useQuery({
-		queryKey: ["mostrar cuentas", usuario?.id],
-		queryFn: () => {
-			if (!usuario?.id) {
-				throw new Error('User ID is not available');
-			}
-			return mostrarCuentas({ idusuario: usuario.id });
-		},
-		enabled: !!usuario?.id,
-	});
-
-	const handleUpdate = async (cuenta: CuentaUpdate) => {
-		const { value: formValues } = await Swal.fire({
-			title: 'Editar Cuenta',
-			html: `
-				<input id="descripcion" class="swal2-input" placeholder="Descripción" value="${cuenta.descripcion}">
-				<input id="saldo" type="number" class="swal2-input" placeholder="Saldo" value="${cuenta.saldo_actual}">
-				<input id="icono" class="swal2-input" placeholder="Icono" value="${cuenta.icono}">
-			`,
-			focusConfirm: false,
-			preConfirm: () => {
-				return {
-					descripcion: (document.getElementById('descripcion') as HTMLInputElement).value,
-					saldo_actual: Number((document.getElementById('saldo') as HTMLInputElement).value),
-					icono: (document.getElementById('icono') as HTMLInputElement).value,
-				}
-			}
-		});
-
-		if (!cuenta.id) {
-			return;
-		}
-
-		if (formValues) {
-			await actualizarCuenta(cuenta.id, formValues);
-		}
+	const openEditModal = (cuenta: CuentaUpdate) => {
+		setAccion("Editar");
+		setDataSelect(cuenta);
+		setOpenRegistro(true);
 	};
 
 	const handleDelete = async (id: number) => {
@@ -97,8 +65,12 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 		});
 
 		if (result.isConfirmed) {
-			await eliminarCuenta(id);
-			Swal.fire('Eliminado', 'La cuenta ha sido eliminada', 'success');
+			try {
+				await eliminarCuenta(id);
+				showSuccessMessage('Cuenta eliminada correctamente');
+			} catch (error) {
+				showErrorMessage('Error al eliminar la cuenta');
+			}
 		}
 	};
 
@@ -106,9 +78,9 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 		<Container onClick={cerrarDesplegables}>
 			{openRegistro && (
 				<RegistrarCuentas
-					dataSelect={dataSelect || {}}
-					onClose={() => setOpenRegistro(!openRegistro)}
-					accion={accion as Accion}
+					dataSelect={dataSelect}
+					onClose={() => setOpenRegistro(false)}
+					accion={accion}
 				/>
 			)}
 
@@ -124,9 +96,9 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 						}}
 					>
 						<Btndesplegable
-							textcolor={colorCategoria}
-							bgcolor={bgCategoria}
-							text={tituloBtnDesCuentas}
+							textcolor={selectTipoCuenta.color}
+							bgcolor={selectTipoCuenta.bgcolor}
+							text={selectTipoCuenta.text}
 							funcion={openTipo}
 						/>
 						{stateTipo && (
@@ -142,16 +114,14 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 				<ContentFiltro>
 					<Btnfiltro
 						funcion={nuevoRegistro}
-						bgcolor={bgCategoria}
-						textcolor={colorCategoria}
+						bgcolor={selectTipoCuenta.bgcolor}
+						textcolor={selectTipoCuenta.color}
 						icono={<v.agregar />}
 					/>
 				</ContentFiltro>
 			</section>
 
 			<section className="main">
-				{isLoading && <p>Cargando cuentas...</p>}
-				{error && <p>Error al cargar las cuentas</p>}
 				{data?.length > 0 ? (
 					<div className="accounts-grid">
 						{data.map((cuenta) => (
@@ -162,14 +132,14 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 								</div>
 								<p className="balance">{usuario?.moneda} {cuenta.saldo_actual?.toFixed(2)}</p>
 								<div className="card-actions">
-									<button onClick={() => handleUpdate(cuenta)}>✏️</button>
+									<button onClick={() => openEditModal(cuenta)}>✏️</button>
 									<button onClick={() => handleDelete(cuenta.id)}>🗑️</button>
 								</div>
 							</div>
 						))}
 					</div>
 				) : (
-					!isLoading && <p>No hay cuentas registradas</p>
+					<p>No hay cuentas registradas</p>
 				)}
 			</section>
 		</Container>

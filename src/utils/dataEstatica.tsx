@@ -43,13 +43,13 @@ export const DataDesplegableCuenta = [
 
 export const DataDesplegableTipo = [
   {
-    text: "Categorias gastos",
+    text: "Categoria gasto",
     color: v.colorGastos,
     tipo: "g",
     bgcolor: v.colorbgGastos,
   },
   {
-    text: "Categorias ingresos",
+    text: "Categoria ingreso",
     color: v.colorIngresos,
     tipo: "i",
     bgcolor: v.colorbgingresos,
@@ -78,8 +78,19 @@ export const DataDesplegableMovimientos = [
     icono: "📊"
   },
 ];
+export const DataDesplegables = {
+  movimientos : Object.fromEntries(
+    DataDesplegableMovimientos.map(item => [item.tipo, { ...item, text: item.text.replace(/s$/, "") }])
+  ),
+  cuentas : Object.fromEntries(
+    DataDesplegableCuenta.map(item => [item.tipo, {...item, text: item.text.replace(/s$/, "") }])
+  ),
+  categorias : Object.fromEntries(
+    DataDesplegableTipo.map(item => [item.tipo, {...item, text: item.text.replace(/s$/, "") }])
+  )
+}
 export const DataDesplegableMovimientosObj = Object.fromEntries(
-  DataDesplegableMovimientos.map(item => [item.tipo, {...item, text: item.text.replace(/s$/, "")}])
+  DataDesplegableMovimientos.map(item => [item.tipo, { ...item, text: item.text.replace(/s$/, "") }])
 );
 const titulosPorTipo = {
   g: "Gastos",
@@ -100,15 +111,15 @@ export const LinksArray = [
     to: "/",
   },
   {
-    label: "Cuentas",
-    icon: <MdAccountBalance  />,
-    to: "/cuentas",
+    label: "Dashboard",
+    icon: <AiOutlineDashboard />,
+    to: "/dashboard",
   },
   {
-    label: "Dashboard",
-    icon: <AiOutlineDashboard  />,
-    to: "/dashboard",
-  },   
+    label: "Cuentas",
+    icon: <MdAccountBalance />,
+    to: "/cuentas",
+  },
   {
     label: "Categorias",
     icon: <MdOutlineAnalytics />,

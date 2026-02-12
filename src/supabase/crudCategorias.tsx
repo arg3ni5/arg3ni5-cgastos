@@ -12,14 +12,14 @@ export type CategoriaInsert = Database["public"]["Tables"]["categorias"]["Insert
 export type CategoriaUpdate = Database["public"]["Tables"]["categorias"]["Update"];
 export interface CategoriaQueryParams {
   idusuario: number;
-  tipo: string;
+  tipo?: string;
   id?: number;
 }
 
 export const InsertarCategorias = async (p: CategoriaInsert): Promise<void> => {
   try {
     console.log("InsertarCategorias", p);
-    
+
     const { data, error } = await supabase
       .from("categorias")
       .insert(p)
@@ -49,12 +49,19 @@ export const InsertarCategorias = async (p: CategoriaInsert): Promise<void> => {
 
 export const MostrarCategorias = async (p: CategoriaQueryParams): Promise<Categoria[] | null> => {
   try {
-    const { data } = await supabase
-      .from("categorias")
-      .select()
-      .eq("idusuario", p.idusuario)
-      .eq("tipo", p.tipo)
-      .order("id", { ascending: false });
+    const { data } =
+      p.tipo ?
+        await supabase
+          .from("categorias")
+          .select()
+          .eq("idusuario", p.idusuario)
+          .eq("tipo", p.tipo || '')
+          .order("id", { ascending: false }) :
+        await supabase
+          .from("categorias")
+          .select()
+          .eq("idusuario", p.idusuario)
+          .order("id", { ascending: false });
     return data;
   } catch (error) {
     return null;

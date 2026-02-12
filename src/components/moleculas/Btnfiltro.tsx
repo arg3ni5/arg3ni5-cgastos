@@ -1,5 +1,18 @@
 import styled from "styled-components";
-export function Btnfiltro({ bgcolor, textcolor, icono, funcion }) {
+
+interface BtnfiltroProps {
+  bgcolor: string;
+  textcolor: string;
+  icono: React.ReactNode;
+  funcion: () => void;
+}
+
+interface ContainerProps {
+  $bgcolor: string;
+  $textcolor: string;
+}
+
+export const Btnfiltro: React.FC<BtnfiltroProps> = ({ bgcolor, textcolor, icono, funcion }) => {
   return (
     <Container $textcolor={textcolor} $bgcolor={bgcolor} onClick={funcion}>
       <div className="contentIcon">
@@ -7,8 +20,9 @@ export function Btnfiltro({ bgcolor, textcolor, icono, funcion }) {
       </div>
     </Container>
   );
-}
-const Container = styled.div`
+};
+
+const Container = styled.div<ContainerProps>`
   min-width: 50px;
   min-height: 50px;
   border-radius: 50%;
@@ -29,7 +43,7 @@ const Container = styled.div`
     right: 0;
     display: flex;
     justify-content: center;
-    transition:0.2s;
+    transition: 0.2s;
     &:hover {
       transform: scale(1.3);
     }

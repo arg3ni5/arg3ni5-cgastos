@@ -25,7 +25,7 @@ export interface DataMovimientos {
 interface MovimientosState {
   datamovimientos: DataMovimientos;
   rptParams: RptMovimientosMesAnioParams;
-  dataRptMovimientosAñoMes: { i: RptMovimientosMesAnio, g: RptMovimientosMesAnio };
+  dataRptMovimientosAñoMes: DataRptMovimientosAñoMes;
   totalMesAño: number;
   totalMesAñoPagados: number;
   totalMesAñoPendientes: number;
@@ -55,10 +55,9 @@ export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
       await MostrarMovimientosPorMesAño({ ...p, tipocategoria: "g" }) || [] : [];
     const response = { i, g };
 
-    
-    
-    const { calcularTotales, datamovimientos } = get();
-    console.log('mostrarMovimientos', datamovimientos);
+
+
+    const { calcularTotales } = get();
     if (response) calcularTotales(response);
     set({ datamovimientos: { i: i || [], g: g || [] } });
     return response;
@@ -66,20 +65,23 @@ export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
 
   calcularTotales: (data: DataMovimientos): void => {
     const { parametros } = get();
-    
+
     if (parametros.tipocategoria === "b") {
       const totalIngresos = data.i?.reduce((sum, item) => sum + Number(item.valor), 0) || 0;
       const totalGastos = data.g?.reduce((sum, item) => sum + Number(item.valor), 0) || 0;
-      
+
       const ingPagados = data.i?.filter(item => Number(item.estado) === 1)
         .reduce((sum, item) => sum + Number(item.valor), 0) || 0;
       const gasPagados = data.g?.filter(item => Number(item.estado) === 1)
         .reduce((sum, item) => sum + Number(item.valor), 0) || 0;
-      
+
       const ingPendientes = data.i?.filter(item => Number(item.estado) === 0)
         .reduce((sum, item) => sum + Number(item.valor), 0) || 0;
       const gasPendientes = data.g?.filter(item => Number(item.estado) === 0)
         .reduce((sum, item) => sum + Number(item.valor), 0) || 0;
+
+      console.log({ totalIngresos, totalGastos, ingPagados, gasPagados, ingPendientes, gasPendientes });
+
 
       set({
         totalMesAño: totalIngresos - totalGastos,

@@ -17,12 +17,14 @@ import {
   CardTotales,
   Device,
   CalendarioLineal,
-  DataDesplegableMovimientos,
   obtenerTitulo,
+  BtnIcono,
 } from "../../index";
 import { JSX, useState } from "react";
 import vacioverde from "../../assets/vacioverde.json";
 import vaciorojo from "../../assets/vaciorojo.json";
+import vacioazul from "../../assets/vacioazul.json";
+import { DataDesplegables } from '../../utils/dataEstatica';
 
 
 export const MovimientosTemplate = (): JSX.Element => {
@@ -30,7 +32,7 @@ export const MovimientosTemplate = (): JSX.Element => {
   const [accion, setAccion] = useState<Accion>("Nuevo");
   const [state, setState] = useState(false);
   const [stateTipo, setStateTipo] = useState(false);
-  const { colorCategoria, bgCategoria, setTipoMovimientos, tipo, tituloBtnDesMovimientos } = useOperaciones();
+  const { setTipoMovimientos, selectTipoMovimiento: tipo } = useOperaciones();
   const {
     totalMesAño,
     totalMesAñoPagados,
@@ -60,6 +62,10 @@ export const MovimientosTemplate = (): JSX.Element => {
     setStateTipo(false);
   };
 
+  const gastos = DataDesplegables.movimientos['g'];
+  const ingresos = DataDesplegables.movimientos['i'];
+  const balance = DataDesplegables.movimientos['b'];
+
   const nuevoRegistro = (): void => {
     setOpenRegistro(!openRegistro);
     setAccion("Nuevo");
@@ -82,32 +88,77 @@ export const MovimientosTemplate = (): JSX.Element => {
 
       <section className="tipo">
         <ContentFiltros>
-          <div
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            <Btndesplegable
-              textcolor={colorCategoria}
-              bgcolor={bgCategoria}
-              text={tituloBtnDesMovimientos}
-              funcion={openTipo}
+          {(tipo.tipo == "i" || tipo.tipo == "g") &&
+            <BtnIcono
+              icono={tipo.tipo === "g" ? gastos.icono : ingresos.icono}
+              textcolor={tipo.tipo === "g" ? gastos.color : ingresos.color}
+              bgcolor={tipo.tipo === "g" ? gastos.bgcolor : ingresos.bgcolor}
+              text={tipo.tipo === "g" ? gastos.text : ingresos.text}
+              funcion={() => {}}
             />
-            {stateTipo && (
-              <ListaMenuDesplegable
-                data={DataDesplegableMovimientos}
-                top="112%"
-                funcion={(p) => cambiarTipo(p as Tipo)}
-              />
-            )}
-          </div>
-        </ContentFiltros>
+          }
 
+          {tipo.tipo == "i" &&
+            <BtnIcono
+              icono={gastos.icono}
+              textcolor={gastos.color}
+              bgcolor={gastos.bgcolor}
+              text={gastos.text}
+              funcion={() => cambiarTipo(gastos)}
+            />
+          }
+
+          {tipo.tipo == "g" &&
+            <BtnIcono
+              icono={ingresos.icono}
+              textcolor={ingresos.color}
+              bgcolor={ingresos.bgcolor}
+              text={ingresos.text}
+              funcion={() => cambiarTipo(ingresos)}
+            />
+          }
+
+
+
+          {tipo.tipo !== "b" &&
+            <BtnIcono
+              icono={balance.icono}
+              textcolor={balance.color}
+              bgcolor={balance.bgcolor}
+              text="Todos"
+              funcion={() => cambiarTipo(balance)}
+            />
+          }
+
+          {tipo.tipo == "b" &&
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              <Btndesplegable
+                icono={balance.icono}
+                textcolor={balance.color}
+                bgcolor={balance.bgcolor}
+                text={balance.text}
+                funcion={openTipo}
+              />
+              {stateTipo && (
+                <ListaMenuDesplegable
+                  data={[ingresos, gastos]}
+                  top="112%"
+                  funcion={(p) => cambiarTipo(p as Tipo)}
+                />
+              )}
+
+            </div>
+          }
+        </ContentFiltros>
         <ContentFiltro>
           <Btnfiltro
             funcion={nuevoRegistro}
-            bgcolor={bgCategoria}
-            textcolor={colorCategoria}
+            bgcolor={tipo.bgcolor}
+            textcolor={tipo.color}
             icono={<v.agregar />}
           />
         </ContentFiltro>
@@ -116,20 +167,20 @@ export const MovimientosTemplate = (): JSX.Element => {
       <section className="totales">
         <CardTotales
           total={totalMesAñoPendientes}
-          title={obtenerTitulo(tipo as "i" | "g" | "b", "pendientes")}
-          color={colorCategoria}
+          title={obtenerTitulo(tipo.tipo as "i" | "g" | "b", "pendientes")}
+          color={tipo.color}
           icono={<v.flechaarribalarga />}
         />
         <CardTotales
           total={totalMesAñoPagados}
-          title={obtenerTitulo(tipo as "i" | "g" | "b", "pagados")}
-          color={colorCategoria}
+          title={obtenerTitulo(tipo.tipo as "i" | "g" | "b", "pagados")}
+          color={tipo.color}
           icono={<v.flechaabajolarga />}
         />
         <CardTotales
           total={totalMesAño}
           title="Total"
-          color={colorCategoria}
+          color={tipo.color}
           icono={<v.balance />}
         />
       </section>
@@ -140,10 +191,11 @@ export const MovimientosTemplate = (): JSX.Element => {
 
       <section className="main">
 
-        {(tipo == "i" || tipo == "b")
+        {(tipo.tipo == "i" || tipo.tipo == "b")
           && datamovimientos.i?.length > 0 &&
           <TablaMovimientos
-            tipo={"i"}
+            titulo={"Ingresos"}
+            tipo={ingresos}
             color={v.colorIngresos}
             data={datamovimientos.i}
             setOpenRegistro={setOpenRegistro}
@@ -151,28 +203,33 @@ export const MovimientosTemplate = (): JSX.Element => {
             setAccion={setAccion} />
         }
 
-        {(tipo == "g" || tipo == "b")
+        {(tipo.tipo == "g" || tipo.tipo == "b")
           && datamovimientos.g?.length > 0 &&
           <TablaMovimientos
-            tipo={"g"}
+            titulo={"Gastos"}
+            tipo={gastos}
             color={v.colorGastos}
             data={datamovimientos.g}
             setOpenRegistro={setOpenRegistro}
             setDataSelect={setDataSelect}
             setAccion={setAccion} />
         }
+      </section>
 
-        {(
-          tipo == "i" && datamovimientos.i?.length == 0 ||
-          tipo == "g" && datamovimientos.g?.length == 0
-        ) && (
+
+      {(
+        (tipo.tipo == "b" && datamovimientos.i?.length == 0 && datamovimientos.g?.length == 0) ||
+        (tipo.tipo == "i" && datamovimientos.i?.length == 0) ||
+        (tipo.tipo == "g" && datamovimientos.g?.length == 0)
+      ) && (
+          <section className="empty">
             <Lottieanimacion
               alto={300}
               ancho={300}
-              animacion={tipo == "i" ? vacioverde : vaciorojo}
+              animacion={tipo.tipo == "i" ? vacioverde : (tipo.tipo == "g" ? vaciorojo : vacioazul)}
             />
-          )}
-      </section>
+          </section>
+        )}
     </Container>
   );
 }
@@ -187,26 +244,24 @@ const Container = styled.div`
   grid-template:
     "header" 100px
     "tipo" 100px
-    "totales" 360px
+    "totales" auto
     "calendario" 100px
-    "main" auto;
+    "main" auto    
+    "empty" auto;
 
   .header {
     grid-area: header;
-    /* background-color: rgba(103, 93, 241, 0.14); */
     display: flex;
     align-items: center;
   }
   .tipo {
     grid-area: tipo;
-    /* background-color: rgba(107, 214, 14, 0.14); */
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
-    .totales {
+  .totales {
     grid-area: totales;
-  //  background-color: rgba(229, 26, 165, 0.14);
     display: grid;
     align-items: center;
     grid-template-columns: 1fr;
@@ -216,23 +271,22 @@ const Container = styled.div`
       grid-template-columns: repeat(3, 1fr);
     }
   }
-    .calendario {
+  .calendario {
     grid-area: calendario;
-   // background-color: rgba(77, 237, 106, 0.14);
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  .area2 {
-    grid-area: area2;
-    /* background-color: rgba(77, 237, 106, 0.14); */
-    display: flex;
-    align-items: center;
-    justify-content: end;
+  .empty {
   }
   .main {
     grid-area: main;
-    /* background-color: rgba(179, 46, 241, 0.14); */
+    flex-wrap: wrap;
+    
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 `;
 const ContentFiltro = styled.div`

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { editarTemaMonedaUser, obtenerUsuarioActual, Usuario } from "../index";
+import { editarTemaMonedaUser, ConsultarUsuario, Usuario } from "../index";
 
 type UsuarioUpdate = Partial<Omit<Usuario, "id">> & { id: number };
 interface UsuariosStore {
@@ -8,6 +8,7 @@ interface UsuariosStore {
   setUsuario: (u: Usuario) => void;
   clearUsuario: () => void;
   editartemamonedauser: (p: UsuarioUpdate) => Promise<void>;
+  ObtenerUsuarioActual: () => Promise<Usuario>;
 }
 
 export const useUsuariosStore = create<UsuariosStore>((set) => ({
@@ -17,16 +18,52 @@ export const useUsuariosStore = create<UsuariosStore>((set) => ({
     localStorage.setItem("usuario", JSON.stringify(u));
     set({ usuario: u, idusuario: u.id });
   },
-  clearUsuario: () => set({ usuario: null, idusuario: 0 }),
-
+  clearUsuario: () => {
+    localStorage.removeItem("usuario");
+    set({ usuario: null, idusuario: 0 });
+  },
   editartemamonedauser: async (p) => {
     await editarTemaMonedaUser(p);
     // Refrescar datos después del update
-    const nuevoUsuario = await obtenerUsuarioActual();
-    set({
-      usuario: nuevoUsuario,
-      idusuario: nuevoUsuario.id,
-    });
+    const { data: nuevoUsuario } = await ConsultarUsuario();
+    if (nuevoUsuario) {
+      set({
+        usuario: nuevoUsuario,
+        idusuario: nuevoUsuario.id,
+      });
+    }
   },
-}));
+  ObtenerUsuarioActual: async () => {
+    // 1. Intentar leer desde localStorage
+    const stored = localStorage.getItem("usuario");
 
+    if (stored) {
+      const usuario: Usuario = JSON.parse(stored);
+
+      // Validar que el usuario local sea usable
+      if (usuario?.id && usuario?.idauth_supabase) {
+        set({ usuario, idusuario: usuario.id });
+        return usuario;
+      }
+    }
+
+    // 2. Consultar a Supabase
+    const { data, error } = await ConsultarUsuario();
+
+    if (error) {
+      throw new Error(`Error al obtener usuario actual: ${error}`);
+    }
+
+    if (!data) {
+      throw new Error("Usuario no encontrado");
+    }
+
+    // 3. Guardar usuario válido en store + localStorage
+    localStorage.setItem("usuario", JSON.stringify(data));
+    set({ usuario: data, idusuario: data.id });
+
+    return data;
+  }
+
+
+}));

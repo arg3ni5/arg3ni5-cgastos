@@ -1,5 +1,5 @@
 import { CiPalette } from "react-icons/ci";
-import { BsEmojiLaughing } from "react-icons/bs";
+import { BsBarChartSteps, BsEmojiLaughing } from "react-icons/bs";
 import { RiDeleteBin2Line, RiEditLine } from "react-icons/ri";
 import { IoIosArrowDown } from "react-icons/io";
 import { RiVipCrownFill } from "react-icons/ri";
@@ -42,7 +42,7 @@ export const v = {
   emoji: BsEmojiLaughing,
   iconeditarTabla: RiEditLine,
   iconeliminarTabla: RiDeleteBin2Line,
-  colorBalance: `#3E43D6`,
+  colorBalance: `#9955ff`,
   colorbgBalance: `#B3B5FF`,
   colorIngresos: `#53B257`,
   colorbgingresos: `#e6ffe7`,
@@ -81,6 +81,7 @@ export const v = {
   iconopie: HiOutlineChartPie,
   iconolineal: SlGraph,
   iconobars: BsBarChartLine,
+  iconobarsh: BsBarChartSteps,
   iconocalculadora: AiOutlineCalculator,
   iconocheck: BsCalendarCheck,
   imagenfondo: fondo,

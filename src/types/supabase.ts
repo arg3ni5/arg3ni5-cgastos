@@ -208,7 +208,7 @@ export type Database = {
           descripcion: string
           valor: number
           fecha: string
-          estado: string
+          estado: boolean
           cuenta: string
           categoria: string
           valorymoneda: string

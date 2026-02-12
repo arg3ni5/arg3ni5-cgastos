@@ -3,33 +3,21 @@ import {
   Header,
   CalendarioLineal,
   CardTotales,
-  useOperaciones,
   useMovimientosStore,
   v,
-  Tabs,
-  DataDesplegableMovimientos,
-  Tipo,
+  Tabs
 } from "../../index";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Device } from "../../styles/breakpoints";
 
 export const DashboardTemplate = () => {
-  const [state, setState] = useState(false); // agregado para stateConfig del Header
-
-  const {
-    colorCategoria,
-    setTipoMovimientos,
-  } = useOperaciones();
+  const [state, setState] = useState(false);
 
   const {
     totalMesAño,
     totalMesAñoPagados,
     totalMesAñoPendientes,
   } = useMovimientosStore();
-
-  useEffect(() => {
-    setTipoMovimientos(DataDesplegableMovimientos[2] as Tipo);
-  }, [setTipoMovimientos]);
 
   return (
     <Container>
@@ -47,19 +35,19 @@ export const DashboardTemplate = () => {
         <CardTotales
           total={totalMesAñoPendientes}
           title="Ingresos / Gastos pendientes"
-          color={colorCategoria}
+          color={v.colorBalance}
           icono={<v.flechaarribalarga />}
         />
         <CardTotales
           total={totalMesAñoPagados}
           title="Ingresos / Gastos pagados"
-          color={colorCategoria}
+          color={v.colorBalance}
           icono={<v.flechaabajolarga />}
         />
         <CardTotales
           total={totalMesAño}
           title="Balance mensual"
-          color={colorCategoria}
+          color={v.colorBalance}
           icono={<v.balance />}
         />
       </section>
@@ -74,7 +62,6 @@ export const DashboardTemplate = () => {
 const Container = styled.div`
   max-width: 100%;
   overflow-x: hidden;
-  width: 100%;
   padding: 15px;
   background: ${({ theme }) => theme.bgtotal};
   color: ${({ theme }) => theme.text};
@@ -122,5 +109,7 @@ const Container = styled.div`
   .graficos {
     grid-area: graficos;
     margin-top: 20px;
+    overflow-x: auto;
+    max-width: 100%;
   }
 `;
