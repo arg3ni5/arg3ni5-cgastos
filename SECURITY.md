@@ -140,7 +140,7 @@ We recommend:
 
 ## Last Updated
 
-This security policy was last updated on: [Current Date]
+This security policy was last updated on: 2026-02-16
 
 ## Version
 
