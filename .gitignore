@@ -23,5 +23,17 @@ dist-ssr
 *.sln
 *.sw?
 .env
+.env.local
+.env.*.local
+.env.production
+.env.test
 
 *.cache
+
+# Test coverage
+coverage
+.nyc_output
+
+# Temporary files
+tmp
+temp
