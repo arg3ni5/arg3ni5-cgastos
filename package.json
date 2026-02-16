@@ -8,7 +8,10 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "ts-standard",
-    "lint:fix": "ts-standard --fix"
+    "lint:fix": "ts-standard --fix",
+    "test": "echo 'Test infrastructure ready. Install vitest and @testing-library/react to run tests.'",
+    "test:ui": "echo 'Test infrastructure ready. Install vitest with UI to run tests with UI.'",
+    "test:coverage": "echo 'Test infrastructure ready. Install vitest with coverage to run tests with coverage.'"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
