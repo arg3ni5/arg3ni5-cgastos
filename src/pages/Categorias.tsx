@@ -20,22 +20,19 @@ export const Categorias = () => {
   const { usuario } = useUsuariosStore();
   const { setIsLoading } = useLoading();
 
-  const { isLoading, error, refetch } = useQuery<Categoria[], Error>({
-    queryKey: ["mostrar cuentas", selectTipoCategoria, usuario?.id],
+  const { isLoading, error } = useQuery<Categoria[], Error>({
+    queryKey: ["mostrar categorias", selectTipoCategoria, usuario?.id],
     queryFn: () =>
       mostrarCategorias({
         idusuario: usuario?.id,
         tipo: selectTipoCategoria.tipo,
       } as QueryParams),
-    enabled: false, // desactivar ejecución automática
+    enabled: !!usuario?.id,
+    staleTime: 5 * 60 * 1000, // 5 minutos
+    gcTime: 10 * 60 * 1000, // 10 minutos (renamed from cacheTime)
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
-  
-  useEffect(() => {
-    if (usuario?.id) {
-      refetch(); // ejecutar manualmente cuando esté disponible
-    }
-  }, [usuario?.id, selectTipoCategoria, refetch]);
-  
 
   useEffect(() => {
     setIsLoading(isLoading);

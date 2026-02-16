@@ -14,13 +14,17 @@ export function Cuentas() {
   const { setIsLoading } = useLoading();
 
   const { isLoading, error } = useQuery<Cuenta[], Error>({
-    queryKey: ["mostrar categorias", selectTipoCuenta],
+    queryKey: ["mostrar cuentas", selectTipoCuenta, usuario?.id],
     queryFn: () =>
       mostrarCuentas({
         idusuario: usuario?.id,
         tipo: selectTipoCuenta.tipo
       } as Cuenta),
     enabled: !!usuario?.id,
+    staleTime: 5 * 60 * 1000, // 5 minutos
+    gcTime: 10 * 60 * 1000, // 10 minutos (renamed from cacheTime)
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   useEffect(() => {
