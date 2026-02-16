@@ -21,11 +21,11 @@ function validateEnv(): EnvConfig {
       VITE_APP_ENV: import.meta.env.VITE_APP_ENV,
       VITE_SESSION_TIMEOUT: import.meta.env.VITE_SESSION_TIMEOUT
     });
-    
+
     return env;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const missingVars = error.errors.map(err => err.path.join('.')).join(', ');
+      const missingVars = error.issues.map(err => err.path.join('.')).join(', ');
       throw new Error(
         `Environment validation failed. Missing or invalid variables: ${missingVars}. ` +
         'Please check your .env file and ensure all required variables are set correctly.'
