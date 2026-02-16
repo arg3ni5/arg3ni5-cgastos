@@ -1,5 +1,8 @@
 import { Database, supabase } from "../index";
-import { showErrorMessage, showSuccessMessage } from "../utils/sweetAlertUtils";
+import { movimientoInsertSchema, movimientoUpdateSchema } from "../schemas/movimiento.schema";
+import { logger } from "../utils/logger";
+import { showErrorMessage, showSuccessMessage } from "../utils/messages";
+import { z } from "zod";
 
 export type Movimiento = Database["public"]["Tables"]["movimientos"]["Row"];
 export type MovimientoInsert = Database["public"]["Tables"]["movimientos"]["Insert"];
@@ -7,20 +10,30 @@ export type MovimientoUpdate = Database["public"]["Tables"]["movimientos"]["Upda
 
 export const InsertarMovimientos = async (p: MovimientoInsert): Promise<void> => {
   try {
-    console.log("InsertarMovimientos", p);
-
+    // Validate data before inserting
+    const validatedData = movimientoInsertSchema.parse(p);
+    
     const { data, error } = await supabase
       .from("movimientos")
-      .insert(p)
+      .insert(validatedData)
       .select();
-    if (error) {
-      showErrorMessage(`Ya existe un registro con ${p.descripcion}`);
-    }
+    
+    if (error) throw error;
+    
     if (data) {
+      logger.info('Movimiento creado exitosamente', { movimientoId: data[0]?.id });
       showSuccessMessage("Registrado");
     }
-  } catch (error: any) {
-    showErrorMessage(error.error_description || error.message + " insertar movimientos");
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errorMessage = error.errors.map(e => e.message).join(', ');
+      logger.error('Error de validación al insertar movimiento', { error: errorMessage, movimiento: p });
+      showErrorMessage(`Datos inválidos: ${errorMessage}`);
+    } else {
+      logger.error('Error al insertar movimiento', { error, movimiento: p });
+      showErrorMessage('No se pudo registrar el movimiento. Por favor, intenta nuevamente.');
+    }
+    throw error;
   }
 };
 
@@ -30,27 +43,42 @@ export const EliminarMovimientos = async (p: Movimiento): Promise<void> => {
       .from("movimientos")
       .delete()
       .eq("id", p.id);
-    if (error) {
-      showErrorMessage(`Error al eliminar: ${error.message}`);
-    }
-  } catch (error: any) {
-    showErrorMessage(error.error_description || error.message + " eliminar movimientos");
+    
+    if (error) throw error;
+    logger.info('Movimiento eliminado exitosamente', { movimientoId: p.id });
+  } catch (error) {
+    logger.error('Error al eliminar movimiento', { error, movimientoId: p.id });
+    showErrorMessage('No se pudo eliminar el movimiento. Por favor, intenta nuevamente.');
+    throw error;
   }
 };
 
 export const ActualizarMovimientos = async (p: MovimientoUpdate): Promise<void> => {
   try {
     if (!p.id) {
-      showErrorMessage("No se puede actualizar el registro");
-      return;
+      throw new Error("No se puede actualizar el registro sin ID");
     }
-    await supabase
+    
+    // Validate data before updating
+    const validatedData = movimientoUpdateSchema.parse(p);
+    
+    const { error } = await supabase
       .from("movimientos")
-      .update(p)
-      .eq("id", p.id)
-
-  } catch (error: any) {
-    showErrorMessage(error.error_description || error.message + " insertar movimientos");
+      .update(validatedData)
+      .eq("id", p.id);
+    
+    if (error) throw error;
+    logger.info('Movimiento actualizado exitosamente', { movimientoId: p.id });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errorMessage = error.errors.map(e => e.message).join(', ');
+      logger.error('Error de validación al actualizar movimiento', { error: errorMessage, movimientoId: p.id });
+      showErrorMessage(`Datos inválidos: ${errorMessage}`);
+    } else {
+      logger.error('Error al actualizar movimiento', { error, movimientoId: p.id });
+      showErrorMessage('No se pudo actualizar el movimiento. Por favor, intenta nuevamente.');
+    }
+    throw error;
   }
 }
 
@@ -60,13 +88,11 @@ export type MovimientosMesAnio = Database["public"]["Functions"]["mmovimientosme
 export const MostrarMovimientosPorMesAño = async (p: MovimientosMesAnioParams): Promise<MovimientosMesAnio | null> => {
   try {
     const { data, error } = await supabase.rpc("mmovimientosmesanio", p);
-    if (error) {
-      showErrorMessage(`Error al mostrar movimientos: ${error.message}`);
-      return null;
-    }
+    if (error) throw error;
     return data;
-  } catch (error: any) {
-    showErrorMessage(error.error_description || error.message + " mostrar movimientos");
+  } catch (error) {
+    logger.error('Error al mostrar movimientos por mes/año', { error, params: p });
+    showErrorMessage('No se pudieron cargar los movimientos. Por favor, intenta nuevamente.');
     return null;
   }
 };
@@ -78,13 +104,11 @@ export type RptMovimientosMesAnio = Database["public"]["Functions"]["rptmovimien
 export const RptMovimientosPorMesAño = async (p: RptMovimientosMesAnioParams): Promise<RptMovimientosMesAnio | null> => {
   try {
     const { data, error } = await supabase.rpc("rptmovimientos_anio_mes", p);
-    if (error) {
-      showErrorMessage(`Error al generar reporte: ${error.message}`);
-      return null;
-    }
+    if (error) throw error;
     return data;
-  } catch (error: any) {
-    showErrorMessage(error.error_description || error.message + " reporte movimientos");
+  } catch (error) {
+    logger.error('Error al generar reporte de movimientos', { error, params: p });
+    showErrorMessage('No se pudo generar el reporte. Por favor, intenta nuevamente.');
     return null;
   }
 };
