@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { MostrarCuentas, InsertarCuenta, ActualizarCuenta, EliminarCuenta, Cuenta, CuentaInsert } from "../index";
+import { logger } from "../utils/logger";
 
 interface CuentaStore {
   cuentas: Cuenta[];
@@ -16,46 +17,74 @@ export const useCuentaStore = create<CuentaStore>((set, get) => ({
   cuentas: [],
 
   mostrarCuentas: async (p) => {
-    const response = await MostrarCuentas(p);
-    if (response) {
-      set({ cuentas: response });
-      set({ cuentaItemSelect: response.filter(item => item.descripcion === "Billetera")[0] });
+    try {
+      const response = await MostrarCuentas(p);
+      if (response) {
+        set({ cuentas: response });
+        const billetera = response.filter(item => item.descripcion === "Billetera")[0];
+        if (billetera) {
+          set({ cuentaItemSelect: billetera });
+        }
+        logger.debug('Cuentas cargadas exitosamente', { count: response.length });
+      }
+      return response || [];
+    } catch (error) {
+      logger.error('Error al mostrar cuentas en store', { error, userId: p.idusuario });
+      return [];
     }
-    return response || [];
   },
 
   selectCuenta: (p) => {
     set({ cuentaItemSelect: p });
+    logger.debug('Cuenta seleccionada', { cuentaId: p.id });
   },
 
   insertarCuenta: async (cuenta) => {
-    const response = await InsertarCuenta(cuenta);
-    if (response) {
-      const currentData = get().cuentas;
-      set({ cuentas: [...currentData, response] });
+    try {
+      const response = await InsertarCuenta(cuenta);
+      if (response) {
+        const currentData = get().cuentas;
+        set({ cuentas: [...currentData, response] });
+        logger.debug('Cuenta agregada al store', { cuentaId: response.id });
+      }
+      return response;
+    } catch (error) {
+      logger.error('Error al insertar cuenta en store', { error, cuenta });
+      return null;
     }
-    return response;
   },
 
   actualizarCuenta: async (id, cuenta) => {
-    const response = await ActualizarCuenta(id, cuenta);
-    if (response) {
-      const currentData = get().cuentas;
-      const updatedData = currentData.map(item =>
-        item.id === id ? response : item
-      );
-      set({ cuentas: updatedData });
+    try {
+      const response = await ActualizarCuenta(id, cuenta);
+      if (response) {
+        const currentData = get().cuentas;
+        const updatedData = currentData.map(item =>
+          item.id === id ? response : item
+        );
+        set({ cuentas: updatedData });
+        logger.debug('Cuenta actualizada en store', { cuentaId: id });
+      }
+      return response;
+    } catch (error) {
+      logger.error('Error al actualizar cuenta en store', { error, cuentaId: id });
+      return null;
     }
-    return response;
   },
 
   eliminarCuenta: async (id) => {
-    const success = await EliminarCuenta(id);
-    if (success) {
-      const currentData = get().cuentas;
-      const filteredData = currentData.filter(item => item.id !== id);
-      set({ cuentas: filteredData });
+    try {
+      const success = await EliminarCuenta(id);
+      if (success) {
+        const currentData = get().cuentas;
+        const filteredData = currentData.filter(item => item.id !== id);
+        set({ cuentas: filteredData });
+        logger.debug('Cuenta eliminada del store', { cuentaId: id });
+      }
+      return success;
+    } catch (error) {
+      logger.error('Error al eliminar cuenta en store', { error, cuentaId: id });
+      return false;
     }
-    return success;
   }
 }));

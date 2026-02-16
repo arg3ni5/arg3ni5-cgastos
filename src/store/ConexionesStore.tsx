@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { InsertarConexion, MostrarConexiones, EliminarConexiones, Conexion, ConexionInsert } from "../index";
+import { logger } from "../utils/logger";
 
 type ConexionQueryParams = {
   usuario_id: number;
@@ -22,26 +23,48 @@ export const useConexionesStore = create<ConexionesStore>((set, get) => ({
   conexiones: [],
   
   mostrarConexiones: async (p) => {
-    const response = await MostrarConexiones({usuario_id: Number(p.usuario_id!)} as Conexion);
-    set({
-      parametros: p,
-      conexiones: response,
-      categoriaItemSelect: response?.[0] || null,
-    });
-    return response;
+    try {
+      const response = await MostrarConexiones({usuario_id: Number(p.usuario_id)} as Conexion);
+      set({
+        parametros: p,
+        conexiones: response,
+        categoriaItemSelect: response?.[0] || null,
+      });
+      logger.debug('Conexiones cargadas exitosamente', { count: response?.length || 0 });
+      return response;
+    } catch (error) {
+      logger.error('Error al mostrar conexiones en store', { error, userId: p.usuario_id });
+      return null;
+    }
   },
 
   insertarConexion: async (c: ConexionInsert) => {
-    await InsertarConexion(c);
-    const { mostrarConexiones, parametros } = get();
-    const nuevas = await mostrarConexiones(parametros!);
-    set({ conexiones: nuevas });
+    try {
+      await InsertarConexion(c);
+      const { mostrarConexiones, parametros } = get();
+      if (parametros) {
+        const nuevas = await mostrarConexiones(parametros);
+        set({ conexiones: nuevas });
+      }
+      logger.debug('Conexión insertada y lista refrescada');
+    } catch (error) {
+      logger.error('Error al insertar conexión en store', { error, conexion: c });
+      throw error;
+    }
   },
 
   eliminarConexion: async (p: Conexion) => {
-    await EliminarConexiones({id: p.id} as Conexion);
-    const { mostrarConexiones, parametros } = get();
-    const nuevas = await mostrarConexiones(parametros!);
-    set({ conexiones: nuevas });
+    try {
+      await EliminarConexiones({id: p.id} as Conexion);
+      const { mostrarConexiones, parametros } = get();
+      if (parametros) {
+        const nuevas = await mostrarConexiones(parametros);
+        set({ conexiones: nuevas });
+      }
+      logger.debug('Conexión eliminada y lista refrescada', { conexionId: p.id });
+    } catch (error) {
+      logger.error('Error al eliminar conexión en store', { error, conexionId: p.id });
+      throw error;
+    }
   },
 }));

@@ -13,6 +13,7 @@ import {
   MovimientoUpdate,
   ActualizarMovimientos
 } from "../index";
+import { logger } from "../utils/logger";
 
 export interface DataRptMovimientosAñoMes {
   i: RptMovimientosMesAnio;
@@ -48,92 +49,130 @@ export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
   parametros: {} as MovimientosMesAnioParams,
 
   mostrarMovimientos: async (p: MovimientosMesAnioParams) => {
-    set({ parametros: p });
-    const i = p.tipocategoria === "i" || p.tipocategoria === "b" ?
-      await MostrarMovimientosPorMesAño({ ...p, tipocategoria: "i" }) || [] : [];
-    const g = p.tipocategoria === "g" || p.tipocategoria === "b" ?
-      await MostrarMovimientosPorMesAño({ ...p, tipocategoria: "g" }) || [] : [];
-    const response = { i, g };
+    try {
+      set({ parametros: p });
+      const i = p.tipocategoria === "i" || p.tipocategoria === "b" ?
+        await MostrarMovimientosPorMesAño({ ...p, tipocategoria: "i" }) || [] : [];
+      const g = p.tipocategoria === "g" || p.tipocategoria === "b" ?
+        await MostrarMovimientosPorMesAño({ ...p, tipocategoria: "g" }) || [] : [];
+      const response = { i, g };
 
-
-
-    const { calcularTotales } = get();
-    if (response) calcularTotales(response);
-    set({ datamovimientos: { i: i || [], g: g || [] } });
-    return response;
+      const { calcularTotales } = get();
+      if (response) calcularTotales(response);
+      set({ datamovimientos: { i: i || [], g: g || [] } });
+      logger.debug('Movimientos cargados exitosamente', { 
+        ingresos: i?.length || 0, 
+        gastos: g?.length || 0 
+      });
+      return response;
+    } catch (error) {
+      logger.error('Error al mostrar movimientos en store', { error, params: p });
+      return { i: [], g: [] };
+    }
   },
 
   calcularTotales: (data: DataMovimientos): void => {
-    const { parametros } = get();
+    try {
+      const { parametros } = get();
 
-    if (parametros.tipocategoria === "b") {
-      const totalIngresos = data.i?.reduce((sum, item) => sum + Number(item.valor), 0) || 0;
-      const totalGastos = data.g?.reduce((sum, item) => sum + Number(item.valor), 0) || 0;
+      if (parametros.tipocategoria === "b") {
+        const totalIngresos = data.i?.reduce((sum, item) => sum + Number(item.valor), 0) || 0;
+        const totalGastos = data.g?.reduce((sum, item) => sum + Number(item.valor), 0) || 0;
 
-      const ingPagados = data.i?.filter(item => Number(item.estado) === 1)
-        .reduce((sum, item) => sum + Number(item.valor), 0) || 0;
-      const gasPagados = data.g?.filter(item => Number(item.estado) === 1)
-        .reduce((sum, item) => sum + Number(item.valor), 0) || 0;
+        const ingPagados = data.i?.filter(item => Number(item.estado) === 1)
+          .reduce((sum, item) => sum + Number(item.valor), 0) || 0;
+        const gasPagados = data.g?.filter(item => Number(item.estado) === 1)
+          .reduce((sum, item) => sum + Number(item.valor), 0) || 0;
 
-      const ingPendientes = data.i?.filter(item => Number(item.estado) === 0)
-        .reduce((sum, item) => sum + Number(item.valor), 0) || 0;
-      const gasPendientes = data.g?.filter(item => Number(item.estado) === 0)
-        .reduce((sum, item) => sum + Number(item.valor), 0) || 0;
+        const ingPendientes = data.i?.filter(item => Number(item.estado) === 0)
+          .reduce((sum, item) => sum + Number(item.valor), 0) || 0;
+        const gasPendientes = data.g?.filter(item => Number(item.estado) === 0)
+          .reduce((sum, item) => sum + Number(item.valor), 0) || 0;
 
-      console.log({ totalIngresos, totalGastos, ingPagados, gasPagados, ingPendientes, gasPendientes });
+        logger.debug('Totales calculados (ambos)', { 
+          totalIngresos, totalGastos, ingPagados, gasPagados, ingPendientes, gasPendientes 
+        });
 
+        set({
+          totalMesAño: totalIngresos - totalGastos,
+          totalMesAñoPagados: ingPagados - gasPagados,
+          totalMesAñoPendientes: ingPendientes - gasPendientes
+        });
+        return;
+      }
+
+      const tipo = parametros.tipocategoria === "i" ? "i" : "g";
+      const movimientos = data[tipo];
+
+      const dtPagados = movimientos?.filter(item => Number(item.estado) === 1);
+      const dtPendientes = movimientos?.filter(item => Number(item.estado) === 0);
+
+      const total = movimientos?.reduce((sum, item) => sum + Number(item.valor), 0) || 0;
+      const tpagados = dtPagados?.reduce((sum, item) => sum + Number(item.valor), 0) || 0;
+      const tpendientes = dtPendientes?.reduce((sum, item) => sum + Number(item.valor), 0) || 0;
 
       set({
-        totalMesAño: totalIngresos - totalGastos,
-        totalMesAñoPagados: ingPagados - gasPagados,
-        totalMesAñoPendientes: ingPendientes - gasPendientes
+        totalMesAño: total,
+        totalMesAñoPagados: tpagados,
+        totalMesAñoPendientes: tpendientes
       });
-      return;
+      
+      logger.debug('Totales calculados', { tipo, total, tpagados, tpendientes });
+    } catch (error) {
+      logger.error('Error al calcular totales', { error, data });
     }
-
-    const tipo = parametros.tipocategoria === "i" ? "i" : "g";
-    const movimientos = data[tipo];
-
-    const dtPagados = movimientos?.filter(item => Number(item.estado) === 1);
-    const dtPendientes = movimientos?.filter(item => Number(item.estado) === 0);
-
-    const total = movimientos?.reduce((sum, item) => sum + Number(item.valor), 0) || 0;
-    const tpagados = dtPagados?.reduce((sum, item) => sum + Number(item.valor), 0) || 0;
-    const tpendientes = dtPendientes?.reduce((sum, item) => sum + Number(item.valor), 0) || 0;
-
-    set({
-      totalMesAño: total,
-      totalMesAñoPagados: tpagados,
-      totalMesAñoPendientes: tpendientes
-    });
   },
 
   actualizarMovimientos: async (p: MovimientoUpdate): Promise<void> => {
-    await ActualizarMovimientos(p);
-    const { mostrarMovimientos, parametros } = get();
-    await mostrarMovimientos(parametros);
+    try {
+      await ActualizarMovimientos(p);
+      const { mostrarMovimientos, parametros } = get();
+      await mostrarMovimientos(parametros);
+      logger.debug('Movimiento actualizado y lista refrescada', { movimientoId: p.id });
+    } catch (error) {
+      logger.error('Error al actualizar movimiento en store', { error, movimientoId: p.id });
+      throw error;
+    }
   },
 
   insertarMovimientos: async (p: MovimientoInsert): Promise<void> => {
-    await InsertarMovimientos(p);
-    const { mostrarMovimientos, parametros } = get();
-    await mostrarMovimientos(parametros);
+    try {
+      await InsertarMovimientos(p);
+      const { mostrarMovimientos, parametros } = get();
+      await mostrarMovimientos(parametros);
+      logger.debug('Movimiento insertado y lista refrescada');
+    } catch (error) {
+      logger.error('Error al insertar movimiento en store', { error, movimiento: p });
+      throw error;
+    }
   },
 
   eliminarMovimiento: async (p: Movimiento): Promise<void> => {
-    await EliminarMovimientos(p);
-    const { parametros, mostrarMovimientos } = get();
-    await mostrarMovimientos(parametros);
+    try {
+      await EliminarMovimientos(p);
+      const { parametros, mostrarMovimientos } = get();
+      await mostrarMovimientos(parametros);
+      logger.debug('Movimiento eliminado y lista refrescada', { movimientoId: p.id });
+    } catch (error) {
+      logger.error('Error al eliminar movimiento en store', { error, movimientoId: p.id });
+      throw error;
+    }
   },
 
   rptMovimientosAñoMes: async (p: RptMovimientosMesAnioParams): Promise<DataRptMovimientosAñoMes> => {
-    set({ rptParams: p });
-    const i = p.tipocategoria === "i" || p.tipocategoria === "b" ?
-      await RptMovimientosPorMesAño({ ...p, tipocategoria: "i" }) || [] : [];
-    const g = p.tipocategoria === "g" || p.tipocategoria === "b" ?
-      await RptMovimientosPorMesAño({ ...p, tipocategoria: "g" }) || [] : [];
-    const response = { i, g };
-    set({ dataRptMovimientosAñoMes: { i: i || [], g: g || [] } });
-    return response;
+    try {
+      set({ rptParams: p });
+      const i = p.tipocategoria === "i" || p.tipocategoria === "b" ?
+        await RptMovimientosPorMesAño({ ...p, tipocategoria: "i" }) || [] : [];
+      const g = p.tipocategoria === "g" || p.tipocategoria === "b" ?
+        await RptMovimientosPorMesAño({ ...p, tipocategoria: "g" }) || [] : [];
+      const response = { i, g };
+      set({ dataRptMovimientosAñoMes: { i: i || [], g: g || [] } });
+      logger.debug('Reporte de movimientos generado', { params: p });
+      return response;
+    } catch (error) {
+      logger.error('Error al generar reporte de movimientos', { error, params: p });
+      return { i: [], g: [] };
+    }
   },
 }));
