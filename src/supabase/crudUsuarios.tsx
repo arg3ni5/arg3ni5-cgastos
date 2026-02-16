@@ -44,10 +44,10 @@ export const InsertarUsuarios = async (
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errorMessage = error.errors.map(e => e.message).join(', ');
-      logger.error('Error de validación al insertar usuario', { error: errorMessage, usuario: p });
+      logger.error('Error de validación al insertar usuario', { error: errorMessage });
       showErrorMessage(`Datos inválidos: ${errorMessage}`);
     } else {
-      logger.error('Error al insertar usuario', { error, usuario: p });
+      logger.error('Error al insertar usuario', { error });
       showErrorMessage('No se pudo crear el usuario. Por favor, intenta nuevamente.');
     }
     return null;

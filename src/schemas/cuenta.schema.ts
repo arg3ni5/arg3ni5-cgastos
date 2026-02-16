@@ -12,7 +12,7 @@ export const cuentaSchema = z.object({
 
 // Schema for inserting a new Cuenta
 export const cuentaInsertSchema = z.object({
-  descripcion: z.string().min(1, 'La descripción es requerida').max(100, 'La descripción no puede exceder 100 caracteres').optional().default(''),
+  descripcion: z.string().min(1, 'La descripción es requerida').max(100, 'La descripción no puede exceder 100 caracteres'),
   icono: z.string().nullable().optional(),
   tipo: z.string().min(1, 'El tipo es requerido').nullable(),
   idusuario: z.number().int().positive('El ID de usuario debe ser un número positivo').nullable().optional(),

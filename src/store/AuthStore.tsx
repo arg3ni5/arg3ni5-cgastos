@@ -41,9 +41,10 @@ export const useAuthStore = create<AuthStore>((set) => ({
       set({ isAuth: true });
       logger.info('Autenticación con Google exitosa', { provider: data.provider });
       
+      // Return provider and url if available
       return {
         provider: data.provider,
-        url: data.url
+        url: data.url || ''
       };
     } catch (error) {
       logger.error('Error inesperado durante signInWithGoogle', { error });

@@ -24,8 +24,8 @@ export const movimientoInsertSchema = z.object({
     .nullable()
     .optional(),
   fecha: z.string()
-    .datetime({ message: 'La fecha debe ser una fecha válida en formato ISO' })
-    .or(z.string().regex(/^\d{4}-\d{2}-\d{2}/, 'La fecha debe estar en formato YYYY-MM-DD'))
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'La fecha debe estar en formato YYYY-MM-DD')
+    .or(z.string().datetime({ message: 'La fecha debe ser una fecha válida en formato ISO' }))
     .nullable()
     .optional(),
   estado: z.string().nullable().optional(),
@@ -45,8 +45,8 @@ export const movimientoUpdateSchema = z.object({
     .nullable()
     .optional(),
   fecha: z.string()
-    .datetime({ message: 'La fecha debe ser una fecha válida en formato ISO' })
-    .or(z.string().regex(/^\d{4}-\d{2}-\d{2}/, 'La fecha debe estar en formato YYYY-MM-DD'))
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'La fecha debe estar en formato YYYY-MM-DD')
+    .or(z.string().datetime({ message: 'La fecha debe ser una fecha válida en formato ISO' }))
     .nullable()
     .optional(),
   estado: z.string().nullable().optional(),
