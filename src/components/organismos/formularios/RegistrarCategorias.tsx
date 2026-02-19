@@ -29,7 +29,6 @@ export const RegistrarCategorias = ({ onClose, dataSelect, accion }: RegistrarCa
   const [emojiselect, setEmojiselect] = useState<string>("😻");
   const [currentColor, setColor] = useState<string>("#F44336");
   const [estadoProceso, setEstadoproceso] = useState<boolean>(false);
-  const { tipo } = useOperaciones();
 
   function onEmojiClick(emojiObject: EmojiClickData): void {
     setEmojiselect(() => emojiObject.emoji);
@@ -77,7 +76,6 @@ export const RegistrarCategorias = ({ onClose, dataSelect, accion }: RegistrarCa
       color: currentColor,
       icono: emojiselect,
       idusuario: usuario.id,
-      tipo: tipo,
     };
   
     if (accion === "Editar" && dataSelect.id) {
