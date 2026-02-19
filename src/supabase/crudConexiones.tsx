@@ -13,7 +13,7 @@ export const InsertarConexion = async (c: ConexionInsert) => {
   try {
     // Validate data before inserting
     const validatedData = conexionInsertSchema.parse(c);
-    
+
     const { data, error } = await supabase.from("conexiones_usuarios").insert(validatedData).select();
 
     if (error) {
@@ -21,7 +21,7 @@ export const InsertarConexion = async (c: ConexionInsert) => {
       showErrorMessage(`Ya existe un registro con ${c.canal_username}. Agregue un nuevo nombre.`);
       throw error;
     }
-    
+
     if (data) {
       logger.info('Conexión creada exitosamente', { conexionId: data[0]?.id });
       showSuccessMessage('Datos guardados', '✅ Éxito');
@@ -29,7 +29,7 @@ export const InsertarConexion = async (c: ConexionInsert) => {
     return data;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errorMessage = error.errors.map(e => e.message).join(', ');
+      const errorMessage = error.issues.map(e => e.message).join(', ');
       logger.error('Error de validación al insertar conexión', { error: errorMessage, conexion: c });
       showErrorMessage(`Datos inválidos: ${errorMessage}`);
     } else {

@@ -12,21 +12,21 @@ export const InsertarMovimientos = async (p: MovimientoInsert): Promise<void> =>
   try {
     // Validate data before inserting
     const validatedData = movimientoInsertSchema.parse(p);
-    
+
     const { data, error } = await supabase
       .from("movimientos")
       .insert(validatedData)
       .select();
-    
+
     if (error) throw error;
-    
+
     if (data) {
       logger.info('Movimiento creado exitosamente', { movimientoId: data[0]?.id });
       showSuccessMessage("Registrado");
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errorMessage = error.errors.map(e => e.message).join(', ');
+      const errorMessage = error.issues.map(e => e.message).join(', ');
       logger.error('Error de validación al insertar movimiento', { error: errorMessage, movimiento: p });
       showErrorMessage(`Datos inválidos: ${errorMessage}`);
     } else {
@@ -43,7 +43,7 @@ export const EliminarMovimientos = async (p: Movimiento): Promise<void> => {
       .from("movimientos")
       .delete()
       .eq("id", p.id);
-    
+
     if (error) throw error;
     logger.info('Movimiento eliminado exitosamente', { movimientoId: p.id });
   } catch (error) {
@@ -58,20 +58,20 @@ export const ActualizarMovimientos = async (p: MovimientoUpdate): Promise<void> 
     if (!p.id) {
       throw new Error("No se puede actualizar el registro sin ID");
     }
-    
+
     // Validate data before updating
     const validatedData = movimientoUpdateSchema.parse(p);
-    
+
     const { error } = await supabase
       .from("movimientos")
       .update(validatedData)
       .eq("id", p.id);
-    
+
     if (error) throw error;
     logger.info('Movimiento actualizado exitosamente', { movimientoId: p.id });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errorMessage = error.errors.map(e => e.message).join(', ');
+      const errorMessage = error.issues.map(e => e.message).join(', ');
       logger.error('Error de validación al actualizar movimiento', { error: errorMessage, movimientoId: p.id });
       showErrorMessage(`Datos inválidos: ${errorMessage}`);
     } else {

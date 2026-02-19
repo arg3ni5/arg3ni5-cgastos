@@ -23,7 +23,7 @@ export const InsertarUsuarios = async (
     if (!existingUser && !error) {
       // Validate data before inserting
       const validatedData = usuarioInsertSchema.parse(p);
-      
+
       const { data: newUser, error: insertError } = await supabase
         .from("usuarios")
         .insert(validatedData)
@@ -43,7 +43,7 @@ export const InsertarUsuarios = async (
     return existingUser;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errorMessage = error.errors.map(e => e.message).join(', ');
+      const errorMessage = error.issues.map(e => e.message).join(', ');
       logger.error('Error de validación al insertar usuario', { error: errorMessage });
       showErrorMessage(`Datos inválidos: ${errorMessage}`);
     } else {
@@ -64,14 +64,14 @@ export const editarTemaMonedaUser = async (
   try {
     // Validate data before updating
     const validatedData = usuarioUpdateSchema.parse(p);
-    
+
     const { error } = await supabase.from("usuarios").update(validatedData).eq("id", p.id);
-    
+
     if (error) throw error;
     logger.info('Usuario actualizado exitosamente', { userId: p.id });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errorMessage = error.errors.map(e => e.message).join(', ');
+      const errorMessage = error.issues.map(e => e.message).join(', ');
       logger.error('Error de validación al editar usuario', { error: errorMessage, userId: p.id });
       showErrorMessage(`Datos inválidos: ${errorMessage}`);
     } else {

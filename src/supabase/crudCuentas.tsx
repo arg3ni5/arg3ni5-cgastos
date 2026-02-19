@@ -27,7 +27,7 @@ export async function MostrarCuentas(p: Cuenta): Promise<Cuenta[] | null> {
         .from("cuenta")
         .select()
         .eq("idusuario", p.idusuario);
-    
+
     if (error) throw error;
     return data;
   } catch (error) {
@@ -41,7 +41,7 @@ export async function InsertarCuenta(cuenta: CuentaInsert): Promise<Cuenta | nul
   try {
     // Validate data before inserting
     const validatedData = cuentaInsertSchema.parse(cuenta);
-    
+
     const { data, error } = await supabase
       .from("cuenta")
       .insert(validatedData)
@@ -53,7 +53,7 @@ export async function InsertarCuenta(cuenta: CuentaInsert): Promise<Cuenta | nul
     return data;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errorMessage = error.errors.map(e => e.message).join(', ');
+      const errorMessage = error.issues.map(e => e.message).join(', ');
       logger.error('Error de validación al insertar cuenta', { error: errorMessage, cuenta });
       showErrorMessage(`Datos inválidos: ${errorMessage}`);
     } else {
@@ -68,7 +68,7 @@ export async function ActualizarCuenta(id: number, cuenta: CuentaUpdate): Promis
   try {
     // Validate data before updating
     const validatedData = cuentaUpdateSchema.parse(cuenta);
-    
+
     const { data, error } = await supabase
       .from("cuenta")
       .update(validatedData)
@@ -81,7 +81,7 @@ export async function ActualizarCuenta(id: number, cuenta: CuentaUpdate): Promis
     return data;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errorMessage = error.errors.map(e => e.message).join(', ');
+      const errorMessage = error.issues.map(e => e.message).join(', ');
       logger.error('Error de validación al actualizar cuenta', { error: errorMessage, cuentaId: id });
       showErrorMessage(`Datos inválidos: ${errorMessage}`);
     } else {
