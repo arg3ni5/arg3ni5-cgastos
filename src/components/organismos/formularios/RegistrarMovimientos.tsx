@@ -21,7 +21,6 @@ import {
   useUsuariosStore,
   DataDesplegableMovimientos,
   Tipo,
-  DataDesplegableMovimientosObj,
   DataDesplegables,
   Cuenta,
 } from "../../../index";
@@ -41,6 +40,7 @@ interface FormInputs {
 
 export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, accion }: RegistrarMovimientosProps): JSX.Element => {
   const { cuentaItemSelect, mostrarCuentas, selectCuenta } = useCuentaStore();
+  const { selectTipoMovimiento } = useOperaciones();
   const { idusuario } = useUsuariosStore();
   const { categoriaItemSelect, selectCategoria, mostrarCategorias } = useCategoriasStore();
   const { insertarMovimientos, actualizarMovimientos } = useMovimientosStore();
@@ -50,8 +50,18 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
   const [stateCategorias, setStateCategorias] = useState<boolean>(false);
   const [stateCuenta, setStateCuenta] = useState<boolean>(false);
   const [stateTipo, setStateTipo] = useState<boolean>(false);
-  const [tipoMovimiento, setTipoMovimiento] = useState<Tipo>(DataDesplegables.movimientos[dataSelect.tipo!] || {} as Tipo);
+  const tipoInicial = dataSelect?.tipo || (selectTipoMovimiento?.tipo !== "b" ? selectTipoMovimiento?.tipo : undefined);
+  const [tipoMovimiento, setTipoMovimiento] = useState<Tipo>(
+    (tipoInicial ? DataDesplegables.movimientos[tipoInicial] : undefined) || {} as Tipo
+  );
   const fechaactual = new Date();
+
+  useEffect(() => {
+    const tipo = dataSelect?.tipo || (accion === "Nuevo" && selectTipoMovimiento?.tipo !== "b" ? selectTipoMovimiento?.tipo : undefined);
+    if (tipo && DataDesplegables.movimientos[tipo]) {
+      setTipoMovimiento(DataDesplegables.movimientos[tipo]);
+    }
+  }, [dataSelect?.tipo, accion, selectTipoMovimiento?.tipo]);
 
   const {
     register,
@@ -89,10 +99,11 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
       valor: parseFloat(formData.monto.toString()),
     } as MovimientoInsert;
     try {
+      console.log(baseData);
       await insertarMovimientos(baseData);
       setState();
     } catch (err) {
-      alert(err);
+      console.error(err);
     }
   };
 
@@ -157,8 +168,8 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
           <ContenedorDropdown>
             <Selector
               color="#e14e19"
-              texto1={(categoriaItemSelect?.tipo ? DataDesplegables.movimientos[categoriaItemSelect.tipo].text : tipoMovimiento?.text) ? accion + " " : ""}
-              texto2={(categoriaItemSelect?.tipo ? DataDesplegables.movimientos[categoriaItemSelect.tipo].text : tipoMovimiento?.text) || "Selecciones un tipo"}
+              texto1={tipoMovimiento?.text ? accion + " " : ""}
+              texto2={tipoMovimiento?.text || "Seleccione un tipo"}
               funcion={() => setStateTipo(!stateTipo)}
             />
 
@@ -425,7 +436,7 @@ const ContenedorDropdown = styled.div`
   position: relative;
   width: 100%;
   flex: 1;
-  display: flex;  
+  display: flex;
   gap: 10px;
   flex-direction: row;
   align-items: center;
@@ -492,4 +503,3 @@ const StickyFooter = styled.div`
   z-index: 10;
   position: relative;
 `;
-
