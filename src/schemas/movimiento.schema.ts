@@ -11,13 +11,11 @@ export const movimientoSchema = z.object({
   idcategoria: z.number().int().positive().nullable(),
   idcuenta: z.number().int().positive().nullable()
 });
-
+const tipoEnum = ['i', 'g'] as const;
 // Schema for inserting a new Movimiento
 export const movimientoInsertSchema = z.object({
   descripcion: z.string().min(1, 'La descripción es requerida').max(200, 'La descripción no puede exceder 200 caracteres').nullable().optional(),
-  tipo: z.enum(['ingreso', 'egreso'], {
-    errorMap: () => ({ message: 'El tipo debe ser "ingreso" o "egreso"' })
-  }),
+  tipo: z.enum(tipoEnum).default('i'),
   valor: z.number()
     .positive('El valor debe ser un número positivo')
     .finite('El valor debe ser un número válido')
@@ -36,9 +34,7 @@ export const movimientoInsertSchema = z.object({
 // Schema for updating a Movimiento
 export const movimientoUpdateSchema = z.object({
   descripcion: z.string().min(1, 'La descripción es requerida').max(200, 'La descripción no puede exceder 200 caracteres').nullable().optional(),
-  tipo: z.enum(['ingreso', 'egreso'], {
-    errorMap: () => ({ message: 'El tipo debe ser "ingreso" o "egreso"' })
-  }).optional(),
+  tipo: z.enum(tipoEnum).optional(),
   valor: z.number()
     .positive('El valor debe ser un número positivo')
     .finite('El valor debe ser un número válido')

@@ -10,11 +10,13 @@ export const categoriaSchema = z.object({
   idusuario: z.number().int().positive().nullable()
 });
 
+const tipoEnum = ['i', 'g'] as const;
+
 // Schema for inserting a new Categoria
 export const categoriaInsertSchema = z.object({
   descripcion: z.string().min(1, 'La descripción es requerida').max(100, 'La descripción no puede exceder 100 caracteres').nullable().optional(),
-  tipo: z.enum(['ingreso', 'egreso'], {
-    errorMap: () => ({ message: 'El tipo debe ser "ingreso" o "egreso"' })
+  tipo: z.enum(tipoEnum, {
+    message: 'El tipo debe ser "i" o "g"'
   }).nullable().optional(),
   color: z.string()
     .regex(/^#[0-9A-Fa-f]{6}$/, 'El color debe ser un código hexadecimal válido (ej: #FF5733)')
@@ -27,8 +29,8 @@ export const categoriaInsertSchema = z.object({
 // Schema for updating a Categoria
 export const categoriaUpdateSchema = z.object({
   descripcion: z.string().min(1, 'La descripción es requerida').max(100, 'La descripción no puede exceder 100 caracteres').nullable().optional(),
-  tipo: z.enum(['ingreso', 'egreso'], {
-    errorMap: () => ({ message: 'El tipo debe ser "ingreso" o "egreso"' })
+  tipo: z.enum(tipoEnum, {
+    message: 'El tipo debe ser "i" o "g"'
   }).nullable().optional(),
   color: z.string()
     .regex(/^#[0-9A-Fa-f]{6}$/, 'El color debe ser un código hexadecimal válido (ej: #FF5733)')
