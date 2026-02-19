@@ -121,7 +121,9 @@ export const convertToMovimiento = (item: MovimientosMesAnio[number]): Movimient
     descripcion: item.descripcion,
     valor: item.valor,
     fecha: item.fecha,
-    estado: item.estado
-
-  } as Movimiento;
+    estado: item.estado,
+    idcategoria: null,
+    idcuenta: null,
+    tipo: ''
+  } as unknown as Movimiento;
 };
