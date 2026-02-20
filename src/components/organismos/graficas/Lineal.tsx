@@ -12,7 +12,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { JSX } from "react";
-import { DataRptMovimientosAñoMes } from "../../../index";
+import { DataRptMovimientosAñoMes, useUsuariosStore } from "../../../index";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -48,14 +48,38 @@ interface LinealProps {
 }
 
 export const Lineal = ({ data, tipo }: LinealProps): JSX.Element => {
+  const { usuario } = useUsuariosStore();
+  const formatCurrency = (valor: number): string =>
+    `${usuario?.moneda || "$"} ${new Intl.NumberFormat('es-ES', {
+      maximumFractionDigits: 0,
+    }).format(valor)}`;
+
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    cutout: "60%"
+    cutout: "60%",
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: (context: { dataset: { label?: string }; parsed: { y?: number } }): string => {
+            const label = context.dataset.label || "Total";
+            return `${label}: ${formatCurrency(Number(context.parsed.y || 0))}`;
+          }
+        }
+      }
+    },
+    scales: {
+      y: {
+        ticks: {
+          callback: (value: string | number): string => formatCurrency(Number(value))
+        }
+      }
+    }
   };
 
   const dataTipo = tipo == 'i' ? data.i : data.g;
   const titulo = tipo == 'i' ? 'Ingresos' : 'Gastos';
+  const totalGeneral = (dataTipo || []).reduce((acum, item) => acum + Number(item.total || 0), 0);
 
   const colors = [
     ["rgba(255, 99, 132, 0.2)", "rgba(255, 99, 132, 1)"],
@@ -65,13 +89,17 @@ export const Lineal = ({ data, tipo }: LinealProps): JSX.Element => {
     ["rgba(153, 102, 255, 0.2)", "rgba(153, 102, 255, 1)"],
     ["rgba(255, 159, 64, 0.2)", "rgba(255, 159, 64, 1)"],
   ];
+  const withAlpha = (hexColor: string, alphaHex: string): string => {
+    if (/^#[0-9A-Fa-f]{6}$/.test(hexColor)) return `${hexColor}${alphaHex}`;
+    return hexColor;
+  };
   const datagrafica: DataGrafica = {
     labels: [titulo],
     datasets: (dataTipo || []).map((item, index) => ({
       label: item.descripcion,
       data: [item.total],
-      backgroundColor: colors[index % colors.length][0],
-      borderColor: colors[index % colors.length][1],
+      backgroundColor: item.color ? withAlpha(item.color, '33') : colors[index % colors.length][0],
+      borderColor: item.color || colors[index % colors.length][1],
       borderWidth: 2,
       tension: 0.3,
       fill: true,
@@ -89,13 +117,17 @@ export const Lineal = ({ data, tipo }: LinealProps): JSX.Element => {
       </section>
       <section>
         <h2>{titulo} por categoria</h2>
+        <ContentTotal>
+          <span>Total</span>
+          <strong>{formatCurrency(totalGeneral)}</strong>
+        </ContentTotal>
         {dataTipo.map((item, index) => (
-          <ContentCars key={index}>
+          <ContentCars key={index} $borderColor={item.color || (tipo === 'i' ? '#54A2EB' : '#FF6384')}>
             <div className="contentDescripcion">
               <span>{item.icono}</span>
               <span className="descripcion">{item.descripcion}</span>
             </div>
-            <span>{item.total}</span>
+            <span>{formatCurrency(Number(item.total || 0))}</span>
           </ContentCars>
         ))}
       </section>
@@ -110,11 +142,19 @@ align-items:center;
 gap:18px;
 
 `;
-const ContentCars = styled.div`
+const ContentCars = styled.div<{ $borderColor: string }>`
 display:flex;
 justify-content:space-between;
+border-bottom: 2px solid ${({ $borderColor }) => $borderColor};
+padding: 6px 0;
 .contentDescripcion{
     display:flex;
     gap:10px;
 }
+`;
+
+const ContentTotal = styled.div`
+display:flex;
+justify-content:space-between;
+margin: 8px 0 12px;
 `;
