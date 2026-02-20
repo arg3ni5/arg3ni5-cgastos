@@ -18,24 +18,6 @@ interface ContainerProps {
   };
 }
 
-interface DataGrafica {
-  labels: string[];
-  datasets: {
-    tension: number;
-    fill: boolean;
-    label: string;
-    borderRadius: number;
-    cutout: number;
-    minBarLength: string;
-    data: number[];
-    backgroundColor: string[];
-    borderColor: string[];
-    borderWidth: number;
-    hoverOffset: number;
-    offset: number;
-  }[];
-}
-
 export const Tabs = (): JSX.Element => {
   const [activeTab, setActiveTab] = useState<number>(0);
   const [gliderStyle, setGliderStyle] = useState<{ left: string; width: string }>({
