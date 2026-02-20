@@ -15,13 +15,36 @@ interface BtnIconoProps {
 interface ContainerProps {
   $bgcolor: string;
   $textcolor: string;
+  $bordercolor: string;
+  $active: boolean;
 }
 
+const ajustarColor = (color: string, factor: number): string => {
+  if (!color.startsWith("#") || (color.length !== 7 && color.length !== 4)) {
+    return color;
+  }
+
+  const hex = color.length === 4
+    ? `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`
+    : color;
+
+  const num = parseInt(hex.slice(1), 16);
+  const r = Math.max(0, Math.min(255, Math.round(((num >> 16) & 255) * factor)));
+  const g = Math.max(0, Math.min(255, Math.round(((num >> 8) & 255) * factor)));
+  const b = Math.max(0, Math.min(255, Math.round((num & 255) * factor)));
+
+  return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+};
+
 export const BtnIcono: React.FC<BtnIconoProps> = ({ active, tipo, icono, text, bgcolor, textcolor, funcion }) => {
+  const baseColor = tipo?.bgcolor || bgcolor || "";
+  const borderColor = active ? ajustarColor(baseColor, 0.85) : "transparent";
   return (
     <Container
-      $bgcolor={tipo?.bgcolor || bgcolor || ''}
+      $bgcolor={baseColor}
       $textcolor={tipo?.color || textcolor || ''}
+      $bordercolor={borderColor}
+      $active={!!active}
       onClick={funcion}>
       <span className="containerText">
         {tipo?.icono || icono}
@@ -38,6 +61,7 @@ letter-spacing: 0.3px;
   display: flex;
   background-color: ${(props) => props.$bgcolor};
   color: ${(props) => props.$textcolor};
+  border: 2px solid ${(props) => (props.$active ? props.$bordercolor : "transparent")};
   font-weight: 500;
   font-size: 23px;
   padding: 0.9rem 2.3rem;

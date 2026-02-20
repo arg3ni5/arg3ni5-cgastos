@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useUsuariosStore, useCuentaStore } from "../../index";
 import Swal from "sweetalert2";
 import { Container, ContentFiltro } from "./CuentasTemplate.styles";
+import { MovimientosCuentaModal } from "./MovimientosCuentaModal";
 
 interface CuentasTemplateProps {
 	data: Cuenta[];
@@ -11,6 +12,7 @@ interface CuentasTemplateProps {
 export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 	const [state, setState] = useState(false);
 	const [openRegistro, setOpenRegistro] = useState(false);
+	const [cuentaSeleccionada, setCuentaSeleccionada] = useState<Cuenta | null>(null);
 	const { usuario } = useUsuariosStore();
 	const { eliminarCuenta } = useCuentaStore();
 	const [accion, setAccion] = useState<Accion>("Nuevo");
@@ -73,6 +75,8 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 		}
 	};
 
+	const totalSaldos = data?.reduce((sum, cuenta) => sum + (cuenta.saldo_actual || 0), 0) || 0;
+
 	return (
 		<Container onClick={cerrarDesplegables}>
 			{openRegistro && (
@@ -83,9 +87,23 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 				/>
 			)}
 
+			{cuentaSeleccionada && (
+				<MovimientosCuentaModal
+					cuenta={cuentaSeleccionada}
+					onClose={() => setCuentaSeleccionada(null)}
+				/>
+			)}
+
 			<header className="header">
 				<Header stateConfig={{ state: state, setState: openUser }} />
 			</header>
+
+			<section className="total-summary">
+				<div className="total-card">
+					<h2>Saldo Total</h2>
+					<p className="total-amount">{usuario?.moneda} {totalSaldos.toFixed(2)}</p>
+				</div>
+			</section>
 
 			<section className="tipo">
 				<ContentFiltros>
@@ -124,15 +142,34 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 				{data?.length > 0 ? (
 					<div className="accounts-grid">
 						{data.map((cuenta) => (
-							<div key={cuenta.id} className="account-card">
+							<div
+								key={cuenta.id}
+								className="account-card"
+								onClick={() => setCuentaSeleccionada(cuenta)}
+								style={{ cursor: "pointer" }}
+							>
 								<div className="card-header">
 									<span className="icon">{cuenta.icono}</span>
 									<h3>{cuenta.descripcion}</h3>
 								</div>
 								<p className="balance">{usuario?.moneda} {cuenta.saldo_actual?.toFixed(2)}</p>
 								<div className="card-actions">
-									<button onClick={() => openEditModal(cuenta)}>✏️</button>
-									<button onClick={() => handleDelete(cuenta.id)}>🗑️</button>
+									<button
+										onClick={(e) => {
+											e.stopPropagation();
+											openEditModal(cuenta);
+										}}
+									>
+										✏️
+									</button>
+									<button
+										onClick={(e) => {
+											e.stopPropagation();
+											handleDelete(cuenta.id);
+										}}
+									>
+										🗑️
+									</button>
 								</div>
 							</div>
 						))}

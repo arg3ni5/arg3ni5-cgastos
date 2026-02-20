@@ -64,10 +64,24 @@ export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
   mostrarMovimientos: async (p: MovimientosMesAnioParams) => {
     try {
       set({ parametros: p });
-      const i = p.tipocategoria === "i" || p.tipocategoria === "b" ?
-        await MostrarMovimientosPorMesAño({ ...p, tipocategoria: "i" }) || [] : [];
-      const g = p.tipocategoria === "g" || p.tipocategoria === "b" ?
-        await MostrarMovimientosPorMesAño({ ...p, tipocategoria: "g" }) || [] : [];
+      const currentState = get();
+
+      let i = p.tipocategoria === "i" || p.tipocategoria === "b" ?
+        await MostrarMovimientosPorMesAño({ ...p, tipocategoria: "i" }) || [] : currentState.datamovimientos.i || [];
+      let g = p.tipocategoria === "g" || p.tipocategoria === "b" ?
+        await MostrarMovimientosPorMesAño({ ...p, tipocategoria: "g" }) || [] : currentState.datamovimientos.g || [];
+
+      // Convertir estado a booleano
+      i = i?.map(item => ({
+        ...item,
+        estado: esPagado(item.estado)
+      })) || [];
+
+      g = g?.map(item => ({
+        ...item,
+        estado: esPagado(item.estado)
+      })) || [];
+
       const response = { i, g };
 
       const { calcularTotales } = get();

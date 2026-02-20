@@ -9,6 +9,7 @@ export const Container = styled.div`
   display: grid;
   grid-template:
     "header" 100px
+    "total-summary" 90px
     "tipo" 100px
     "area2" 50px
     "main" auto;
@@ -18,6 +19,38 @@ export const Container = styled.div`
     /* background-color: rgba(103, 93, 241, 0.14); */
     display: flex;
     align-items: center;
+  }
+
+  .total-summary {
+    grid-area: total-summary;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 1rem;
+
+    .total-card {
+      background: linear-gradient(135deg, ${({ theme }) => theme.primary || '#667df4'} 0%, ${({ theme }) => theme.primaryLight || '#8b9aff'} 100%);
+      color: white;
+      padding: 1.5rem 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+
+      h2 {
+        font-size: 1rem;
+        font-weight: 500;
+        margin: 0 0 0.5rem 0;
+        opacity: 0.9;
+      }
+
+      .total-amount {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+      }
+    }
   }
 
   .tipo {
@@ -57,6 +90,13 @@ export const Container = styled.div`
       padding: 1rem;
       border-radius: 10px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      cursor: pointer;
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+      }
 
       .card-header {
         display: flex;
@@ -83,7 +123,7 @@ export const Container = styled.div`
           cursor: pointer;
           padding: 0.25rem;
           border-radius: 4px;
-          
+
           &:hover {
             background: ${({ theme }) => theme.bgAlpha};
           }

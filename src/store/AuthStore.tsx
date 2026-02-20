@@ -24,22 +24,22 @@ export const useAuthStore = create<AuthStore>((set) => ({
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
       });
-      
+
       if (error) {
         logger.error('Error durante autenticación con Google', { error: error.message });
         showErrorMessage('Ocurrió un error durante la autenticación. Por favor, intenta nuevamente.');
         throw new Error("Ocurrió un error durante la autenticación");
       }
-      
+
       if (!data) {
         logger.error('No se recibieron datos de autenticación');
         showErrorMessage('No se pudo completar la autenticación. Por favor, intenta nuevamente.');
         return undefined;
       }
-      
+
       set({ isAuth: true });
       logger.info('Autenticación con Google exitosa', { provider: data.provider });
-      
+
       // Return provider and url if available
       return {
         provider: data.provider,
@@ -55,13 +55,13 @@ export const useAuthStore = create<AuthStore>((set) => ({
   signout: async () => {
     try {
       const { error } = await supabase.auth.signOut();
-      
+
       if (error) {
         logger.error('Error durante cierre de sesión', { error: error.message });
         showErrorMessage('Ocurrió un error durante el cierre de sesión.');
         throw new Error("Ocurrió un error durante el cierre de sesión");
       }
-      
+
       set({ isAuth: false });
       logger.info('Cierre de sesión exitoso');
     } catch (error) {

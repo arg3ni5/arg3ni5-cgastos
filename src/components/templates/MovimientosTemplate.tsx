@@ -11,7 +11,6 @@ import {
   Tipo,
   Accion,
   Movimiento,
-  TablaMovimientos,
   useMovimientosStore,
   RegistrarMovimientos,
   CardTotales,
@@ -19,6 +18,7 @@ import {
   CalendarioLineal,
   obtenerTitulo,
   BtnIcono,
+  TablaMovimientos,
 } from "../../index";
 import { JSX, useState } from "react";
 import vacioverde from "../../assets/vacioverde.json";
@@ -90,6 +90,7 @@ export const MovimientosTemplate = (): JSX.Element => {
         <ContentFiltros>
           {(tipo.tipo == "i" || tipo.tipo == "g") &&
             <BtnIcono
+              active
               icono={tipo.tipo === "g" ? gastos.icono : ingresos.icono}
               textcolor={tipo.tipo === "g" ? gastos.color : ingresos.color}
               bgcolor={tipo.tipo === "g" ? gastos.bgcolor : ingresos.bgcolor}
@@ -139,6 +140,7 @@ export const MovimientosTemplate = (): JSX.Element => {
                 textcolor={balance.color}
                 bgcolor={balance.bgcolor}
                 text={balance.text}
+                active
                 funcion={openTipo}
               />
               {stateTipo && (
