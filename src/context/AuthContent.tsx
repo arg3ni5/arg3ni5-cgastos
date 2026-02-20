@@ -37,7 +37,23 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
 
           setUser(user);
 
-          await insertarUsuarios(user, session.user.id);
+          // Insert usuario con timeout para evitar que se cuelgue
+          try {
+            const timeoutPromise = new Promise<null>((resolve) => {
+              setTimeout(() => {
+                console.warn('Timeout al insertar usuario en AuthContext, continuando sin esperar...');
+                resolve(null);
+              }, 5000); // 5 segundo timeout
+            });
+
+            await Promise.race([
+              insertarUsuarios(user, session.user.id),
+              timeoutPromise,
+            ]);
+          } catch (error) {
+            console.error('Error al insertar usuario en AuthContext:', error);
+            // Continuar de todas formas, el usuario se cargará desde ObtenerUsuarioActual
+          }
 
           if (pathname === "/login") {
             navigate("/");

@@ -11,7 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export const Movimientos = () => {
   const { selectTipoMovimiento: tipo, date } = useOperaciones();
-  const { mostrarMovimientos, datamovimientos } = useMovimientosStore();
+  const { mostrarMovimientos } = useMovimientosStore();
   const { usuario } = useUsuariosStore();
   const { setIsLoading } = useLoading();
 

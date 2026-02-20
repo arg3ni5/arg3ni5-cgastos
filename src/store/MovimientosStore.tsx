@@ -11,7 +11,9 @@ import {
   MovimientoInsert,
   Movimiento,
   MovimientoUpdate,
-  ActualizarMovimientos
+  ActualizarMovimientos,
+  RptMovimientosMesAnioJson,
+  RptMovimientosPorMesAñoJson
 } from "../index";
 import { logger } from "../utils/logger";
 
@@ -37,7 +39,18 @@ interface MovimientosState {
   actualizarMovimientos: (p: MovimientoUpdate) => Promise<void>;
   eliminarMovimiento: (p: Movimiento) => Promise<void>;
   rptMovimientosAñoMes: (p: RptMovimientosMesAnioParams) => Promise<DataRptMovimientosAñoMes | null>;
+  rptMovimientosAñoMesJson: (p: RptMovimientosMesAnioParams) => Promise<RptMovimientosMesAnioJson | null>;
 }
+
+const esPagado = (estado: unknown): boolean => {
+  if (typeof estado === "boolean") return estado;
+  if (typeof estado === "number") return estado === 1;
+  if (typeof estado === "string") {
+    const valor = estado.trim().toLowerCase();
+    return valor === "1" || valor === "true";
+  }
+  return false;
+};
 
 export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
   rptParams: {} as RptMovimientosMesAnioParams,
@@ -60,9 +73,9 @@ export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
       const { calcularTotales } = get();
       if (response) calcularTotales(response);
       set({ datamovimientos: { i: i || [], g: g || [] } });
-      logger.debug('Movimientos cargados exitosamente', { 
-        ingresos: i?.length || 0, 
-        gastos: g?.length || 0 
+      logger.debug('Movimientos cargados exitosamente', {
+        ingresos: i?.length || 0,
+        gastos: g?.length || 0
       });
       return response;
     } catch (error) {
@@ -79,18 +92,18 @@ export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
         const totalIngresos = data.i?.reduce((sum, item) => sum + Number(item.valor), 0) || 0;
         const totalGastos = data.g?.reduce((sum, item) => sum + Number(item.valor), 0) || 0;
 
-        const ingPagados = data.i?.filter(item => Number(item.estado) === 1)
+        const ingPagados = data.i?.filter(item => esPagado(item.estado))
           .reduce((sum, item) => sum + Number(item.valor), 0) || 0;
-        const gasPagados = data.g?.filter(item => Number(item.estado) === 1)
-          .reduce((sum, item) => sum + Number(item.valor), 0) || 0;
-
-        const ingPendientes = data.i?.filter(item => Number(item.estado) === 0)
-          .reduce((sum, item) => sum + Number(item.valor), 0) || 0;
-        const gasPendientes = data.g?.filter(item => Number(item.estado) === 0)
+        const gasPagados = data.g?.filter(item => esPagado(item.estado))
           .reduce((sum, item) => sum + Number(item.valor), 0) || 0;
 
-        logger.debug('Totales calculados (ambos)', { 
-          totalIngresos, totalGastos, ingPagados, gasPagados, ingPendientes, gasPendientes 
+        const ingPendientes = data.i?.filter(item => !esPagado(item.estado))
+          .reduce((sum, item) => sum + Number(item.valor), 0) || 0;
+        const gasPendientes = data.g?.filter(item => !esPagado(item.estado))
+          .reduce((sum, item) => sum + Number(item.valor), 0) || 0;
+
+        logger.debug('Totales calculados (ambos)', {
+          totalIngresos, totalGastos, ingPagados, gasPagados, ingPendientes, gasPendientes
         });
 
         set({
@@ -104,8 +117,8 @@ export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
       const tipo = parametros.tipocategoria === "i" ? "i" : "g";
       const movimientos = data[tipo];
 
-      const dtPagados = movimientos?.filter(item => Number(item.estado) === 1);
-      const dtPendientes = movimientos?.filter(item => Number(item.estado) === 0);
+      const dtPagados = movimientos?.filter(item => esPagado(item.estado));
+      const dtPendientes = movimientos?.filter(item => !esPagado(item.estado));
 
       const total = movimientos?.reduce((sum, item) => sum + Number(item.valor), 0) || 0;
       const tpagados = dtPagados?.reduce((sum, item) => sum + Number(item.valor), 0) || 0;
@@ -116,7 +129,7 @@ export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
         totalMesAñoPagados: tpagados,
         totalMesAñoPendientes: tpendientes
       });
-      
+
       logger.debug('Totales calculados', { tipo, total, tpagados, tpendientes });
     } catch (error) {
       logger.error('Error al calcular totales', { error, data });
@@ -173,6 +186,18 @@ export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
     } catch (error) {
       logger.error('Error al generar reporte de movimientos', { error, params: p });
       return { i: [], g: [] };
+    }
+  },
+
+
+  rptMovimientosAñoMesJson: async (p: RptMovimientosMesAnioParams): Promise<RptMovimientosMesAnioJson | null> => {
+    try {
+      const response = await RptMovimientosPorMesAñoJson(p);
+      logger.debug('Reporte de movimientos (JSON) generado', { params: p });
+      return response;
+    } catch (error) {
+      logger.error('Error al generar reporte de movimientos (JSON)', { error, params: p });
+      return null;
     }
   },
 }));

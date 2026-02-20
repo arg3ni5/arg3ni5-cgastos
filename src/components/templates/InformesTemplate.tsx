@@ -97,7 +97,3 @@ const Container = styled.div`
    // background-color: rgba(179, 46, 241, 0.14);
   }
 `;
-const ContentFiltro = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-`;

@@ -18,24 +18,6 @@ interface ContainerProps {
   };
 }
 
-interface DataGrafica {
-  labels: string[];
-  datasets: {
-    tension: number;
-    fill: boolean;
-    label: string;
-    borderRadius: number;
-    cutout: number;
-    minBarLength: string;
-    data: number[];
-    backgroundColor: string[];
-    borderColor: string[];
-    borderWidth: number;
-    hoverOffset: number;
-    offset: number;
-  }[];
-}
-
 export const Tabs = (): JSX.Element => {
   const [activeTab, setActiveTab] = useState<number>(0);
   const [gliderStyle, setGliderStyle] = useState<{ left: string; width: string }>({
@@ -74,75 +56,7 @@ export const Tabs = (): JSX.Element => {
 
   const { idusuario } = useUsuariosStore();
   const { date, selectTipoMovimiento: tipo } = useOperaciones();
-  const { dataRptMovimientosAñoMes, rptMovimientosAñoMes, rptParams } = useMovimientosStore();
-
-  const datagraficaG: DataGrafica = {
-    labels: dataRptMovimientosAñoMes?.g?.map((item) => item.descripcion) || [],
-    datasets: [
-      {
-        tension: 0.3,
-        fill: true,
-        label: "Total",
-        borderRadius: 5,
-        cutout: 30,
-        minBarLength: "100px",
-        data: dataRptMovimientosAñoMes?.g?.map((item) => item.total),
-        backgroundColor: [
-          "rgba(255, 99, 132, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
-          "rgba(255, 206, 86, 0.2)",
-          "rgba(75, 192, 192, 0.2)",
-          "rgba(153, 102, 255, 0.2)",
-          "rgba(255, 159, 64, 0.2)",
-        ],
-        borderColor: [
-          "rgba(255, 99, 132, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(255, 206, 86, 1)",
-          "rgba(75, 192, 192, 1)",
-          "rgba(153, 102, 255, 1)",
-          "rgba(255, 159, 64, 1)",
-        ],
-        borderWidth: 2,
-        hoverOffset: 16,
-        offset: 10,
-      },
-    ],
-  };
-
-  const datagraficaI: DataGrafica = {
-    labels: dataRptMovimientosAñoMes.i?.map((item) => item.descripcion) || [],
-    datasets: [
-      {
-        tension: 0.3,
-        fill: true,
-        label: "Total",
-        borderRadius: 5,
-        cutout: 30,
-        minBarLength: "100px",
-        data: dataRptMovimientosAñoMes.i?.map((item) => item.total) || [],
-        backgroundColor: [
-          "rgba(255, 99, 132, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
-          "rgba(255, 206, 86, 0.2)",
-          "rgba(75, 192, 192, 0.2)",
-          "rgba(153, 102, 255, 0.2)",
-          "rgba(255, 159, 64, 0.2)",
-        ],
-        borderColor: [
-          "rgba(255, 99, 132, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(255, 206, 86, 1)",
-          "rgba(75, 192, 192, 1)",
-          "rgba(153, 102, 255, 1)",
-          "rgba(255, 159, 64, 1)",
-        ],
-        borderWidth: 2,
-        hoverOffset: 16,
-        offset: 10,
-      },
-    ],
-  };
+  const { dataRptMovimientosAñoMes, rptMovimientosAñoMes } = useMovimientosStore();
 
   const { isLoading, error } = useQuery<DataRptMovimientosAñoMes | null, Error>({
     queryKey: ['rptMovimientos', tipo, idusuario, date.format('YYYY-MM')],
@@ -152,7 +66,7 @@ export const Tabs = (): JSX.Element => {
       tipocategoria: tipo.tipo,
       iduser: idusuario,
     }),
-    enabled: date.month() + 1 !== rptParams.mes || date.year() !== rptParams.anio
+    enabled: !!idusuario && !!tipo?.tipo
   });
 
   if (isLoading) return <h1>Cargando</h1>;
@@ -184,12 +98,12 @@ export const Tabs = (): JSX.Element => {
       <div className="tab-content">
         {activeTab === 0 && (
           <ChartGrid>
-            {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && (
+            {((tipo.tipo === "g" || tipo.tipo === "b") && (
               <ChartContainer>
                 <Dona data={dataRptMovimientosAñoMes} tipo={"g"} />
               </ChartContainer>
             ))}
-            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && (
+            {((tipo.tipo === "i" || tipo.tipo === "b") && (
               <ChartContainer>
                 <Dona data={dataRptMovimientosAñoMes} tipo={"i"} />
               </ChartContainer>
@@ -198,12 +112,12 @@ export const Tabs = (): JSX.Element => {
         )}
         {activeTab === 1 && (
           <ChartGrid>
-            {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && (
+            {((tipo.tipo === "g" || tipo.tipo === "b") && (
               <ChartContainer>
                 <Barras data={dataRptMovimientosAñoMes} tipo={"g"} horizontal />
               </ChartContainer>
             ))}
-            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && (
+            {((tipo.tipo === "i" || tipo.tipo === "b") && (
               <ChartContainer>
                 <Barras data={dataRptMovimientosAñoMes} tipo={"i"} horizontal />
               </ChartContainer>
@@ -213,12 +127,12 @@ export const Tabs = (): JSX.Element => {
 
         {activeTab === 2 && (
           <ChartGrid>
-            {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && (
+            {((tipo.tipo === "g" || tipo.tipo === "b") && (
               <ChartContainer>
                 <Lineal data={dataRptMovimientosAñoMes} tipo={'g'} />
               </ChartContainer>
             ))}
-            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && (
+            {((tipo.tipo === "i" || tipo.tipo === "b") && (
               <ChartContainer>
                 <Lineal data={dataRptMovimientosAñoMes} tipo={'i'} />
               </ChartContainer>
@@ -295,7 +209,7 @@ const Container = styled.div<ContainerProps>`
       z-index: 1;
       transition: all 0.25s ease-out;
       box-shadow: 0px 10px 20px -3px ${(props) => props.theme.carouselColor};
-      left: 0; 
+      left: 0;
       width: 75px;
     }
 
@@ -340,6 +254,6 @@ const ChartContainer = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: auto;  
+  height: auto;
   padding-bottom: 40px;
 `;

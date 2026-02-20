@@ -4,10 +4,10 @@ import { v } from "../../../styles/variables";
 import {
   InputText,
   Spinner,
-  useOperaciones,
   BtnForm,
   useUsuariosStore,
   useCategoriasStore,
+  useOperaciones,
   CategoriaUpdate,
   CategoriaInsert,
   Accion
@@ -25,11 +25,11 @@ interface RegistrarCategoriasProps {
 export const RegistrarCategorias = ({ onClose, dataSelect, accion }: RegistrarCategoriasProps) => {
   const { insertarCategorias, editarCategoria } = useCategoriasStore();
   const { usuario } = useUsuariosStore();
+  const { selectTipoCategoria } = useOperaciones();
   const [showPicker, setShowPicker] = useState<boolean>(false);
   const [emojiselect, setEmojiselect] = useState<string>("😻");
   const [currentColor, setColor] = useState<string>("#F44336");
   const [estadoProceso, setEstadoproceso] = useState<boolean>(false);
-  const { tipo } = useOperaciones();
 
   function onEmojiClick(emojiObject: EmojiClickData): void {
     setEmojiselect(() => emojiObject.emoji);
@@ -49,13 +49,13 @@ export const RegistrarCategorias = ({ onClose, dataSelect, accion }: RegistrarCa
     tipo?: string;
     id?: number;
   }
-  
+
   const {
     register,
     formState: { errors },
     handleSubmit,
   } = useForm<FormInputs>();
-  
+
   // Update InputText component to register all required fields
   <InputText
     defaultValue={dataSelect.descripcion || ""}
@@ -65,27 +65,27 @@ export const RegistrarCategorias = ({ onClose, dataSelect, accion }: RegistrarCa
     errors={errors}
     style={{ textTransform: "capitalize" }}
   />
-  
+
   // Update the insertar function
   const insertar = async (formData: FormInputs): Promise<void> => {
     if (usuario?.id == undefined) {
       return;
     }
-  
+
     const baseData = {
       descripcion: formData.descripcion,
+      tipo: (accion === "Editar" ? dataSelect.tipo : selectTipoCategoria.tipo),
       color: currentColor,
       icono: emojiselect,
       idusuario: usuario.id,
-      tipo: tipo,
     };
-  
+
     if (accion === "Editar" && dataSelect.id) {
       const updateData: CategoriaUpdate = {
         ...baseData,
         id: dataSelect.id,
       };
-      
+
       try {
         setEstadoproceso(true);
         await editarCategoria(updateData);
@@ -110,7 +110,7 @@ export const RegistrarCategorias = ({ onClose, dataSelect, accion }: RegistrarCa
       setColor(dataSelect.color || '#F44336');
     }
   }, []);
-  
+
   return (
     <Container>
       {estadoProceso && <Spinner />}

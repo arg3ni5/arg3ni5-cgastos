@@ -118,8 +118,6 @@ export const MovimientosTemplate = (): JSX.Element => {
             />
           }
 
-
-
           {tipo.tipo !== "b" &&
             <BtnIcono
               icono={balance.icono}
@@ -246,7 +244,7 @@ const Container = styled.div`
     "tipo" 100px
     "totales" auto
     "calendario" 100px
-    "main" auto    
+    "main" auto
     "empty" auto;
 
   .header {
@@ -282,7 +280,7 @@ const Container = styled.div`
   .main {
     grid-area: main;
     flex-wrap: wrap;
-    
+
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;

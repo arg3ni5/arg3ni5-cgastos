@@ -7,6 +7,7 @@ import {
   BtnForm,
   useUsuariosStore,
   useCuentaStore,
+  useOperaciones,
   CuentaUpdate,
   CuentaInsert,
   Accion,
@@ -24,6 +25,7 @@ interface RegistrarCuentasProps {
 export const RegistrarCuentas = ({ onClose, dataSelect, accion }: RegistrarCuentasProps) => {
   const { insertarCuenta, actualizarCuenta } = useCuentaStore();
   const { usuario } = useUsuariosStore();
+  const { selectTipoCuenta } = useOperaciones();
   const [showPicker, setShowPicker] = useState<boolean>(false);
   const [emojiselect, setEmojiselect] = useState<string>("💰"); // Default icon for accounts
   const [estadoProceso, setEstadoproceso] = useState<boolean>(false);
@@ -57,6 +59,9 @@ export const RegistrarCuentas = ({ onClose, dataSelect, accion }: RegistrarCuent
       descripcion: formData.descripcion,
       saldo_actual: Number(formData.saldo_actual), // Ensure saldo_actual is a number
       icono: emojiselect,
+      tipo: accion === "Editar" && "tipo" in dataSelect && dataSelect.tipo 
+        ? dataSelect.tipo 
+        : selectTipoCuenta.tipo,
       idusuario: usuario.id,
     };
 

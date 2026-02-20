@@ -10,7 +10,6 @@ import {
 } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useEffect, FC, useRef } from "react";
-// Import Swiper styles
 import img1 from "../../assets/Ruleta/ruleta9.png";
 import img2 from "../../assets/Ruleta/ruleta8.png";
 import img3 from "../../assets/Ruleta/ruleta5.png";
@@ -32,7 +31,7 @@ export const Carousel: FC = () => {
 
   return (
     <CarouselContainer>
-      
+
       <div className="custom-button-prev" ref={prevRef}>
         <IoIosArrowBack />
       </div>
@@ -78,8 +77,10 @@ export const Carousel: FC = () => {
   );
 }
 const CarouselContainer = styled.div`
+  position: relative;
   width: 20vw;
   height: 50vh;
+  min-width: 220px;
 
   @media (max-width: 70em) {
     height: 40vh;
@@ -127,11 +128,16 @@ const CarouselContainer = styled.div`
   .custom-button-next {
     position: absolute;
     right: 0;
-    top: 60%;
-    padding-top: 5px;
-    color: ${(props) => props.theme.text};
-    
-    background: #21252B;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: ${(props) => props.theme.bgtotal};
+    cursor: pointer;
+    z-index: 20;
+
+    background: ${(props) => props.theme.text};
     border-radius: 50%;
     width: 32px;
     height: 32px;
@@ -140,6 +146,10 @@ const CarouselContainer = styled.div`
 
     &:after {
       display: none;
+    }
+
+    svg {
+      font-size: 22px;
     }
   }
 

@@ -102,17 +102,41 @@ export const useUsuariosStore = create<UsuariosStore>((set) => ({
         }
       }
 
-      // 2. Consultar a Supabase
+      // 2. Consultar a Supabase con timeout
       logger.debug('Consultando usuario desde Supabase');
-      const { data, error } = await ConsultarUsuario();
+      
+      // Set a timeout for the entire Supabase query
+      const timeoutPromise = new Promise<{ data: null; error: string }>((resolve) => {
+        setTimeout(() => {
+          logger.warn('Timeout al consultar usuario desde Supabase, usando datos del storage o continuando sin usuario');
+          resolve({ data: null, error: 'Timeout en consulta a Supabase' });
+        }, 5000); // 5 segundo timeout
+      });
+
+      const queryPromise = ConsultarUsuario().catch((err) => ({
+        data: null,
+        error: (err as Error).message || 'Error desconocido'
+      }));
+
+      const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
 
       if (error) {
-        logger.error('Error al obtener usuario actual desde Supabase', { error });
+        logger.warn('Error al obtener usuario actual desde Supabase, intentando con datos del storage', { error });
+        // Fallback: si tenemos datos en storage aunque sean viejos, usarlos
+        if (stored && stored.id) {
+          set({ usuario: stored, idusuario: stored.id });
+          return stored;
+        }
         throw new Error(`Error al obtener usuario actual: ${error}`);
       }
 
       if (!data) {
         logger.warn('Usuario no encontrado en Supabase');
+        // Fallback similar
+        if (stored && stored.id) {
+          set({ usuario: stored, idusuario: stored.id });
+          return stored;
+        }
         throw new Error("Usuario no encontrado");
       }
 

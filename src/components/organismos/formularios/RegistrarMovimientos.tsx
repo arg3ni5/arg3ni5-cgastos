@@ -21,7 +21,6 @@ import {
   useUsuariosStore,
   DataDesplegableMovimientos,
   Tipo,
-  DataDesplegableMovimientosObj,
   DataDesplegables,
   Cuenta,
 } from "../../../index";
@@ -39,8 +38,19 @@ interface FormInputs {
   monto: number;
 }
 
+const esPagado = (estado: unknown): boolean => {
+  if (typeof estado === "boolean") return estado;
+  if (typeof estado === "number") return estado === 1;
+  if (typeof estado === "string") {
+    const valor = estado.trim().toLowerCase();
+    return valor === "1" || valor === "true";
+  }
+  return false;
+};
+
 export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, accion }: RegistrarMovimientosProps): JSX.Element => {
   const { cuentaItemSelect, mostrarCuentas, selectCuenta } = useCuentaStore();
+  const { selectTipoMovimiento } = useOperaciones();
   const { idusuario } = useUsuariosStore();
   const { categoriaItemSelect, selectCategoria, mostrarCategorias } = useCategoriasStore();
   const { insertarMovimientos, actualizarMovimientos } = useMovimientosStore();
@@ -50,8 +60,28 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
   const [stateCategorias, setStateCategorias] = useState<boolean>(false);
   const [stateCuenta, setStateCuenta] = useState<boolean>(false);
   const [stateTipo, setStateTipo] = useState<boolean>(false);
-  const [tipoMovimiento, setTipoMovimiento] = useState<Tipo>(DataDesplegables.movimientos[dataSelect.tipo!] || {} as Tipo);
+  const tipoInicial = dataSelect?.tipo || (selectTipoMovimiento?.tipo !== "b" ? selectTipoMovimiento?.tipo : undefined);
+  const [tipoMovimiento, setTipoMovimiento] = useState<Tipo>(
+    (tipoInicial ? DataDesplegables.movimientos[tipoInicial] : undefined) || {} as Tipo
+  );
   const fechaactual = new Date();
+
+  useEffect(() => {
+    const tipo = dataSelect?.tipo || (accion === "Nuevo" && selectTipoMovimiento?.tipo !== "b" ? selectTipoMovimiento?.tipo : undefined);
+    if (tipo && DataDesplegables.movimientos[tipo]) {
+      setTipoMovimiento(DataDesplegables.movimientos[tipo]);
+    }
+  }, [dataSelect?.tipo, accion, selectTipoMovimiento?.tipo]);
+
+  useEffect(() => {
+    if (accion === "Editar") {
+      setEstado(esPagado(dataSelect?.estado));
+      return;
+    }
+    if (accion === "Nuevo") {
+      setEstado(true);
+    }
+  }, [accion, dataSelect?.estado, dataSelect?.id]);
 
   const {
     register,
@@ -68,8 +98,6 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
   );
 
   const insertar = async (formData: FormInputs): Promise<void> => {
-    const estadoText = estado ? 1 : 0;
-
     if (categoriaItemSelect == null) {
       showErrorMessage("Seleccione una categoria");
       return;
@@ -81,7 +109,7 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
 
     const baseData = {
       descripcion: formData.descripcion,
-      estado: estadoText.toString(),
+      estado: estado,
       fecha: formData.fecha,
       idcategoria: categoriaItemSelect.id,
       idcuenta: cuentaItemSelect.id,
@@ -89,16 +117,15 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
       valor: parseFloat(formData.monto.toString()),
     } as MovimientoInsert;
     try {
+      console.log(baseData);
       await insertarMovimientos(baseData);
       setState();
     } catch (err) {
-      alert(err);
+      console.error(err);
     }
   };
 
   const actualizar = async (formData: FormInputs): Promise<void> => {
-    const estadoText = estado ? 1 : 0;
-
     if (categoriaItemSelect == null) {
       showErrorMessage("Seleccione una categoria");
       return;
@@ -110,7 +137,7 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
 
     const baseData = {
       descripcion: formData.descripcion,
-      estado: estadoText.toString(),
+      estado: estado,
       fecha: formData.fecha,
       id: dataSelect.id,
       idcategoria: categoriaItemSelect.id,
@@ -119,6 +146,8 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
       valor: parseFloat(formData.monto.toString()),
     } as MovimientoUpdate;
     try {
+      console.log('actualizar', baseData);
+
       await actualizarMovimientos(baseData);
       setState();
     }
@@ -140,13 +169,53 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
     queryKey: ["cuentas", idusuario],
     queryFn: () => mostrarCuentas({ idusuario } as Cuenta),
     enabled: !!idusuario,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
   const { data: categorias } = useQuery({
     queryKey: ["categorias", tipoMovimiento?.tipo, idusuario],
     queryFn: () => mostrarCategorias({ tipo: tipoMovimiento?.tipo, idusuario }),
     enabled: !!idusuario && !!tipoMovimiento?.tipo,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
+
+  useEffect(() => {
+    if (accion !== "Editar") return;
+    if (!cuentas?.length) return;
+
+    const cuentaNombre = (dataSelect as Movimiento & { cuenta?: string })?.cuenta;
+    const cuentaSeleccionada = cuentas.find((cuenta) => {
+      if (dataSelect?.idcuenta) return cuenta.id === dataSelect.idcuenta;
+      if (cuentaNombre) return cuenta.descripcion === cuentaNombre;
+      return false;
+    });
+
+    if (cuentaSeleccionada) {
+      selectCuenta(cuentaSeleccionada);
+    }
+  }, [accion, dataSelect?.idcuenta, (dataSelect as Movimiento & { cuenta?: string })?.cuenta, cuentas, selectCuenta]);
+
+  useEffect(() => {
+    if (accion !== "Editar") return;
+    if (!categorias?.length) return;
+
+    const categoriaNombre = (dataSelect as Movimiento & { categoria?: string })?.categoria;
+    const categoriaSeleccionada = categorias.find((categoria) => {
+      if (dataSelect?.idcategoria) return categoria.id === dataSelect.idcategoria;
+      if (categoriaNombre) return categoria.descripcion === categoriaNombre;
+      return false;
+    });
+
+    if (categoriaSeleccionada) {
+      selectCategoria(categoriaSeleccionada);
+    }
+  }, [accion, dataSelect?.idcategoria, (dataSelect as Movimiento & { categoria?: string })?.categoria, categorias, selectCategoria]);
 
   return (
     <Container onClick={setState}>
@@ -157,8 +226,8 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
           <ContenedorDropdown>
             <Selector
               color="#e14e19"
-              texto1={(categoriaItemSelect?.tipo ? DataDesplegables.movimientos[categoriaItemSelect.tipo].text : tipoMovimiento?.text) ? accion + " " : ""}
-              texto2={(categoriaItemSelect?.tipo ? DataDesplegables.movimientos[categoriaItemSelect.tipo].text : tipoMovimiento?.text) || "Selecciones un tipo"}
+              texto1={tipoMovimiento?.text ? accion + " " : ""}
+              texto2={tipoMovimiento?.text || "Seleccione un tipo"}
               funcion={() => setStateTipo(!stateTipo)}
             />
 
@@ -425,7 +494,7 @@ const ContenedorDropdown = styled.div`
   position: relative;
   width: 100%;
   flex: 1;
-  display: flex;  
+  display: flex;
   gap: 10px;
   flex-direction: row;
   align-items: center;
@@ -492,4 +561,3 @@ const StickyFooter = styled.div`
   z-index: 10;
   position: relative;
 `;
-

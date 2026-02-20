@@ -62,8 +62,18 @@ export const TablaMovimientos = ({
 
   const editar = (data: Movimiento): void => {
     setOpenRegistro(true);
-    setDataSelect({ ...data, tipo: tipo.tipo });
+    setDataSelect({ ...data, tipo: tipo.tipo } as Movimiento);
     setAccion("Editar");
+  };
+
+  const esPagado = (estado: unknown): boolean => {
+    if (typeof estado === "boolean") return estado;
+    if (typeof estado === "number") return estado === 1;
+    if (typeof estado === "string") {
+      const valor = estado.trim().toLowerCase();
+      return valor === "1" || valor === "true";
+    }
+    return false;
   };
 
   return (
@@ -93,7 +103,7 @@ export const TablaMovimientos = ({
                   <tr key={item.id}>
                     <th scope="row">
                       <Pagado
-                        $bgcolor={item.estado ? "#69e673" : "#b3b3b3"}
+                        $bgcolor={esPagado(item.estado) ? "#69e673" : "#b3b3b3"}
                       ></Pagado>
                     </th>
                     <td data-title="Fecha" >{item.fecha}</td>
@@ -105,7 +115,11 @@ export const TablaMovimientos = ({
                     <td data-title="Monto">{item.valorymoneda}</td>
                     <td data-title="Acciones" >
                       <ContentAccionesTabla
-                        funcionEditar={() => editar(convertToMovimiento(item))}
+                        funcionEditar={() => editar({
+                          ...convertToMovimiento(item),
+                          cuenta: item.cuenta,
+                          categoria: item.categoria,
+                        } as Movimiento)}
                         funcionEliminar={() => eliminar(convertToMovimiento(item))}
                       />
                     </td>

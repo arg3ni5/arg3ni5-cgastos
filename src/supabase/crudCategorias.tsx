@@ -17,7 +17,7 @@ export const InsertarCategorias = async (p: CategoriaInsert): Promise<void> => {
   try {
     // Validate data before inserting
     const validatedData = categoriaInsertSchema.parse(p);
-    
+
     const { data, error } = await supabase
       .from("categorias")
       .insert(validatedData)
@@ -28,14 +28,14 @@ export const InsertarCategorias = async (p: CategoriaInsert): Promise<void> => {
       showErrorMessage(`Ya existe un registro con ${p.descripcion}. Agregue una nueva descripción.`);
       throw error;
     }
-    
+
     if (data) {
       logger.info('Categoría creada exitosamente', { categoriaId: data[0]?.id });
       showSuccessMessage('Datos guardados', '✅ Éxito');
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errorMessage = error.errors.map(e => e.message).join(', ');
+      const errorMessage = error.issues.map(e => e.message).join(', ');
       logger.error('Error de validación al insertar categoría', { error: errorMessage, categoria: p });
       showErrorMessage(`Datos inválidos: ${errorMessage}`);
     } else {
@@ -60,7 +60,7 @@ export const MostrarCategorias = async (p: CategoriaQueryParams): Promise<Catego
           .select()
           .eq("idusuario", p.idusuario)
           .order("id", { ascending: false });
-    
+
     if (error) throw error;
     return data;
   } catch (error) {
@@ -78,13 +78,13 @@ export const EliminarCategorias = async (p: CategoriaQueryParams): Promise<void>
     if (!p.idusuario) {
       throw new Error("ID usuario is required");
     }
-    
+
     const { error } = await supabase
       .from("categorias")
       .delete()
       .eq("idusuario", p.idusuario)
       .eq("id", p.id);
-    
+
     if (error) throw error;
     logger.info('Categoría eliminada exitosamente', { categoriaId: p.id });
   } catch (error) {
@@ -102,21 +102,21 @@ export const EditarCategorias = async (p: CategoriaUpdate): Promise<void> => {
     if (!p.idusuario) {
       throw new Error("ID usuario is required");
     }
-    
+
     // Validate data before updating
     const validatedData = categoriaUpdateSchema.parse(p);
-    
+
     const { error } = await supabase
       .from("categorias")
       .update(validatedData)
       .eq("idusuario", p.idusuario)
       .eq("id", p.id);
-    
+
     if (error) throw error;
     logger.info('Categoría actualizada exitosamente', { categoriaId: p.id });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errorMessage = error.errors.map(e => e.message).join(', ');
+      const errorMessage = error.issues.map(e => e.message).join(', ');
       logger.error('Error de validación al editar categoría', { error: errorMessage, categoriaId: p.id });
       showErrorMessage(`Datos inválidos: ${errorMessage}`);
     } else {
@@ -133,9 +133,9 @@ export const EliminarCategoriasTodas = async (p: Pick<CategoriaQueryParams, 'idu
       .from("categorias")
       .delete()
       .eq("idusuario", p.idusuario);
-    
+
     if (error) throw error;
-    
+
     logger.info('Todas las categorías eliminadas exitosamente', { userId: p.idusuario });
     showSuccessMessage('Datos reseteados', '✅ Éxito');
   } catch (error) {

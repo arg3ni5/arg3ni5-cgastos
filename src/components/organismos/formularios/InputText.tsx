@@ -12,6 +12,7 @@ interface InputTextProps {
   type?: string;
   name?: string;
   minLength?: number;
+  label?: string;
 }
 
 export function InputText({
@@ -24,9 +25,11 @@ export function InputText({
   minLength,
   type = "text",
   name = "descripcion",
+  label,
 }: InputTextProps) {
   return (
     <Container>
+      {label && <Label>{label}</Label>}
       <input
         style={style}
         // Remove onChange prop since it will be handled by register
@@ -48,6 +51,9 @@ export function InputText({
 
 const Container = styled.div`
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
   input {
     background: ${({ theme }) => theme.bgtotal};
     font-size: 16px;
@@ -69,4 +75,9 @@ const Container = styled.div`
     color: #ff6d00;
     font-size: 12px;
   }
+`;
+
+const Label = styled.label`
+  font-size: 0.9em;
+  color: ${({ theme }) => theme.text};
 `;
