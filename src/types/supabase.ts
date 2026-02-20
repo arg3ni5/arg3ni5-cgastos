@@ -44,7 +44,7 @@ export type Database = {
           canal_user_id: string;
           canal_username: string | null;
           id: number;
-          usuario_id: number;
+          idusuario: number;
           vinculado_en: string | null;
         };
         Insert: {
@@ -52,7 +52,7 @@ export type Database = {
           canal_user_id: string;
           canal_username?: string | null;
           id?: number;
-          usuario_id: number;
+          idusuario: number;
           vinculado_en?: string | null;
         };
         Update: {
@@ -60,13 +60,13 @@ export type Database = {
           canal_user_id?: string;
           canal_username?: string | null;
           id?: number;
-          usuario_id?: number;
+          idusuario?: number;
           vinculado_en?: string | null;
         };
         Relationships: [
           {
             foreignKeyName: "conexiones_usuarios_usuario_id_fkey";
-            columns: ["usuario_id"];
+            columns: ["idusuario"];
             isOneToOne: false;
             referencedRelation: "usuarios";
             referencedColumns: ["id"];
