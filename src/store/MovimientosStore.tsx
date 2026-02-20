@@ -126,7 +126,7 @@ export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
         totalMesAñoPagados: tpagados,
         totalMesAñoPendientes: tpendientes
       });
-      
+
       logger.debug('Totales calculados', { tipo, total, tpagados, tpendientes });
     } catch (error) {
       logger.error('Error al calcular totales', { error, data });

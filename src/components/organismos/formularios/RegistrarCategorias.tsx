@@ -4,7 +4,6 @@ import { v } from "../../../styles/variables";
 import {
   InputText,
   Spinner,
-  useOperaciones,
   BtnForm,
   useUsuariosStore,
   useCategoriasStore,
@@ -48,13 +47,13 @@ export const RegistrarCategorias = ({ onClose, dataSelect, accion }: RegistrarCa
     tipo?: string;
     id?: number;
   }
-  
+
   const {
     register,
     formState: { errors },
     handleSubmit,
   } = useForm<FormInputs>();
-  
+
   // Update InputText component to register all required fields
   <InputText
     defaultValue={dataSelect.descripcion || ""}
@@ -64,26 +63,26 @@ export const RegistrarCategorias = ({ onClose, dataSelect, accion }: RegistrarCa
     errors={errors}
     style={{ textTransform: "capitalize" }}
   />
-  
+
   // Update the insertar function
   const insertar = async (formData: FormInputs): Promise<void> => {
     if (usuario?.id == undefined) {
       return;
     }
-  
+
     const baseData = {
       descripcion: formData.descripcion,
       color: currentColor,
       icono: emojiselect,
       idusuario: usuario.id,
     };
-  
+
     if (accion === "Editar" && dataSelect.id) {
       const updateData: CategoriaUpdate = {
         ...baseData,
         id: dataSelect.id,
       };
-      
+
       try {
         setEstadoproceso(true);
         await editarCategoria(updateData);
@@ -108,7 +107,7 @@ export const RegistrarCategorias = ({ onClose, dataSelect, accion }: RegistrarCa
       setColor(dataSelect.color || '#F44336');
     }
   }, []);
-  
+
   return (
     <Container>
       {estadoProceso && <Spinner />}

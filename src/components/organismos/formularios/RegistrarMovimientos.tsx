@@ -146,6 +146,8 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
       valor: parseFloat(formData.monto.toString()),
     } as MovimientoUpdate;
     try {
+      console.log('actualizar', baseData);
+
       await actualizarMovimientos(baseData);
       setState();
     }
