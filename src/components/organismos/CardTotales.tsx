@@ -12,6 +12,12 @@ interface CardTotalesProps {
 export const CardTotales = ({ color, total, title, icono }: CardTotalesProps): JSX.Element => {
   const { usuario } = useUsuariosStore();
 
+  // Formatear el número a 2 decimales
+  const formatearTotal = (valor: number | string): string => {
+    const num = typeof valor === 'string' ? parseFloat(valor) : valor;
+    return isNaN(num) ? '0.00' : num.toFixed(2);
+  };
+
   return (
     <Container>
       <div className="contentTextos">
@@ -20,7 +26,7 @@ export const CardTotales = ({ color, total, title, icono }: CardTotalesProps): J
           <b>{<v.iconoFlechabajo />}</b>
         </section>
         <span className="total">
-          {usuario?.moneda} {total}
+          {usuario?.moneda} {formatearTotal(total)}
         </span>
       </div>
       <div className="contentIcono">
