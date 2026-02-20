@@ -26,7 +26,7 @@ export const movimientoInsertSchema = z.object({
     .or(z.string().datetime({ message: 'La fecha debe ser una fecha válida en formato ISO' }))
     .nullable()
     .optional(),
-  estado: z.string().nullable().optional(),
+  estado: z.boolean(),
   idcategoria: z.number().int().positive('El ID de categoría debe ser un número positivo').nullable().optional(),
   idcuenta: z.number().int().positive('El ID de cuenta debe ser un número positivo').nullable().optional()
 });
@@ -45,7 +45,7 @@ export const movimientoUpdateSchema = z.object({
     .or(z.string().datetime({ message: 'La fecha debe ser una fecha válida en formato ISO' }))
     .nullable()
     .optional(),
-  estado: z.string().nullable().optional(),
+  estado: z.boolean().optional(),
   idcategoria: z.number().int().positive().nullable().optional(),
   idcuenta: z.number().int().positive().nullable().optional()
 });

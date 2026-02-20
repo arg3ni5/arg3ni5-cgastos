@@ -116,7 +116,7 @@ export type Database = {
       movimientos: {
         Row: {
           descripcion: string | null
-          estado: string | null
+          estado: boolean | null
           fecha: string | null
           id: number
           idcategoria: number | null
@@ -126,7 +126,7 @@ export type Database = {
         }
         Insert: {
           descripcion?: string | null
-          estado?: string | null
+          estado?: boolean | null
           fecha?: string | null
           id?: number
           idcategoria?: number | null
@@ -136,7 +136,7 @@ export type Database = {
         }
         Update: {
           descripcion?: string | null
-          estado?: string | null
+          estado?: boolean | null
           fecha?: string | null
           id?: number
           idcategoria?: number | null
@@ -227,7 +227,7 @@ export type Database = {
           cuenta: string
           categoria: string
           tipocategoria: string
-          estado: number
+          estado: boolean
           monto: number
         }[]
       }
