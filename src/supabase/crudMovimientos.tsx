@@ -85,9 +85,23 @@ export const ActualizarMovimientos = async (p: MovimientoUpdate): Promise<void> 
 export type MovimientosMesAnioParams = Database["public"]["Functions"]["mmovimientosmesanio"]["Args"];
 export type MovimientosMesAnio = Database["public"]["Functions"]["mmovimientosmesanio"]["Returns"];
 
+const RPC_TIMEOUT = 10000; // 10 segundos timeout para RPC calls
+
+const withTimeout = async <T,>(promise: Promise<T>, timeoutMs: number): Promise<T> => {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`RPC Timeout after ${timeoutMs}ms`)), timeoutMs)
+    ),
+  ]);
+};
+
 export const MostrarMovimientosPorMesAño = async (p: MovimientosMesAnioParams): Promise<MovimientosMesAnio | null> => {
   try {
-    const { data, error } = await supabase.rpc("mmovimientosmesanio", p);
+    const { data, error } = await withTimeout(
+      supabase.rpc("mmovimientosmesanio", p),
+      RPC_TIMEOUT
+    );
     if (error) throw error;
     return data;
   } catch (error) {
