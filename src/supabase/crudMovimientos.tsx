@@ -99,11 +99,25 @@ export const MostrarMovimientosPorMesAño = async (p: MovimientosMesAnioParams):
 
 export type RptMovimientosMesAnioParams = Database["public"]["Functions"]["rptmovimientos_anio_mes"]["Args"];
 export type RptMovimientosMesAnio = Database["public"]["Functions"]["rptmovimientos_anio_mes"]["Returns"];
+export type RptMovimientosMesAnioJson = Database["public"]["Functions"]["rptmovimientos_anio_mes_json"]["Returns"];
 
 
 export const RptMovimientosPorMesAño = async (p: RptMovimientosMesAnioParams): Promise<RptMovimientosMesAnio | null> => {
   try {
     const { data, error } = await supabase.rpc("rptmovimientos_anio_mes", p);
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    logger.error('Error al generar reporte de movimientos', { error, params: p });
+    showErrorMessage('No se pudo generar el reporte. Por favor, intenta nuevamente.');
+    return null;
+  }
+};
+
+// rpt_movimientos_anio_mes_json
+export const RptMovimientosPorMesAñoJson = async (p: RptMovimientosMesAnioParams): Promise<RptMovimientosMesAnioJson | null> => {
+  try {
+    const { data, error } = await supabase.rpc("rptmovimientos_anio_mes_json", p);
     if (error) throw error;
     return data;
   } catch (error) {
