@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { supabase } from "../index";
 import { logger } from "../utils/logger";
 import { showErrorMessage } from "../utils/messages";
-import { AuthResponse } from "@supabase/supabase-js";
 
 interface GoogleUserData {
   provider: string;
@@ -22,7 +21,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
 
   signInWithGoogle: async () => {
     try {
-      const { data, error }: AuthResponse = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
       });
       

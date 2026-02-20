@@ -1,33 +1,26 @@
 // Mock Supabase client for testing
+import { vi } from 'vitest';
+
 export const mockSupabaseClient = {
-  from: jest.fn().mockReturnThis(),
-  select: jest.fn().mockReturnThis(),
-  insert: jest.fn().mockReturnThis(),
-  update: jest.fn().mockReturnThis(),
-  delete: jest.fn().mockReturnThis(),
-  eq: jest.fn().mockReturnThis(),
-  single: jest.fn().mockReturnThis(),
-  maybeSingle: jest.fn().mockReturnThis(),
-  order: jest.fn().mockReturnThis(),
-  rpc: jest.fn().mockReturnThis(),
+  from: vi.fn().mockReturnThis(),
+  select: vi.fn().mockReturnThis(),
+  insert: vi.fn().mockReturnThis(),
+  update: vi.fn().mockReturnThis(),
+  delete: vi.fn().mockReturnThis(),
+  eq: vi.fn().mockReturnThis(),
+  single: vi.fn().mockReturnThis(),
+  maybeSingle: vi.fn().mockReturnThis(),
+  order: vi.fn().mockReturnThis(),
+  rpc: vi.fn().mockReturnThis(),
   auth: {
-    getSession: jest.fn(),
-    signInWithOAuth: jest.fn(),
-    signOut: jest.fn(),
-    getUser: jest.fn()
+    getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
+    signInWithOAuth: vi.fn().mockResolvedValue({ data: null, error: null }),
+    signOut: vi.fn().mockResolvedValue({ error: null }),
+    getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null })
   }
 };
 
 // Helper to reset all mocks
 export function resetSupabaseMocks() {
-  Object.values(mockSupabaseClient).forEach(mock => {
-    if (typeof mock === 'function') {
-      mock.mockClear();
-    }
-  });
-  Object.values(mockSupabaseClient.auth).forEach(mock => {
-    if (typeof mock === 'function') {
-      mock.mockClear();
-    }
-  });
+  vi.clearAllMocks();
 }
