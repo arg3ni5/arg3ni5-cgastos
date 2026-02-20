@@ -11,11 +11,11 @@ interface CuentasTemplateProps {
 export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 	const [state, setState] = useState(false);
 	const [openRegistro, setOpenRegistro] = useState(false);
-        const { usuario } = useUsuariosStore();
-        const { eliminarCuenta } = useCuentaStore();
-        const [accion, setAccion] = useState<Accion>("Nuevo");
-        const [dataSelect, setDataSelect] = useState<CuentaInsert | CuentaUpdate>({});
-        const [stateTipo, setStateTipo] = useState(false);
+	const { usuario } = useUsuariosStore();
+	const { eliminarCuenta } = useCuentaStore();
+	const [accion, setAccion] = useState<Accion>("Nuevo");
+	const [dataSelect, setDataSelect] = useState<CuentaInsert | CuentaUpdate>({});
+	const [stateTipo, setStateTipo] = useState(false);
 	const { colorCategoriaCuentaActual, tituloBtnDesCuentasActual, bgCategoriaCuentaActual, setTipoCuenta } = useOperaciones();
 
 	const cambiarTipo = (p: Tipo) => {
@@ -51,8 +51,8 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 		setOpenRegistro(true);
 	};
 
-        const handleDelete = async (id: number) => {
-                const result = await Swal.fire({
+	const handleDelete = async (id: number) => {
+		const result = await Swal.fire({
 			title: '¿Estás seguro?',
 			text: "No podrás revertir esta acción",
 			icon: 'warning',
