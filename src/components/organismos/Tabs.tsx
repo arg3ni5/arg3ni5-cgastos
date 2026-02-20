@@ -56,7 +56,7 @@ export const Tabs = (): JSX.Element => {
 
   const { idusuario } = useUsuariosStore();
   const { date, selectTipoMovimiento: tipo } = useOperaciones();
-  const { dataRptMovimientosAñoMes, rptMovimientosAñoMes, rptParams } = useMovimientosStore();
+  const { dataRptMovimientosAñoMes, rptMovimientosAñoMes } = useMovimientosStore();
 
   const { isLoading, error } = useQuery<DataRptMovimientosAñoMes | null, Error>({
     queryKey: ['rptMovimientos', tipo, idusuario, date.format('YYYY-MM')],
@@ -66,7 +66,7 @@ export const Tabs = (): JSX.Element => {
       tipocategoria: tipo.tipo,
       iduser: idusuario,
     }),
-    enabled: date.month() + 1 !== rptParams.mes || date.year() !== rptParams.anio
+    enabled: !!idusuario && !!tipo?.tipo
   });
 
   if (isLoading) return <h1>Cargando</h1>;
@@ -98,12 +98,12 @@ export const Tabs = (): JSX.Element => {
       <div className="tab-content">
         {activeTab === 0 && (
           <ChartGrid>
-            {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && (
+            {((tipo.tipo === "g" || tipo.tipo === "b") && (
               <ChartContainer>
                 <Dona data={dataRptMovimientosAñoMes} tipo={"g"} />
               </ChartContainer>
             ))}
-            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && (
+            {((tipo.tipo === "i" || tipo.tipo === "b") && (
               <ChartContainer>
                 <Dona data={dataRptMovimientosAñoMes} tipo={"i"} />
               </ChartContainer>
@@ -112,12 +112,12 @@ export const Tabs = (): JSX.Element => {
         )}
         {activeTab === 1 && (
           <ChartGrid>
-            {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && (
+            {((tipo.tipo === "g" || tipo.tipo === "b") && (
               <ChartContainer>
                 <Barras data={dataRptMovimientosAñoMes} tipo={"g"} horizontal />
               </ChartContainer>
             ))}
-            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && (
+            {((tipo.tipo === "i" || tipo.tipo === "b") && (
               <ChartContainer>
                 <Barras data={dataRptMovimientosAñoMes} tipo={"i"} horizontal />
               </ChartContainer>
@@ -127,12 +127,12 @@ export const Tabs = (): JSX.Element => {
 
         {activeTab === 2 && (
           <ChartGrid>
-            {((rptParams.tipocategoria === "g" || rptParams.tipocategoria === "b") && (
+            {((tipo.tipo === "g" || tipo.tipo === "b") && (
               <ChartContainer>
                 <Lineal data={dataRptMovimientosAñoMes} tipo={'g'} />
               </ChartContainer>
             ))}
-            {((rptParams.tipocategoria === "i" || rptParams.tipocategoria === "b") && (
+            {((tipo.tipo === "i" || tipo.tipo === "b") && (
               <ChartContainer>
                 <Lineal data={dataRptMovimientosAñoMes} tipo={'i'} />
               </ChartContainer>
