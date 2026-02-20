@@ -10,7 +10,6 @@ import {
 } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useEffect, FC, useRef } from "react";
-// Import Swiper styles
 import img1 from "../../assets/Ruleta/ruleta9.png";
 import img2 from "../../assets/Ruleta/ruleta8.png";
 import img3 from "../../assets/Ruleta/ruleta5.png";
@@ -32,7 +31,7 @@ export const Carousel: FC = () => {
 
   return (
     <CarouselContainer>
-      
+
       <div className="custom-button-prev" ref={prevRef}>
         <IoIosArrowBack />
       </div>
