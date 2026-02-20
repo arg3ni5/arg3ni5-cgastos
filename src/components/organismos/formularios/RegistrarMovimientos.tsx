@@ -38,6 +38,16 @@ interface FormInputs {
   monto: number;
 }
 
+const esPagado = (estado: unknown): boolean => {
+  if (typeof estado === "boolean") return estado;
+  if (typeof estado === "number") return estado === 1;
+  if (typeof estado === "string") {
+    const valor = estado.trim().toLowerCase();
+    return valor === "1" || valor === "true";
+  }
+  return false;
+};
+
 export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, accion }: RegistrarMovimientosProps): JSX.Element => {
   const { cuentaItemSelect, mostrarCuentas, selectCuenta } = useCuentaStore();
   const { selectTipoMovimiento } = useOperaciones();
@@ -63,6 +73,16 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
     }
   }, [dataSelect?.tipo, accion, selectTipoMovimiento?.tipo]);
 
+  useEffect(() => {
+    if (accion === "Editar") {
+      setEstado(esPagado(dataSelect?.estado));
+      return;
+    }
+    if (accion === "Nuevo") {
+      setEstado(true);
+    }
+  }, [accion, dataSelect?.estado, dataSelect?.id]);
+
   const {
     register,
     formState: { errors },
@@ -78,8 +98,6 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
   );
 
   const insertar = async (formData: FormInputs): Promise<void> => {
-    const estadoText = estado ? 1 : 0;
-
     if (categoriaItemSelect == null) {
       showErrorMessage("Seleccione una categoria");
       return;
@@ -91,7 +109,7 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
 
     const baseData = {
       descripcion: formData.descripcion,
-      estado: estadoText.toString(),
+      estado: estado,
       fecha: formData.fecha,
       idcategoria: categoriaItemSelect.id,
       idcuenta: cuentaItemSelect.id,
@@ -108,8 +126,6 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
   };
 
   const actualizar = async (formData: FormInputs): Promise<void> => {
-    const estadoText = estado ? 1 : 0;
-
     if (categoriaItemSelect == null) {
       showErrorMessage("Seleccione una categoria");
       return;
@@ -121,7 +137,7 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
 
     const baseData = {
       descripcion: formData.descripcion,
-      estado: estadoText.toString(),
+      estado: estado,
       fecha: formData.fecha,
       id: dataSelect.id,
       idcategoria: categoriaItemSelect.id,
