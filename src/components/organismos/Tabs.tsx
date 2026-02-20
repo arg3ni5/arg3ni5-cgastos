@@ -227,7 +227,7 @@ const Container = styled.div<ContainerProps>`
       z-index: 1;
       transition: all 0.25s ease-out;
       box-shadow: 0px 10px 20px -3px ${(props) => props.theme.carouselColor};
-      left: 0; 
+      left: 0;
       width: 75px;
     }
 
@@ -272,6 +272,6 @@ const ChartContainer = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: auto;  
+  height: auto;
   padding-bottom: 40px;
 `;
