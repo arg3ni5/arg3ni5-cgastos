@@ -10,7 +10,7 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import { JSX } from "react";
-import { DataRptMovimientosAñoMes } from "../../../index";
+import { DataRptMovimientosAñoMes, useUsuariosStore } from "../../../index";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -45,6 +45,12 @@ interface BarrasProps {
 }
 
 export const Barras = ({ data, tipo, horizontal = false }: BarrasProps): JSX.Element => {
+  const { usuario } = useUsuariosStore();
+  const formatCurrency = (valor: number): string =>
+    `${usuario?.moneda || "$"} ${new Intl.NumberFormat('es-ES', {
+      maximumFractionDigits: 0,
+    }).format(valor)}`;
+
   const options = {
     indexAxis: horizontal ? 'y' as const : 'x' as const,
     responsive: true,
@@ -54,7 +60,28 @@ export const Barras = ({ data, tipo, horizontal = false }: BarrasProps): JSX.Ele
       legend: {
         display: true,
       },
+      tooltip: {
+        callbacks: {
+          label: (context: { dataset: { label?: string }; parsed: { x?: number; y?: number } }): string => {
+            const label = context.dataset.label || "";
+            const valor = horizontal ? Number(context.parsed.x || 0) : Number(context.parsed.y || 0);
+            return `${label}: ${formatCurrency(valor)}`;
+          }
+        }
+      }
     },
+    scales: {
+      x: {
+        ticks: {
+          callback: (value: string | number): string => formatCurrency(Number(value))
+        }
+      },
+      y: {
+        ticks: {
+          callback: (value: string | number): string => horizontal ? String(value) : formatCurrency(Number(value))
+        }
+      }
+    }
   };
 
   const colors = [
@@ -65,8 +92,13 @@ export const Barras = ({ data, tipo, horizontal = false }: BarrasProps): JSX.Ele
     ["rgba(153, 102, 255, 0.2)", "rgba(153, 102, 255, 1)"],
     ["rgba(255, 159, 64, 0.2)", "rgba(255, 159, 64, 1)"],
   ];
+  const withAlpha = (hexColor: string, alphaHex: string): string => {
+    if (/^#[0-9A-Fa-f]{6}$/.test(hexColor)) return `${hexColor}${alphaHex}`;
+    return hexColor;
+  };
   const dataTipo = tipo == 'i' ? data.i : data.g;
   const titulo = tipo == 'i' ? 'Ingresos' : 'Gastos';
+  const totalGeneral = (dataTipo || []).reduce((acum, item) => acum + Number(item.total || 0), 0);
   const isHorizontal = !!horizontal;
 
   const datagrafica: DataGrafica = isHorizontal
@@ -76,8 +108,8 @@ export const Barras = ({ data, tipo, horizontal = false }: BarrasProps): JSX.Ele
         {
           label: "Total",
           data: (dataTipo || []).map((item) => item.total),
-          backgroundColor: (dataTipo || []).map((_, i) => colors[i % colors.length][0]),
-          borderColor: (dataTipo || []).map((_, i) => colors[i % colors.length][1]),
+          backgroundColor: (dataTipo || []).map((item, i) => item.color ? withAlpha(item.color, '33') : colors[i % colors.length][0]),
+          borderColor: (dataTipo || []).map((item, i) => item.color || colors[i % colors.length][1]),
           borderWidth: 2,
         }
       ]
@@ -87,8 +119,8 @@ export const Barras = ({ data, tipo, horizontal = false }: BarrasProps): JSX.Ele
       datasets: (dataTipo || []).map((item, index) => ({
         label: item.descripcion,
         data: [item.total],
-        backgroundColor: colors[index % colors.length][0],
-        borderColor: colors[index % colors.length][1],
+        backgroundColor: item.color ? withAlpha(item.color, '33') : colors[index % colors.length][0],
+        borderColor: item.color || colors[index % colors.length][1],
         borderWidth: 2,
         tension: 0.3,
         fill: true,
@@ -107,13 +139,17 @@ export const Barras = ({ data, tipo, horizontal = false }: BarrasProps): JSX.Ele
       </section>
       <section>
         <h2>{titulo} por categoria</h2>
+        <ContentTotal>
+          <span>Total</span>
+          <strong>{formatCurrency(totalGeneral)}</strong>
+        </ContentTotal>
         {dataTipo.map((item, index) => (
-          <ContentCars key={index}>
+          <ContentCars key={index} $borderColor={item.color || (tipo === 'i' ? '#54A2EB' : '#FF6384')}>
             <div className="contentDescripcion">
               <span>{item.icono}</span>
               <span className="descripcion">{item.descripcion}</span>
             </div>
-            <span>{item.total}</span>
+            <span>{formatCurrency(Number(item.total || 0))}</span>
           </ContentCars>
         ))}
       </section>
@@ -128,11 +164,19 @@ const Container = styled.div`
   gap:18px;
 
   `;
-const ContentCars = styled.div`
+const ContentCars = styled.div<{ $borderColor: string }>`
   display:flex;
   justify-content:space-between;
+  border-bottom: 2px solid ${({ $borderColor }) => $borderColor};
+  padding: 6px 0;
   .contentDescripcion{
       display:flex;
       gap:10px;
   }
   `;
+
+const ContentTotal = styled.div`
+  display:flex;
+  justify-content:space-between;
+  margin: 8px 0 12px;
+`;
