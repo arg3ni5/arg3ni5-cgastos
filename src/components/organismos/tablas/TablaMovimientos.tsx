@@ -62,7 +62,7 @@ export const TablaMovimientos = ({
 
   const editar = (data: Movimiento): void => {
     setOpenRegistro(true);
-    setDataSelect({ ...data, tipo: tipo.tipo });
+    setDataSelect({ ...data, tipo: tipo.tipo } as Movimiento);
     setAccion("Editar");
   };
 
@@ -115,7 +115,11 @@ export const TablaMovimientos = ({
                     <td data-title="Monto">{item.valorymoneda}</td>
                     <td data-title="Acciones" >
                       <ContentAccionesTabla
-                        funcionEditar={() => editar(convertToMovimiento(item))}
+                        funcionEditar={() => editar({
+                          ...convertToMovimiento(item),
+                          cuenta: item.cuenta,
+                          categoria: item.categoria,
+                        } as Movimiento)}
                         funcionEliminar={() => eliminar(convertToMovimiento(item))}
                       />
                     </td>

@@ -169,13 +169,53 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
     queryKey: ["cuentas", idusuario],
     queryFn: () => mostrarCuentas({ idusuario } as Cuenta),
     enabled: !!idusuario,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
   const { data: categorias } = useQuery({
     queryKey: ["categorias", tipoMovimiento?.tipo, idusuario],
     queryFn: () => mostrarCategorias({ tipo: tipoMovimiento?.tipo, idusuario }),
     enabled: !!idusuario && !!tipoMovimiento?.tipo,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
+
+  useEffect(() => {
+    if (accion !== "Editar") return;
+    if (!cuentas?.length) return;
+
+    const cuentaNombre = (dataSelect as Movimiento & { cuenta?: string })?.cuenta;
+    const cuentaSeleccionada = cuentas.find((cuenta) => {
+      if (dataSelect?.idcuenta) return cuenta.id === dataSelect.idcuenta;
+      if (cuentaNombre) return cuenta.descripcion === cuentaNombre;
+      return false;
+    });
+
+    if (cuentaSeleccionada) {
+      selectCuenta(cuentaSeleccionada);
+    }
+  }, [accion, dataSelect?.idcuenta, (dataSelect as Movimiento & { cuenta?: string })?.cuenta, cuentas, selectCuenta]);
+
+  useEffect(() => {
+    if (accion !== "Editar") return;
+    if (!categorias?.length) return;
+
+    const categoriaNombre = (dataSelect as Movimiento & { categoria?: string })?.categoria;
+    const categoriaSeleccionada = categorias.find((categoria) => {
+      if (dataSelect?.idcategoria) return categoria.id === dataSelect.idcategoria;
+      if (categoriaNombre) return categoria.descripcion === categoriaNombre;
+      return false;
+    });
+
+    if (categoriaSeleccionada) {
+      selectCategoria(categoriaSeleccionada);
+    }
+  }, [accion, dataSelect?.idcategoria, (dataSelect as Movimiento & { categoria?: string })?.categoria, categorias, selectCategoria]);
 
   return (
     <Container onClick={setState}>
