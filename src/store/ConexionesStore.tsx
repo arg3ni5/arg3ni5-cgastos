@@ -3,7 +3,7 @@ import { InsertarConexion, MostrarConexiones, EliminarConexiones, Conexion, Cone
 import { logger } from "../utils/logger";
 
 type ConexionQueryParams = {
-  usuario_id: number;
+  idusuario: number;
 };
 
 interface ConexionesStore {
@@ -24,7 +24,7 @@ export const useConexionesStore = create<ConexionesStore>((set, get) => ({
   
   mostrarConexiones: async (p) => {
     try {
-      const response = await MostrarConexiones({usuario_id: Number(p.usuario_id)} as Conexion);
+      const response = await MostrarConexiones({idusuario: Number(p.idusuario)} as Conexion);
       set({
         parametros: p,
         conexiones: response,
@@ -33,7 +33,7 @@ export const useConexionesStore = create<ConexionesStore>((set, get) => ({
       logger.debug('Conexiones cargadas exitosamente', { count: response?.length || 0 });
       return response;
     } catch (error) {
-      logger.error('Error al mostrar conexiones en store', { error, userId: p.usuario_id });
+      logger.error('Error al mostrar conexiones en store', { error, userId: p.idusuario });
       return null;
     }
   },

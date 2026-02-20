@@ -1,5 +1,5 @@
 import { Database, supabase } from "../index";
-import { conexionInsertSchema, conexionUpdateSchema } from "../schemas/conexion.schema";
+import { conexionInsertSchema } from "../schemas/conexion.schema";
 import { logger } from "../utils/logger";
 import { showErrorMessage, showSuccessMessage } from "../utils/messages";
 import { z } from "zod";
@@ -45,12 +45,12 @@ export const MostrarConexiones = async (c: ConexionQueryParams): Promise<Conexio
     const { data, error } = await supabase
       .from("conexiones_usuarios")
       .select()
-      .eq("usuario_id", c.usuario_id);
+      .eq("idusuario", c.idusuario);
 
     if (error) throw error;
     return data;
   } catch (error) {
-    logger.error('Error al mostrar conexiones', { error, userId: c.usuario_id });
+    logger.error('Error al mostrar conexiones', { error, userId: c.idusuario });
     showErrorMessage('No se pudieron cargar las conexiones. Por favor, intenta nuevamente.');
     return null;
   }

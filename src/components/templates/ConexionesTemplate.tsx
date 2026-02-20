@@ -23,7 +23,7 @@ export const ConexionesTemplate: React.FC = () => {
       if (usuario?.id === undefined) {
         throw new Error('User ID is required');
       }
-      return mostrarConexiones({ usuario_id: usuario.id } as ConexionQueryParams);
+      return mostrarConexiones({ idusuario: usuario.id } as ConexionQueryParams);
     },
     enabled: !!usuario?.id,
   });
@@ -42,7 +42,7 @@ export const ConexionesTemplate: React.FC = () => {
 
     if (result.isConfirmed) {
       try {
-        await eliminarConexion({ usuario_id: conexion.id } as ConexionQueryParams);
+        await eliminarConexion({ idusuario: conexion.id } as ConexionQueryParams);
         if (usuario?.id !== undefined) {
           queryClient.invalidateQueries({
             queryKey: ["mostrar conexiones", usuario.id],
