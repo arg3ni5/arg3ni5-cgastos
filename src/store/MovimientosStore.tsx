@@ -3,6 +3,7 @@ import {
   MostrarMovimientosPorMesAño,
   InsertarMovimientos,
   EliminarMovimientos,
+  RptMovimientosPorMesAño,
   MovimientosMesAnio,
   MovimientosMesAnioParams,
   RptMovimientosMesAnio,
@@ -174,12 +175,12 @@ export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
   rptMovimientosAñoMes: async (p: RptMovimientosMesAnioParams): Promise<DataRptMovimientosAñoMes> => {
     try {
       set({ rptParams: p });
-      const responseJson = await RptMovimientosPorMesAñoJson(p);
-      const response: DataRptMovimientosAñoMes = {
-        i: responseJson?.i || [],
-        g: responseJson?.g || []
-      };
-      set({ dataRptMovimientosAñoMes: response });
+      const i = p.tipocategoria === "i" || p.tipocategoria === "b" ?
+        await RptMovimientosPorMesAño({ ...p, tipocategoria: "i" }) || [] : [];
+      const g = p.tipocategoria === "g" || p.tipocategoria === "b" ?
+        await RptMovimientosPorMesAño({ ...p, tipocategoria: "g" }) || [] : [];
+      const response = { i, g };
+      set({ dataRptMovimientosAñoMes: { i: i || [], g: g || [] } });
       logger.debug('Reporte de movimientos generado', { params: p });
       return response;
     } catch (error) {
@@ -192,13 +193,6 @@ export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
   rptMovimientosAñoMesJson: async (p: RptMovimientosMesAnioParams): Promise<RptMovimientosMesAnioJson | null> => {
     try {
       const response = await RptMovimientosPorMesAñoJson(p);
-      set({
-        rptParams: p,
-        dataRptMovimientosAñoMes: {
-          i: response?.i || [],
-          g: response?.g || []
-        }
-      });
       logger.debug('Reporte de movimientos (JSON) generado', { params: p });
       return response;
     } catch (error) {
