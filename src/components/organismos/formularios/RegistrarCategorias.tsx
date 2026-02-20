@@ -7,6 +7,7 @@ import {
   BtnForm,
   useUsuariosStore,
   useCategoriasStore,
+  useOperaciones,
   CategoriaUpdate,
   CategoriaInsert,
   Accion
@@ -24,6 +25,7 @@ interface RegistrarCategoriasProps {
 export const RegistrarCategorias = ({ onClose, dataSelect, accion }: RegistrarCategoriasProps) => {
   const { insertarCategorias, editarCategoria } = useCategoriasStore();
   const { usuario } = useUsuariosStore();
+  const { selectTipoCategoria } = useOperaciones();
   const [showPicker, setShowPicker] = useState<boolean>(false);
   const [emojiselect, setEmojiselect] = useState<string>("😻");
   const [currentColor, setColor] = useState<string>("#F44336");
@@ -72,6 +74,7 @@ export const RegistrarCategorias = ({ onClose, dataSelect, accion }: RegistrarCa
 
     const baseData = {
       descripcion: formData.descripcion,
+      tipo: (accion === "Editar" ? dataSelect.tipo : selectTipoCategoria.tipo),
       color: currentColor,
       icono: emojiselect,
       idusuario: usuario.id,
