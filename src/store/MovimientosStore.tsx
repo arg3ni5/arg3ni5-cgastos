@@ -11,7 +11,9 @@ import {
   MovimientoInsert,
   Movimiento,
   MovimientoUpdate,
-  ActualizarMovimientos
+  ActualizarMovimientos,
+  RptMovimientosMesAnioJson,
+  RptMovimientosPorMesAñoJson
 } from "../index";
 import { logger } from "../utils/logger";
 
@@ -37,6 +39,7 @@ interface MovimientosState {
   actualizarMovimientos: (p: MovimientoUpdate) => Promise<void>;
   eliminarMovimiento: (p: Movimiento) => Promise<void>;
   rptMovimientosAñoMes: (p: RptMovimientosMesAnioParams) => Promise<DataRptMovimientosAñoMes | null>;
+  rptMovimientosAñoMesJson: (p: RptMovimientosMesAnioParams) => Promise<RptMovimientosMesAnioJson | null>;
 }
 
 const esPagado = (estado: unknown): boolean => {
@@ -183,6 +186,18 @@ export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
     } catch (error) {
       logger.error('Error al generar reporte de movimientos', { error, params: p });
       return { i: [], g: [] };
+    }
+  },
+
+
+  rptMovimientosAñoMesJson: async (p: RptMovimientosMesAnioParams): Promise<RptMovimientosMesAnioJson | null> => {
+    try {
+      const response = await RptMovimientosPorMesAñoJson(p);
+      logger.debug('Reporte de movimientos (JSON) generado', { params: p });
+      return response;
+    } catch (error) {
+      logger.error('Error al generar reporte de movimientos (JSON)', { error, params: p });
+      return null;
     }
   },
 }));
