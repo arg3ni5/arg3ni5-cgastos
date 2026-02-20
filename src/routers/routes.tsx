@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { Login, Home, ProtectedRoute, Configuracion, Categorias, Movimientos, Informes, Vincular, Conexiones, useUserAuth, Dashboard } from "../index";
 import { Cuentas } from '../pages/Cuentas';
+import AuthCallback from "../pages/AuthCallback";
 interface ProtectedRouteProps {
   isLoading: boolean;
 }
@@ -22,6 +23,7 @@ export const MyRoutes = ({ isLoading }: ProtectedRouteProps) => {
         <Route path="/movimientos" element={<Movimientos />} />
         <Route path="/informes" element={<Informes />} />
         <Route path="/acercade" element={<Home />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
       </Route>
     </Routes>
   );
