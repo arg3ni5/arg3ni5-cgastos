@@ -13,7 +13,7 @@ interface DataGrafica {
     label: string;
     borderRadius: number;
     cutout: number;
-    minBarLength: string;
+    minBarLength: number;
     data: number[];
     backgroundColor: string[];
     borderColor: string[];
@@ -31,7 +31,7 @@ export const Dona = ({ data, tipo }: DonaProps): JSX.Element => {
   const options = {
     responsive: true,
     cutout: "60%"
-  };  
+  };
   const dataTipo = tipo == 'i' ? data.i : data.g;
   const titulo = tipo == 'i' ? 'Ingresos' : 'Gastos';
   const colors = [
@@ -51,7 +51,7 @@ export const Dona = ({ data, tipo }: DonaProps): JSX.Element => {
         label: "Total",
         borderRadius: 5,
         cutout: 30,
-        minBarLength: "100px",
+        minBarLength: 100,
         data: dataTipo?.map((item) => item.total),
         backgroundColor: colors.map((item) => item[0]),
         borderColor: colors.map((item) => item[1]),
