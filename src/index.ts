@@ -51,6 +51,7 @@ export * from './components/templates/HomeTemplate';
 export * from './components/templates/InformesTemplate';
 export * from './components/templates/LoginTemplate';
 export * from './components/templates/MovimientosTemplate';
+export * from './components/templates/MovimientosCuentaModal';
 export * from './components/templates/PlantillaBase';
 export * from './components/templates/VincularTemplate';
 export * from './context/AuthContent';
