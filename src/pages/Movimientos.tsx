@@ -14,6 +14,7 @@ export const Movimientos = () => {
   const { mostrarMovimientos } = useMovimientosStore();
   const { usuario } = useUsuariosStore();
   const { setIsLoading } = useLoading();
+  const isDev = import.meta.env.DEV;
 
   // Cargar movimientos
   const { isLoading, error } = useQuery<DataMovimientos, Error>({
@@ -28,6 +29,9 @@ export const Movimientos = () => {
     enabled: !!usuario?.id && !!(date.month() + 1) && !!date.year(),
     staleTime: 5 * 60 * 1000, // 5 minutos
     gcTime: 10 * 60 * 1000, // 10 minutos (renamed from cacheTime)
+    refetchOnMount: isDev ? "always" : true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });

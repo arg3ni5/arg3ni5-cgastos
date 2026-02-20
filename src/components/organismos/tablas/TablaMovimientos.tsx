@@ -11,7 +11,8 @@ import {
 } from "../../../index";
 import Swal from "sweetalert2";
 import { v } from "../../../styles/variables";
-import { JSX, useState } from "react";
+import { JSX, useState, useMemo } from "react";
+import React from "react";
 import { convertToMovimiento } from '../../../supabase/crudMovimientos';
 
 interface TablaMovimientosProps {
@@ -39,7 +40,29 @@ export const TablaMovimientos = ({
 
   const [pagina, setPagina] = useState<number>(1);
   const [porPagina, setPorPagina] = useState<number>(10);
-  const mx = data.length / porPagina;
+
+  // Agrupar movimientos por fecha
+  const groupedData = useMemo(() => {
+    const grupos: { [key: string]: typeof data } = {};
+
+    data.forEach((item) => {
+      const fecha = item.fecha;
+      if (!grupos[fecha]) {
+        grupos[fecha] = [];
+      }
+      grupos[fecha].push(item);
+    });
+
+    // Convertir a array ordenado por fecha descendiente
+    return Object.entries(grupos)
+      .map(([fecha, movimientos]) => ({
+        fecha,
+        movimientos,
+      }))
+      .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+  }, [data]);
+
+  const mx = groupedData.length / porPagina;
   const maximo = mx < 1 ? 1 : mx;
 
   const { eliminarMovimiento } = useMovimientosStore();
@@ -79,55 +102,73 @@ export const TablaMovimientos = ({
   return (
     <>
       <Container $bgcolor={tipo.bgcolor || ''} $color={tipo.color || ''}>
-        {titulo && (<h2>{titulo}</h2>)}
-        <table className="responsive-table">
-          <thead>
-            <tr>
-              <th scope="col">Pagado</th>
-              <th scope="col">Fecha</th>
-              <th scope="col">Descripcion</th>
-              <th scope="col">Categoria</th>
-              <th scope="col">Cuenta</th>
-              <th scope="col">Valor</th>
-              <th scope="col"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {data
+        {titulo && (<h3>{titulo}</h3>)}
+        <div className="table-wrapper">
+          <table className="responsive-table">
+            <thead>
+              <tr>
+                <th scope="col">Pagado</th>
+                <th scope="col">Descripcion</th>
+                <th scope="col">Categoria</th>
+                <th scope="col">Cuenta</th>
+                <th scope="col">Valor</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+            {groupedData
               .slice(
                 (pagina - 1) * porPagina,
                 (pagina - 1) * porPagina + porPagina
               )
-              .map((item) => {
-                return (
-                  <tr key={item.id}>
-                    <th scope="row">
-                      <Pagado
-                        $bgcolor={esPagado(item.estado) ? "#69e673" : "#b3b3b3"}
-                      ></Pagado>
-                    </th>
-                    <td data-title="Fecha" >{item.fecha}</td>
-                    <td data-title="Descripcion" >
-                      {item.descripcion}
-                    </td>
-                    <td data-title="Categoria" >{item.categoria}</td>
-                    <td data-title="Cuenta">{item.cuenta}</td>
-                    <td data-title="Monto">{item.valorymoneda}</td>
-                    <td data-title="Acciones" >
-                      <ContentAccionesTabla
-                        funcionEditar={() => editar({
-                          ...convertToMovimiento(item),
-                          cuenta: item.cuenta,
-                          categoria: item.categoria,
-                        } as Movimiento)}
-                        funcionEliminar={() => eliminar(convertToMovimiento(item))}
-                      />
+              .map((group, groupIndex) => (
+                <React.Fragment key={`group-${groupIndex}`}>
+                  <tr className="group-header">
+                    <td colSpan={6}>
+                      <FechaHeader>
+                        {(() => {
+                          const [año, mes, día] = group.fecha.split('-').map(Number);
+                          const date = new Date(año, mes - 1, día);
+                          return date.toLocaleDateString('es-ES', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                          });
+                        })()}
+                      </FechaHeader>
                     </td>
                   </tr>
-                );
-              })}
-          </tbody>
-        </table>
+                  {group.movimientos.map((item) => (
+                    <tr key={item.id}>
+                      <th scope="row">
+                        <Pagado
+                          $bgcolor={esPagado(item.estado) ? "#69e673" : "#b3b3b3"}
+                        ></Pagado>
+                      </th>
+                      <td data-title="Descripcion">
+                        {item.descripcion}
+                      </td>
+                      <td data-title="Categoria">{item.categoria}</td>
+                      <td data-title="Cuenta">{item.cuenta}</td>
+                      <td data-title="Monto">{item.valorymoneda}</td>
+                      <td data-title="Acciones">
+                        <ContentAccionesTabla
+                          funcionEditar={() => editar({
+                            ...convertToMovimiento(item),
+                            cuenta: item.cuenta,
+                            categoria: item.categoria,
+                          } as Movimiento)}
+                          funcionEliminar={() => eliminar(convertToMovimiento(item))}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <div className="pagination">
 
           {maximo > 1 && <Paginacion pagina={pagina} setPagina={setPagina} maximo={maximo} color={color} />}
@@ -144,13 +185,44 @@ const Container = styled.div<ContainerProps>`
   border-radius: 25px;
   width: 100%;
   background-color: ${(props) => hexToRgba(props.$color, 0.14)};
+  --table-bg: ${(props) => hexToRgba(props.$color, 0.14)};
+  --table-bg-solid: color-mix(in srgb, ${(props) => props.$color} 14%, ${({ theme }) => theme.bg} 86%);
 
   position: relative;
 
-  margin: 5% 3%;
+  margin: 0;
+  flex: 1 1 100%;
 
-  h2 {
-    padding: 20px;
+  h3 {
+    padding: 10px 20px ;
+  }
+  .table-wrapper {
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-radius: 0 0 25px 25px;
+
+    /* Estilo del scrollbar */
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: ${({ theme }) => theme.text}40;
+      border-radius: 4px;
+
+      &:hover {
+        background: ${({ theme }) => theme.text}60;
+      }
+    }
+
+    /* Firefox */
+    scrollbar-color: ${({ theme }) => theme.text}40 transparent;
+    scrollbar-width: thin;
   }
   .pagination{
     padding: 20px;
@@ -158,16 +230,9 @@ const Container = styled.div<ContainerProps>`
     justify-content: center;
     align-items: center;
   }
-  @media (min-width: ${v.bpbart}) {
-    margin: 0;
-  }
-  @media (min-width: ${v.bphomer}) {
-    margin: 2em auto;
-    max-width: ${v.bphomer};
-  }
   .responsive-table {
     width: 100%;
-    margin-bottom: 1.5em;
+    margin-bottom: 0;
     border-spacing: 0;
     @media (min-width: ${v.bpbart}) {
       font-size: 0.9em;
@@ -184,16 +249,21 @@ const Container = styled.div<ContainerProps>`
       width: 1px;
       overflow: hidden;
       @media (min-width: ${v.bpbart}) {
-        position: relative;
+        position: sticky;
+        top: 0;
+        z-index: 2;
         height: auto;
         width: auto;
-        overflow: auto;
+        overflow: visible;
+        background-color: var(--table-bg-solid);
+        border-bottom: 2px solid rgba(115, 115, 115, 0.32);
       }
       th {
         border-bottom: 2px solid rgba(115, 115, 115, 0.32);
         font-weight: normal;
         text-align: center;
         color: ${({ theme }) => theme.text};
+        background-color: var(--table-bg-solid);
         &:first-of-type {
           text-align: center;
         }
@@ -244,6 +314,22 @@ const Container = styled.div<ContainerProps>`
         }
         &:last-of-type {
           margin-bottom: 0;
+        }
+        &.group-header {
+          background-color: transparent !important;
+          margin-bottom: 0.5em;
+          margin-top: 1em;
+
+          @media (min-width: ${v.bpbart}) {
+            background-color: transparent !important;
+          }
+
+          td {
+            padding: 0 !important;
+            @media (min-width: ${v.bpbart}) {
+              padding: 0 !important;
+            }
+          }
         }
         &:nth-of-type(even) {
           @media (min-width: ${v.bpbart}) {
@@ -326,4 +412,16 @@ const Pagado = styled.div<PagadoProps>`
     border-radius: 50%;
     background-color: ${(props) => props.$bgcolor};
   }
+`;
+const FechaHeader = styled.div`
+  font-weight: 700;
+  font-size: 1em;
+  padding: 12px 8px;
+  color: ${({ theme }) => theme.text};
+  text-transform: capitalize;
+  letter-spacing: 0.5px;
+  background: ${({ theme }) =>
+    `linear-gradient(135deg, ${theme.text}10 0%, ${theme.text}05 100%)`};
+  border-radius: 8px;
+  margin: 8px 0;
 `;

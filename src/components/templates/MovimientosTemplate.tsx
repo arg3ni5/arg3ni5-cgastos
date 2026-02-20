@@ -90,6 +90,7 @@ export const MovimientosTemplate = (): JSX.Element => {
         <ContentFiltros>
           {(tipo.tipo == "i" || tipo.tipo == "g") &&
             <BtnIcono
+              active
               icono={tipo.tipo === "g" ? gastos.icono : ingresos.icono}
               textcolor={tipo.tipo === "g" ? gastos.color : ingresos.color}
               bgcolor={tipo.tipo === "g" ? gastos.bgcolor : ingresos.bgcolor}
@@ -139,6 +140,7 @@ export const MovimientosTemplate = (): JSX.Element => {
                 textcolor={balance.color}
                 bgcolor={balance.bgcolor}
                 text={balance.text}
+                active
                 funcion={openTipo}
               />
               {stateTipo && (
@@ -279,12 +281,23 @@ const Container = styled.div`
   }
   .main {
     grid-area: main;
-    flex-wrap: wrap;
-
     display: flex;
-    justify-content: space-between;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 10px;
+
+    @media ${Device.laptop} {
+      gap: 15px;
+
+      > * {
+        flex: 0 0 calc(50% - 7.5px);
+      }
+
+      > *:only-child {
+        flex: 0 0 100%;
+        max-width: 100%;
+      }
+    }
   }
 `;
 const ContentFiltro = styled.div`
