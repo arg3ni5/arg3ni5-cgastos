@@ -1,7 +1,6 @@
 import { Header, v, Btnfiltro, useOperaciones, Tipo, ContentFiltros, Btndesplegable, ListaMenuDesplegable, DataDesplegableCuenta, RegistrarCuentas, Cuenta, CuentaInsert, CuentaUpdate, Accion, showSuccessMessage, showErrorMessage } from "../../index";
 import { useState } from "react";
 import { useUsuariosStore, useCuentaStore } from "../../index";
-import { useQuery } from "@tanstack/react-query";
 import Swal from "sweetalert2";
 import { Container, ContentFiltro } from "./CuentasTemplate.styles";
 
@@ -46,9 +45,9 @@ export const CuentasTemplate = ({ data }: CuentasTemplateProps) => {
 		setDataSelect({});
 	};
 
-	const openEditModal = (cuenta: CuentaUpdate) => {
+	const openEditModal = (cuenta: Cuenta) => {
 		setAccion("Editar");
-		setDataSelect(cuenta);
+		setDataSelect(cuenta as CuentaUpdate);
 		setOpenRegistro(true);
 	};
 
