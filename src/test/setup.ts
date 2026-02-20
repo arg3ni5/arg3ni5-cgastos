@@ -1,19 +1,12 @@
 // Test setup configuration for Vitest
-// This file will be used to configure the test environment
-
 import { afterEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
+import '@testing-library/jest-dom/vitest';
 
 // Cleanup after each test
 afterEach(() => {
   cleanup();
 });
-
-// Mock environment variables for tests
-process.env.VITE_APP_SUPABASE_URL = 'https://test.supabase.co';
-process.env.VITE_APP_SUPABASE_ANON_KEY = 'test-anon-key';
-process.env.VITE_APP_ENV = 'test';
-process.env.VITE_SESSION_TIMEOUT = '3600000'; // 1 hour
 
 // Global test utilities
 export const testUtils = {

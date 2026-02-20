@@ -1,42 +1,43 @@
 // Mock Zustand stores for testing
+import { vi } from 'vitest';
 import { testUtils } from '../setup';
 
 export const mockUsuariosStore = {
   usuario: testUtils.mockUser,
   idusuario: testUtils.mockUser.id,
-  setUsuario: jest.fn(),
-  clearUsuario: jest.fn(),
-  editartemamonedauser: jest.fn(),
-  ObtenerUsuarioActual: jest.fn().mockResolvedValue(testUtils.mockUser)
+  setUsuario: vi.fn(),
+  clearUsuario: vi.fn(),
+  editartemamonedauser: vi.fn().mockResolvedValue(undefined),
+  ObtenerUsuarioActual: vi.fn().mockResolvedValue(testUtils.mockUser)
 };
 
 export const mockAuthStore = {
   isAuth: false,
   datauserGoogle: [],
-  signInWithGoogle: jest.fn(),
-  signout: jest.fn()
+  signInWithGoogle: vi.fn().mockResolvedValue(undefined),
+  signout: vi.fn().mockResolvedValue(undefined)
 };
 
 export const mockCuentaStore = {
   cuentas: [testUtils.mockCuenta],
   cuentaItemSelect: testUtils.mockCuenta,
-  selectCuenta: jest.fn(),
-  mostrarCuentas: jest.fn().mockResolvedValue([testUtils.mockCuenta]),
-  insertarCuenta: jest.fn(),
-  actualizarCuenta: jest.fn(),
-  eliminarCuenta: jest.fn()
+  selectCuenta: vi.fn(),
+  mostrarCuentas: vi.fn().mockResolvedValue([testUtils.mockCuenta]),
+  insertarCuenta: vi.fn().mockResolvedValue(null),
+  actualizarCuenta: vi.fn().mockResolvedValue(null),
+  eliminarCuenta: vi.fn().mockResolvedValue(false)
 };
 
 export const mockCategoriasStore = {
   datacategoria: [testUtils.mockCategoria],
   categoriaItemSelect: testUtils.mockCategoria,
   parametros: null,
-  mostrarCategorias: jest.fn().mockResolvedValue([testUtils.mockCategoria]),
-  selectCategoria: jest.fn(),
-  insertarCategorias: jest.fn(),
-  eliminarCategoria: jest.fn(),
-  eliminarCategoriasTodas: jest.fn(),
-  editarCategoria: jest.fn()
+  mostrarCategorias: vi.fn().mockResolvedValue([testUtils.mockCategoria]),
+  selectCategoria: vi.fn(),
+  insertarCategorias: vi.fn().mockResolvedValue(undefined),
+  eliminarCategoria: vi.fn().mockResolvedValue(undefined),
+  eliminarCategoriasTodas: vi.fn().mockResolvedValue(undefined),
+  editarCategoria: vi.fn().mockResolvedValue(undefined)
 };
 
 export const mockMovimientosStore = {
@@ -47,39 +48,15 @@ export const mockMovimientosStore = {
   totalMesAñoPagados: 0,
   totalMesAñoPendientes: 0,
   parametros: {},
-  mostrarMovimientos: jest.fn().mockResolvedValue({ i: [], g: [] }),
-  calcularTotales: jest.fn(),
-  insertarMovimientos: jest.fn(),
-  actualizarMovimientos: jest.fn(),
-  eliminarMovimiento: jest.fn(),
-  rptMovimientosAñoMes: jest.fn().mockResolvedValue({ i: [], g: [] })
+  mostrarMovimientos: vi.fn().mockResolvedValue({ i: [], g: [] }),
+  calcularTotales: vi.fn(),
+  insertarMovimientos: vi.fn().mockResolvedValue(undefined),
+  actualizarMovimientos: vi.fn().mockResolvedValue(undefined),
+  eliminarMovimiento: vi.fn().mockResolvedValue(undefined),
+  rptMovimientosAñoMes: vi.fn().mockResolvedValue({ i: [], g: [] })
 };
 
 // Helper to reset all store mocks
 export function resetStoreMocks() {
-  Object.values(mockUsuariosStore).forEach(mock => {
-    if (typeof mock === 'function') {
-      mock.mockClear();
-    }
-  });
-  Object.values(mockAuthStore).forEach(mock => {
-    if (typeof mock === 'function') {
-      mock.mockClear();
-    }
-  });
-  Object.values(mockCuentaStore).forEach(mock => {
-    if (typeof mock === 'function') {
-      mock.mockClear();
-    }
-  });
-  Object.values(mockCategoriasStore).forEach(mock => {
-    if (typeof mock === 'function') {
-      mock.mockClear();
-    }
-  });
-  Object.values(mockMovimientosStore).forEach(mock => {
-    if (typeof mock === 'function') {
-      mock.mockClear();
-    }
-  });
+  vi.clearAllMocks();
 }
