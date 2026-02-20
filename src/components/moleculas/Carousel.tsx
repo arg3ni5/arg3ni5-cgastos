@@ -77,8 +77,10 @@ export const Carousel: FC = () => {
   );
 }
 const CarouselContainer = styled.div`
+  position: relative;
   width: 20vw;
   height: 50vh;
+  min-width: 220px;
 
   @media (max-width: 70em) {
     height: 40vh;
@@ -126,11 +128,16 @@ const CarouselContainer = styled.div`
   .custom-button-next {
     position: absolute;
     right: 0;
-    top: 60%;
-    padding-top: 5px;
-    color: ${(props) => props.theme.text};
-    
-    background: #21252B;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: ${(props) => props.theme.bgtotal};
+    cursor: pointer;
+    z-index: 20;
+
+    background: ${(props) => props.theme.text};
     border-radius: 50%;
     width: 32px;
     height: 32px;
@@ -139,6 +146,10 @@ const CarouselContainer = styled.div`
 
     &:after {
       display: none;
+    }
+
+    svg {
+      font-size: 22px;
     }
   }
 
