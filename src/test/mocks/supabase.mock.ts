@@ -1,30 +1,26 @@
 // Mock Supabase client for testing
-// Note: This file requires vitest to be installed. Run: npm install -D vitest
-// Uncomment the imports below after installing vitest:
-// import { vi } from 'vitest';
+import { vi } from 'vitest';
 
 export const mockSupabaseClient = {
-  from: () => mockSupabaseClient,
-  select: () => mockSupabaseClient,
-  insert: () => mockSupabaseClient,
-  update: () => mockSupabaseClient,
-  delete: () => mockSupabaseClient,
-  eq: () => mockSupabaseClient,
-  single: () => mockSupabaseClient,
-  maybeSingle: () => mockSupabaseClient,
-  order: () => mockSupabaseClient,
-  rpc: () => mockSupabaseClient,
+  from: vi.fn().mockReturnThis(),
+  select: vi.fn().mockReturnThis(),
+  insert: vi.fn().mockReturnThis(),
+  update: vi.fn().mockReturnThis(),
+  delete: vi.fn().mockReturnThis(),
+  eq: vi.fn().mockReturnThis(),
+  single: vi.fn().mockReturnThis(),
+  maybeSingle: vi.fn().mockReturnThis(),
+  order: vi.fn().mockReturnThis(),
+  rpc: vi.fn().mockReturnThis(),
   auth: {
-    getSession: () => Promise.resolve({ data: { session: null }, error: null }),
-    signInWithOAuth: () => Promise.resolve({ data: null, error: null }),
-    signOut: () => Promise.resolve({ error: null }),
-    getUser: () => Promise.resolve({ data: { user: null }, error: null })
+    getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
+    signInWithOAuth: vi.fn().mockResolvedValue({ data: null, error: null }),
+    signOut: vi.fn().mockResolvedValue({ error: null }),
+    getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null })
   }
 };
 
 // Helper to reset all mocks
-// After installing vitest, you can implement proper mock reset functionality
 export function resetSupabaseMocks() {
-  // Placeholder - implement with vi.fn() after installing vitest
-  console.log('Reset mocks - install vitest to use vi.fn() functionality');
+  vi.clearAllMocks();
 }

@@ -1,45 +1,43 @@
 // Mock Zustand stores for testing
-// Note: This file requires vitest to be installed. Run: npm install -D vitest
-// Uncomment the imports below after installing vitest:
-// import { vi } from 'vitest';
+import { vi } from 'vitest';
 import { testUtils } from '../setup';
 
 export const mockUsuariosStore = {
   usuario: testUtils.mockUser,
   idusuario: testUtils.mockUser.id,
-  setUsuario: () => {},
-  clearUsuario: () => {},
-  editartemamonedauser: () => Promise.resolve(),
-  ObtenerUsuarioActual: () => Promise.resolve(testUtils.mockUser)
+  setUsuario: vi.fn(),
+  clearUsuario: vi.fn(),
+  editartemamonedauser: vi.fn().mockResolvedValue(undefined),
+  ObtenerUsuarioActual: vi.fn().mockResolvedValue(testUtils.mockUser)
 };
 
 export const mockAuthStore = {
   isAuth: false,
   datauserGoogle: [],
-  signInWithGoogle: () => Promise.resolve(undefined),
-  signout: () => Promise.resolve()
+  signInWithGoogle: vi.fn().mockResolvedValue(undefined),
+  signout: vi.fn().mockResolvedValue(undefined)
 };
 
 export const mockCuentaStore = {
   cuentas: [testUtils.mockCuenta],
   cuentaItemSelect: testUtils.mockCuenta,
-  selectCuenta: () => {},
-  mostrarCuentas: () => Promise.resolve([testUtils.mockCuenta]),
-  insertarCuenta: () => Promise.resolve(null),
-  actualizarCuenta: () => Promise.resolve(null),
-  eliminarCuenta: () => Promise.resolve(false)
+  selectCuenta: vi.fn(),
+  mostrarCuentas: vi.fn().mockResolvedValue([testUtils.mockCuenta]),
+  insertarCuenta: vi.fn().mockResolvedValue(null),
+  actualizarCuenta: vi.fn().mockResolvedValue(null),
+  eliminarCuenta: vi.fn().mockResolvedValue(false)
 };
 
 export const mockCategoriasStore = {
   datacategoria: [testUtils.mockCategoria],
   categoriaItemSelect: testUtils.mockCategoria,
   parametros: null,
-  mostrarCategorias: () => Promise.resolve([testUtils.mockCategoria]),
-  selectCategoria: () => {},
-  insertarCategorias: () => Promise.resolve(),
-  eliminarCategoria: () => Promise.resolve(),
-  eliminarCategoriasTodas: () => Promise.resolve(),
-  editarCategoria: () => Promise.resolve()
+  mostrarCategorias: vi.fn().mockResolvedValue([testUtils.mockCategoria]),
+  selectCategoria: vi.fn(),
+  insertarCategorias: vi.fn().mockResolvedValue(undefined),
+  eliminarCategoria: vi.fn().mockResolvedValue(undefined),
+  eliminarCategoriasTodas: vi.fn().mockResolvedValue(undefined),
+  editarCategoria: vi.fn().mockResolvedValue(undefined)
 };
 
 export const mockMovimientosStore = {
@@ -50,17 +48,15 @@ export const mockMovimientosStore = {
   totalMesAñoPagados: 0,
   totalMesAñoPendientes: 0,
   parametros: {},
-  mostrarMovimientos: () => Promise.resolve({ i: [], g: [] }),
-  calcularTotales: () => {},
-  insertarMovimientos: () => Promise.resolve(),
-  actualizarMovimientos: () => Promise.resolve(),
-  eliminarMovimiento: () => Promise.resolve(),
-  rptMovimientosAñoMes: () => Promise.resolve({ i: [], g: [] })
+  mostrarMovimientos: vi.fn().mockResolvedValue({ i: [], g: [] }),
+  calcularTotales: vi.fn(),
+  insertarMovimientos: vi.fn().mockResolvedValue(undefined),
+  actualizarMovimientos: vi.fn().mockResolvedValue(undefined),
+  eliminarMovimiento: vi.fn().mockResolvedValue(undefined),
+  rptMovimientosAñoMes: vi.fn().mockResolvedValue({ i: [], g: [] })
 };
 
 // Helper to reset all store mocks
-// After installing vitest, you can implement proper mock reset functionality
 export function resetStoreMocks() {
-  // Placeholder - implement with vi.fn() after installing vitest
-  console.log('Reset store mocks - install vitest to use vi.fn() functionality');
+  vi.clearAllMocks();
 }
