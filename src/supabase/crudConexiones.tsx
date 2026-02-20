@@ -1,5 +1,8 @@
 import { Database, supabase } from "../index";
-import Swal from "sweetalert2";
+import { conexionInsertSchema, conexionUpdateSchema } from "../schemas/conexion.schema";
+import { logger } from "../utils/logger";
+import { showErrorMessage, showSuccessMessage } from "../utils/messages";
+import { z } from "zod";
 
 export type Conexion = Database["public"]["Tables"]["conexiones_usuarios"]["Row"];
 export type ConexionInsert = Database["public"]["Tables"]["conexiones_usuarios"]["Insert"];
@@ -8,29 +11,32 @@ export type ConexionQueryParams = Database["public"]["Tables"]["conexiones_usuar
 
 export const InsertarConexion = async (c: ConexionInsert) => {
   try {
-    const { data, error } = await supabase.from("conexiones_usuarios").insert(c).select();
-    console.error("error", error);
+    // Validate data before inserting
+    const validatedData = conexionInsertSchema.parse(c);
+    
+    const { data, error } = await supabase.from("conexiones_usuarios").insert(validatedData).select();
 
     if (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Ya existe un registro con " + c.canal_username,
-        footer: '<a href="">Agregue una nueva descripcion</a>',
-      });
+      logger.error('Error al insertar conexión', { error, conexion: c });
+      showErrorMessage(`Ya existe un registro con ${c.canal_username}. Agregue un nuevo nombre.`);
+      throw error;
     }
+    
     if (data) {
-      Swal.fire({
-        position: "top-end",
-        icon: "success",
-        title: "Datos guardados",
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      logger.info('Conexión creada exitosamente', { conexionId: data[0]?.id });
+      showSuccessMessage('Datos guardados', '✅ Éxito');
     }
     return data;
   } catch (error) {
-    alert(((error as any).error_description || (error as any).message) + " insertar conexion");
+    if (error instanceof z.ZodError) {
+      const errorMessage = error.errors.map(e => e.message).join(', ');
+      logger.error('Error de validación al insertar conexión', { error: errorMessage, conexion: c });
+      showErrorMessage(`Datos inválidos: ${errorMessage}`);
+    } else {
+      logger.error('Error al insertar conexión', { error, conexion: c });
+      // Error already shown above
+    }
+    throw error;
   }
 }
 
@@ -41,14 +47,11 @@ export const MostrarConexiones = async (c: ConexionQueryParams): Promise<Conexio
       .select()
       .eq("usuario_id", c.usuario_id);
 
-    if (error) {
-      console.error("Error al obtener conexiones:", error);
-      return null;
-    }
-
+    if (error) throw error;
     return data;
   } catch (error) {
-    console.error("Excepción en MostrarConexiones:", error);
+    logger.error('Error al mostrar conexiones', { error, userId: c.usuario_id });
+    showErrorMessage('No se pudieron cargar las conexiones. Por favor, intenta nuevamente.');
     return null;
   }
 };
@@ -58,8 +61,10 @@ export async function EliminarConexiones(c: ConexionQueryParams) {
     const { error } = await supabase.from("conexiones_usuarios").delete().eq("id", c.id);
 
     if (error) throw error;
+    logger.info('Conexión eliminada exitosamente', { conexionId: c.id });
   } catch (error) {
-    console.error("Error al eliminar conexión:", (error as Error).message);
-    throw error; // importante para que pueda capturarse si algo falla
+    logger.error('Error al eliminar conexión', { error, conexionId: c.id });
+    showErrorMessage('No se pudo eliminar la conexión. Por favor, intenta nuevamente.');
+    throw error;
   }
 }

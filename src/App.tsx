@@ -18,6 +18,7 @@ import { ThemeProvider, styled } from "styled-components";
 import { useQuery } from "@tanstack/react-query";
 import { LoadingProvider } from "./context/LoadingContext";
 import { GlobalStyles } from "./styles/GlobalStyles";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 type ThemeContextType = typeof Light;
 
@@ -59,35 +60,37 @@ function App(): JSX.Element {
   const themeStyle = themeName === "light" ? Light : Dark;
 
   return (
-    <ThemeContext.Provider value={themeStyle}>
-      <LoadingProvider>
-        <ThemeProvider theme={themeStyle}>
-          <GlobalStyles />
-          <AuthContextProvider>
-            {pathname !== "/login" ? (
-              <Container className={sidebarOpen ? "active" : ""}>
-                <div className="ContentSidebar">
-                  <Sidebar
-                    state={sidebarOpen}
-                    setState={() => setSidebarOpen(!sidebarOpen)}
-                  />
-                </div>
+    <ErrorBoundary>
+      <ThemeContext.Provider value={themeStyle}>
+        <LoadingProvider>
+          <ThemeProvider theme={themeStyle}>
+            <GlobalStyles />
+            <AuthContextProvider>
+              {pathname !== "/login" ? (
+                <Container className={sidebarOpen ? "active" : ""}>
+                  <div className="ContentSidebar">
+                    <Sidebar
+                      state={sidebarOpen}
+                      setState={() => setSidebarOpen(!sidebarOpen)}
+                    />
+                  </div>
 
-                <div className="ContentMenuambur">
-                  <Menuambur />
-                </div>
+                  <div className="ContentMenuambur">
+                    <Menuambur />
+                  </div>
 
-                <Containerbody>
-                  <MyRoutes isLoading={isLoading} />
-                </Containerbody>
-              </Container>
-            ) : (
-              <Login />
-            )}
-          </AuthContextProvider>
-        </ThemeProvider>
-      </LoadingProvider>
-    </ThemeContext.Provider>
+                  <Containerbody>
+                    <MyRoutes isLoading={isLoading} />
+                  </Containerbody>
+                </Container>
+              ) : (
+                <Login />
+              )}
+            </AuthContextProvider>
+          </ThemeProvider>
+        </LoadingProvider>
+      </ThemeContext.Provider>
+    </ErrorBoundary>
   );
 }
 

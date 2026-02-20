@@ -19,7 +19,11 @@ export const Informes = (): JSX.Element => {
         iduser: usuario?.id ?? 0,
         tipocategoria: selectTipoMovimiento.tipo,
       }),
-      enabled: !!usuario?.id && !!date
+    enabled: !!usuario?.id && !!date,
+    staleTime: 5 * 60 * 1000, // 5 minutos
+    gcTime: 10 * 60 * 1000, // 10 minutos (renamed from cacheTime)
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   useEffect(() => {

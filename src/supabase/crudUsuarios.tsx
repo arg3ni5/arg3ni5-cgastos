@@ -1,6 +1,10 @@
 import { supabase } from "../index";
 import { ObtenerIdAuthSupabase } from "./authHelpers";
-import { Database } from "../types/supabase"; // Ajustá el path si es distinto
+import { Database } from "../types/supabase";
+import { usuarioInsertSchema, usuarioUpdateSchema } from "../schemas/usuario.schema";
+import { logger } from "../utils/logger";
+import { showErrorMessage } from "../utils/messages";
+import { z } from "zod";
 
 export type Usuario = Database["public"]["Tables"]["usuarios"]["Row"];
 export type UsuarioInsert = Database["public"]["Tables"]["usuarios"]["Insert"];
@@ -17,23 +21,35 @@ export const InsertarUsuarios = async (
     const { data: existingUser, error } = await ConsultarUsuario(idAuthSupabase);
 
     if (!existingUser && !error) {
+      // Validate data before inserting
+      const validatedData = usuarioInsertSchema.parse(p);
+      
       const { data: newUser, error: insertError } = await supabase
         .from("usuarios")
-        .insert(p)
+        .insert(validatedData)
         .select()
         .single();
 
       if (insertError) {
-        console.error("Error inserting user:", insertError);
+        logger.error('Error al insertar usuario', { error: insertError, usuario: p });
+        showErrorMessage('No se pudo crear el usuario. Por favor, intenta nuevamente.');
         return null;
       }
 
+      logger.info('Usuario creado exitosamente', { userId: newUser.id });
       return newUser;
     }
 
     return existingUser;
   } catch (error) {
-    console.error("InsertarUsuarios", error);
+    if (error instanceof z.ZodError) {
+      const errorMessage = error.errors.map(e => e.message).join(', ');
+      logger.error('Error de validación al insertar usuario', { error: errorMessage });
+      showErrorMessage(`Datos inválidos: ${errorMessage}`);
+    } else {
+      logger.error('Error al insertar usuario', { error });
+      showErrorMessage('No se pudo crear el usuario. Por favor, intenta nuevamente.');
+    }
     return null;
   }
 };
@@ -45,9 +61,24 @@ export const InsertarUsuarios = async (
 export const editarTemaMonedaUser = async (
   p: Partial<Usuario> & { id: number }
 ): Promise<void> => {
-  const { error } = await supabase.from("usuarios").update(p).eq("id", p.id);
-  if (error) {
-    throw new Error(`Error al editar usuarios: ${error.message}`);
+  try {
+    // Validate data before updating
+    const validatedData = usuarioUpdateSchema.parse(p);
+    
+    const { error } = await supabase.from("usuarios").update(validatedData).eq("id", p.id);
+    
+    if (error) throw error;
+    logger.info('Usuario actualizado exitosamente', { userId: p.id });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errorMessage = error.errors.map(e => e.message).join(', ');
+      logger.error('Error de validación al editar usuario', { error: errorMessage, userId: p.id });
+      showErrorMessage(`Datos inválidos: ${errorMessage}`);
+    } else {
+      logger.error('Error al editar usuario', { error, userId: p.id });
+      showErrorMessage('No se pudo actualizar el usuario. Por favor, intenta nuevamente.');
+    }
+    throw error;
   }
 };
 
@@ -65,6 +96,7 @@ export const ConsultarUsuario = async (
     }
 
     if (!idAuthSupabase) {
+      logger.warn('No se pudo obtener el idAuthSupabase para consultar usuario');
       return { data: null, error: "No se pudo obtener el idAuthSupabase" };
     }
 
@@ -74,8 +106,13 @@ export const ConsultarUsuario = async (
       .eq("idauth_supabase", idAuthSupabase)
       .maybeSingle();
 
+    if (error) {
+      logger.error('Error al consultar usuario', { error, idAuthSupabase });
+    }
+
     return { data, error: error?.message || null };
   } catch (error) {
+    logger.error('Error inesperado al consultar usuario', { error, idAuthSupabase });
     return { data: null, error: (error as Error).message };
   }
 };

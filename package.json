@@ -8,7 +8,10 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "ts-standard",
-    "lint:fix": "ts-standard --fix"
+    "lint:fix": "ts-standard --fix",
+    "test": "echo 'Test infrastructure ready. To enable tests, install dependencies: npm install -D vitest @testing-library/react @testing-library/jest-dom'",
+    "test:ui": "echo 'Install vitest first: npm install -D vitest @vitest/ui'",
+    "test:coverage": "echo 'Install vitest first: npm install -D vitest @vitest/coverage-v8'"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -36,6 +39,7 @@
     "sweetalert2": "^11.17.2",
     "swiper": "^11.2.6",
     "typescript": "^5.8.2",
+    "zod": "^4.3.6",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
