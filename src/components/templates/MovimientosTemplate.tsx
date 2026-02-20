@@ -11,7 +11,6 @@ import {
   Tipo,
   Accion,
   Movimiento,
-  TablaMovimientos,
   useMovimientosStore,
   RegistrarMovimientos,
   CardTotales,
@@ -19,6 +18,7 @@ import {
   CalendarioLineal,
   obtenerTitulo,
   BtnIcono,
+  TablaMovimientos,
 } from "../../index";
 import { JSX, useState } from "react";
 import vacioverde from "../../assets/vacioverde.json";
@@ -281,23 +281,12 @@ const Container = styled.div`
   }
   .main {
     grid-area: main;
-    display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
     gap: 10px;
-
-    @media ${Device.laptop} {
-      gap: 15px;
-
-      > * {
-        flex: 0 0 calc(50% - 7.5px);
-      }
-
-      > *:only-child {
-        flex: 0 0 100%;
-        max-width: 100%;
-      }
-    }
   }
 `;
 const ContentFiltro = styled.div`
