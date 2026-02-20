@@ -59,7 +59,9 @@ export const RegistrarCuentas = ({ onClose, dataSelect, accion }: RegistrarCuent
       descripcion: formData.descripcion,
       saldo_actual: Number(formData.saldo_actual), // Ensure saldo_actual is a number
       icono: emojiselect,
-      tipo: (accion === "Editar" ? dataSelect.tipo : selectTipoCuenta.tipo) || selectTipoCuenta.tipo,
+      tipo: accion === "Editar" && "tipo" in dataSelect && dataSelect.tipo 
+        ? dataSelect.tipo 
+        : selectTipoCuenta.tipo,
       idusuario: usuario.id,
     };
 
