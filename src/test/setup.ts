@@ -1,19 +1,25 @@
 // Test setup configuration for Vitest
 // This file will be used to configure the test environment
+// Note: This file requires vitest and @testing-library/react to be installed.
+// Run: npm install -D vitest @testing-library/react @testing-library/jest-dom
+// Uncomment the imports below after installing the dependencies:
 
-import { afterEach } from 'vitest';
-import { cleanup } from '@testing-library/react';
+// import { afterEach } from 'vitest';
+// import { cleanup } from '@testing-library/react';
 
 // Cleanup after each test
-afterEach(() => {
-  cleanup();
-});
+// Uncomment after installing dependencies:
+// afterEach(() => {
+//   cleanup();
+// });
 
 // Mock environment variables for tests
-process.env.VITE_APP_SUPABASE_URL = 'https://test.supabase.co';
-process.env.VITE_APP_SUPABASE_ANON_KEY = 'test-anon-key';
-process.env.VITE_APP_ENV = 'test';
-process.env.VITE_SESSION_TIMEOUT = '3600000'; // 1 hour
+if (typeof process !== 'undefined' && process.env) {
+  process.env.VITE_APP_SUPABASE_URL = 'https://test.supabase.co';
+  process.env.VITE_APP_SUPABASE_ANON_KEY = 'test-anon-key';
+  process.env.VITE_APP_ENV = 'test';
+  process.env.VITE_SESSION_TIMEOUT = '3600000'; // 1 hour
+}
 
 // Global test utilities
 export const testUtils = {

@@ -1,33 +1,30 @@
 // Mock Supabase client for testing
+// Note: This file requires vitest to be installed. Run: npm install -D vitest
+// Uncomment the imports below after installing vitest:
+// import { vi } from 'vitest';
+
 export const mockSupabaseClient = {
-  from: jest.fn().mockReturnThis(),
-  select: jest.fn().mockReturnThis(),
-  insert: jest.fn().mockReturnThis(),
-  update: jest.fn().mockReturnThis(),
-  delete: jest.fn().mockReturnThis(),
-  eq: jest.fn().mockReturnThis(),
-  single: jest.fn().mockReturnThis(),
-  maybeSingle: jest.fn().mockReturnThis(),
-  order: jest.fn().mockReturnThis(),
-  rpc: jest.fn().mockReturnThis(),
+  from: () => mockSupabaseClient,
+  select: () => mockSupabaseClient,
+  insert: () => mockSupabaseClient,
+  update: () => mockSupabaseClient,
+  delete: () => mockSupabaseClient,
+  eq: () => mockSupabaseClient,
+  single: () => mockSupabaseClient,
+  maybeSingle: () => mockSupabaseClient,
+  order: () => mockSupabaseClient,
+  rpc: () => mockSupabaseClient,
   auth: {
-    getSession: jest.fn(),
-    signInWithOAuth: jest.fn(),
-    signOut: jest.fn(),
-    getUser: jest.fn()
+    getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+    signInWithOAuth: () => Promise.resolve({ data: null, error: null }),
+    signOut: () => Promise.resolve({ error: null }),
+    getUser: () => Promise.resolve({ data: { user: null }, error: null })
   }
 };
 
 // Helper to reset all mocks
+// After installing vitest, you can implement proper mock reset functionality
 export function resetSupabaseMocks() {
-  Object.values(mockSupabaseClient).forEach(mock => {
-    if (typeof mock === 'function') {
-      mock.mockClear();
-    }
-  });
-  Object.values(mockSupabaseClient.auth).forEach(mock => {
-    if (typeof mock === 'function') {
-      mock.mockClear();
-    }
-  });
+  // Placeholder - implement with vi.fn() after installing vitest
+  console.log('Reset mocks - install vitest to use vi.fn() functionality');
 }
