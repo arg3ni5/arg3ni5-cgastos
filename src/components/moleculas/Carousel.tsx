@@ -9,7 +9,12 @@ import {
   Autoplay,
 } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { useEffect, FC, useRef } from "react";
+import { FC, useRef } from "react";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css/scrollbar";
+import "swiper/css/effect-cards";
 import img1 from "../../assets/Ruleta/ruleta9.png";
 import img2 from "../../assets/Ruleta/ruleta8.png";
 import img3 from "../../assets/Ruleta/ruleta5.png";
@@ -20,14 +25,6 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 export const Carousel: FC = () => {
   const prevRef = useRef(null);
   const nextRef = useRef(null);
-
-  useEffect(() => {
-    import("swiper/css");
-    import("swiper/css/navigation");
-    import("swiper/css/pagination");
-    import("swiper/css/scrollbar");
-    import("swiper/css/effect-cards");
-  }, []);
 
   return (
     <CarouselContainer>
