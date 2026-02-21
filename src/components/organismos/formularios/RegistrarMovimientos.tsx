@@ -24,7 +24,9 @@ import {
   DataDesplegables,
   Cuenta,
 } from "../../../index";
+import { ConfigRecurrencia } from "../../../store/MovimientosStore";
 import { useQuery } from "@tanstack/react-query";
+
 interface RegistrarMovimientosProps {
   setState: () => void;
   state: boolean;
@@ -53,13 +55,22 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
   const { selectTipoMovimiento } = useOperaciones();
   const { idusuario } = useUsuariosStore();
   const { categoriaItemSelect, selectCategoria, mostrarCategorias } = useCategoriasStore();
-  const { insertarMovimientos, actualizarMovimientos } = useMovimientosStore();
+  const { insertarMovimientos, actualizarMovimientos, insertarMovimientosRecurrentes, previewRecurrencia } = useMovimientosStore();
 
   const [estado, setEstado] = useState<boolean>(true);
-  //const [ignorar, setIgnorar] = useState<boolean>(false);
   const [stateCategorias, setStateCategorias] = useState<boolean>(false);
   const [stateCuenta, setStateCuenta] = useState<boolean>(false);
   const [stateTipo, setStateTipo] = useState<boolean>(false);
+
+  // Recurrence state
+  const [esRecurrente, setEsRecurrente] = useState<boolean>(false);
+  const [modoRecurrencia, setModoRecurrencia] = useState<'intervalo' | 'mensual'>('intervalo');
+  const [intervaloDias, setIntervaloDias] = useState<number>(30);
+  const [diaMes, setDiaMes] = useState<number>(1);
+  const [repeticiones, setRepeticiones] = useState<number>(3);
+  const [politica, setPolitica] = useState<'este_mes' | 'proximo_mes'>('este_mes');
+  const [previewFechas, setPreviewFechas] = useState<string[]>([]);
+
   const tipoInicial = dataSelect?.tipo || (selectTipoMovimiento?.tipo !== "b" ? selectTipoMovimiento?.tipo : undefined);
   const [tipoMovimiento, setTipoMovimiento] = useState<Tipo>(
     (tipoInicial ? DataDesplegables.movimientos[tipoInicial] : undefined) || {} as Tipo
@@ -87,6 +98,7 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
     register,
     formState: { errors },
     handleSubmit,
+    watch,
   } = useForm<FormInputs>(
     {
       defaultValues: {
@@ -96,6 +108,8 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
       },
     }
   );
+
+  const fechaActualForm = watch('fecha');
 
   const insertar = async (formData: FormInputs): Promise<void> => {
     if (categoriaItemSelect == null) {
@@ -116,13 +130,42 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
       tipo: tipoMovimiento.tipo,
       valor: parseFloat(formData.monto.toString()),
     } as MovimientoInsert;
+
     try {
-      console.log(baseData);
-      await insertarMovimientos(baseData);
+      if (esRecurrente) {
+        const config: ConfigRecurrencia = {
+          modo: modoRecurrencia,
+          repeticiones,
+          intervaloDias: modoRecurrencia === 'intervalo' ? intervaloDias : undefined,
+          diaMes: modoRecurrencia === 'mensual' ? diaMes : undefined,
+          politica: modoRecurrencia === 'mensual' ? politica : undefined,
+        };
+        await insertarMovimientosRecurrentes(baseData, config);
+      } else {
+        console.log(baseData);
+        await insertarMovimientos(baseData);
+      }
       setState();
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const actualizarPreview = (): void => {
+    if (!esRecurrente) {
+      setPreviewFechas([]);
+      return;
+    }
+    const fechaBase = fechaActualForm || fechaactual.toISOString().slice(0, 10);
+    const config: ConfigRecurrencia = {
+      modo: modoRecurrencia,
+      repeticiones,
+      intervaloDias: modoRecurrencia === 'intervalo' ? intervaloDias : undefined,
+      diaMes: modoRecurrencia === 'mensual' ? diaMes : undefined,
+      politica: modoRecurrencia === 'mensual' ? politica : undefined,
+    };
+    const fechas = previewRecurrencia({ fecha: fechaBase } as MovimientoInsert, config);
+    setPreviewFechas(fechas);
   };
 
   const actualizar = async (formData: FormInputs): Promise<void> => {
@@ -336,6 +379,106 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
                 />
               )}
             </ContenedorDropdown>
+
+            {accion === "Nuevo" && (
+              <ContainerRecurrencia>
+                <ContainerFuepagado>
+                  <label>Recurrente:</label>
+                  <Switch
+                    checked={esRecurrente}
+                    onChange={(e) => {
+                      setEsRecurrente(e.target.checked);
+                      if (!e.target.checked) setPreviewFechas([]);
+                    }}
+                    color="warning"
+                  />
+                </ContainerFuepagado>
+
+                {esRecurrente && (
+                  <ContainerRecurrenciaOpciones>
+                    <ContainerFuepagado>
+                      <label>Modo:</label>
+                      <select
+                        value={modoRecurrencia}
+                        onChange={(e) => {
+                          setModoRecurrencia(e.target.value as 'intervalo' | 'mensual');
+                          setPreviewFechas([]);
+                        }}
+                      >
+                        <option value="intervalo">Cada N días</option>
+                        <option value="mensual">Día X de cada mes</option>
+                      </select>
+                    </ContainerFuepagado>
+
+                    {modoRecurrencia === 'intervalo' && (
+                      <ContainerFuepagado>
+                        <label>Cada (días):</label>
+                        <input
+                          type="number"
+                          min={1}
+                          value={intervaloDias}
+                          onChange={(e) => setIntervaloDias(Number(e.target.value))}
+                        />
+                      </ContainerFuepagado>
+                    )}
+
+                    {modoRecurrencia === 'mensual' && (
+                      <>
+                        <ContainerFuepagado>
+                          <label>Día del mes:</label>
+                          <input
+                            type="number"
+                            min={1}
+                            max={31}
+                            value={diaMes}
+                            onChange={(e) => setDiaMes(Number(e.target.value))}
+                          />
+                        </ContainerFuepagado>
+                        <ContainerFuepagado>
+                          <label>Inicio:</label>
+                          <select
+                            value={politica}
+                            onChange={(e) => setPolitica(e.target.value as 'este_mes' | 'proximo_mes')}
+                          >
+                            <option value="este_mes">Este mes</option>
+                            <option value="proximo_mes">Próximo mes</option>
+                          </select>
+                        </ContainerFuepagado>
+                      </>
+                    )}
+
+                    <ContainerFuepagado>
+                      <label>Repeticiones:</label>
+                      <input
+                        type="number"
+                        min={2}
+                        max={60}
+                        value={repeticiones}
+                        onChange={(e) => setRepeticiones(Number(e.target.value))}
+                      />
+                    </ContainerFuepagado>
+
+                    <BtnPreview
+                      type="button"
+                      onClick={() => actualizarPreview()}
+                    >
+                      Ver previsualización
+                    </BtnPreview>
+
+                    {previewFechas.length > 0 && (
+                      <ContainerPreview>
+                        <label>Fechas a generar ({previewFechas.length}):</label>
+                        <ul>
+                          {previewFechas.map((f, i) => (
+                            <li key={i}>{f}</li>
+                          ))}
+                        </ul>
+                      </ContainerPreview>
+                    )}
+                  </ContainerRecurrenciaOpciones>
+                )}
+              </ContainerRecurrencia>
+            )}
           </section>
           <ContenedorBotones>
             <StickyFooter>
@@ -560,4 +703,72 @@ const StickyFooter = styled.div`
   align-items: center;
   z-index: 10;
   position: relative;
+`;
+
+const ContainerRecurrencia = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid ${({ theme }) => theme.text}33;
+  padding-top: 10px;
+`;
+
+const ContainerRecurrenciaOpciones = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  select, input[type="number"] {
+    background: ${({ theme }) => theme.bgtotal};
+    color: ${({ theme }) => theme.text};
+    border: 1px solid ${({ theme }) => theme.text}55;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 15px;
+    width: 100%;
+    cursor: pointer;
+  }
+`;
+
+const BtnPreview = styled.button`
+  background: #e14e19;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  align-self: flex-start;
+`;
+
+const ContainerPreview = styled.div`
+  background: ${({ theme }) => theme.bgtotal};
+  border: 1px solid ${({ theme }) => theme.text}33;
+  border-radius: 8px;
+  padding: 8px 12px;
+  max-height: 150px;
+  overflow-y: auto;
+
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  li {
+    background: #e14e1922;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 13px;
+  }
 `;

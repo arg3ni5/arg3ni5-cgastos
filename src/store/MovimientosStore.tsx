@@ -16,6 +16,21 @@ import {
   RptMovimientosPorMesAñoJson
 } from "../index";
 import { logger } from "../utils/logger";
+import { InsertarMovimientosMasivo } from "../supabase/crudMovimientosRecurrentes";
+import {
+  generarFechasIntervalo,
+  generarFechasMensual,
+  ModoRecurrencia,
+  PoliticaInicioMensual,
+} from "../utils/recurrencia";
+
+export interface ConfigRecurrencia {
+  modo: ModoRecurrencia;
+  repeticiones: number;
+  intervaloDias?: number;
+  diaMes?: number;
+  politica?: PoliticaInicioMensual;
+}
 
 export interface DataRptMovimientosAñoMes {
   i: RptMovimientosMesAnio;
@@ -40,6 +55,8 @@ interface MovimientosState {
   eliminarMovimiento: (p: Movimiento) => Promise<void>;
   rptMovimientosAñoMes: (p: RptMovimientosMesAnioParams) => Promise<DataRptMovimientosAñoMes | null>;
   rptMovimientosAñoMesJson: (p: RptMovimientosMesAnioParams) => Promise<RptMovimientosMesAnioJson | null>;
+  previewRecurrencia: (base: MovimientoInsert, config: ConfigRecurrencia) => string[];
+  insertarMovimientosRecurrentes: (base: MovimientoInsert, config: ConfigRecurrencia) => Promise<void>;
 }
 
 const esPagado = (estado: unknown): boolean => {
@@ -212,6 +229,37 @@ export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
     } catch (error) {
       logger.error('Error al generar reporte de movimientos (JSON)', { error, params: p });
       return null;
+    }
+  },
+
+  previewRecurrencia: (base: MovimientoInsert, config: ConfigRecurrencia): string[] => {
+    if (config.modo === 'intervalo') {
+      const fechaBase = base.fecha || new Date().toISOString().slice(0, 10);
+      return generarFechasIntervalo(fechaBase, config.intervaloDias ?? 30, config.repeticiones);
+    }
+    return generarFechasMensual(
+      config.diaMes ?? 1,
+      config.repeticiones,
+      config.politica ?? 'este_mes'
+    );
+  },
+
+  insertarMovimientosRecurrentes: async (
+    base: MovimientoInsert,
+    config: ConfigRecurrencia
+  ): Promise<void> => {
+    try {
+      const { previewRecurrencia, mostrarMovimientos, parametros } = get();
+      const fechas = previewRecurrencia(base, config);
+      const items: MovimientoInsert[] = fechas.map((fecha) => ({ ...base, fecha }));
+      await InsertarMovimientosMasivo(items);
+      await mostrarMovimientos(parametros);
+      logger.debug('Movimientos recurrentes insertados y lista refrescada', {
+        cantidad: items.length,
+      });
+    } catch (error) {
+      logger.error('Error al insertar movimientos recurrentes en store', { error });
+      throw error;
     }
   },
 }));
