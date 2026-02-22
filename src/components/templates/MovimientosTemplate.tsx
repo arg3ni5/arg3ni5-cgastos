@@ -71,8 +71,11 @@ export const MovimientosTemplate = (): JSX.Element => {
     setAccion("Nuevo");
     setDataSelect(undefined);
   };
+
+  const isBalanceActive = tipo.tipo === "b";
+
   return (
-    <Container onClick={cerrarDesplegables}>
+    <Container onClick={cerrarDesplegables} $isBalanceActive={isBalanceActive}>
       {openRegistro && (
         <RegistrarMovimientos
           accion={accion}
@@ -233,7 +236,11 @@ export const MovimientosTemplate = (): JSX.Element => {
     </Container>
   );
 }
-const Container = styled.div`
+interface ContainerProps {
+  $isBalanceActive: boolean;
+}
+
+const Container = styled.div<ContainerProps>`
   max-width: 100%;
   overflow-x: hidden;
   padding: 15px;
@@ -281,12 +288,22 @@ const Container = styled.div`
   }
   .main {
     grid-area: main;
-    flex-wrap: wrap;
-
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     flex-wrap: wrap;
     gap: 10px;
+
+    > * {
+      flex: 1 1 100%;
+      max-width: 100%;
+    }
+
+    @media ${Device.tablet} {
+      > * {
+        flex: ${({ $isBalanceActive }) => ($isBalanceActive ? "1 1 calc(50% - 5px)" : "1 1 100%")};
+        max-width: ${({ $isBalanceActive }) => ($isBalanceActive ? "calc(50% - 5px)" : "100%")};
+      }
+    }
   }
 `;
 const ContentFiltro = styled.div`
