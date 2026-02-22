@@ -25,6 +25,7 @@ import {
   Cuenta,
 } from "../../../index";
 import { ConfigRecurrencia } from "../../../store/MovimientosStore";
+import { showConfirmDialog } from "../../../utils/messages";
 import { useQuery } from "@tanstack/react-query";
 
 interface RegistrarMovimientosProps {
@@ -133,6 +134,15 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
 
     try {
       if (esRecurrente) {
+        if (repeticiones > 20) {
+          const confirmed = await showConfirmDialog(
+            `Vas a crear ${repeticiones} movimientos recurrentes. ¿Quieres continuar?`,
+            '¿Estás seguro?',
+            `Sí, crear ${repeticiones}`,
+            'Cancelar'
+          );
+          if (!confirmed) return;
+        }
         const config: ConfigRecurrencia = {
           modo: modoRecurrencia,
           repeticiones,
@@ -156,7 +166,7 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
       setPreviewFechas([]);
       return;
     }
-    const fechaBase = fechaActualForm || fechaactual.toISOString().slice(0, 10);
+    const fechaBase = fechaActualForm;
     const config: ConfigRecurrencia = {
       modo: modoRecurrencia,
       repeticiones,
@@ -416,8 +426,14 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
                         <input
                           type="number"
                           min={1}
+                          max={365}
                           value={intervaloDias}
-                          onChange={(e) => setIntervaloDias(Number(e.target.value))}
+                          onChange={(e) => {
+                            const value = Number(e.target.value);
+                            const clamped = Math.min(Math.max(Number.isNaN(value) ? 1 : value, 1), 365);
+                            setIntervaloDias(clamped);
+                            setPreviewFechas([]);
+                          }}
                         />
                       </ContainerFuepagado>
                     )}
@@ -431,30 +447,31 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
                             min={1}
                             max={31}
                             value={diaMes}
-                            onChange={(e) => setDiaMes(Number(e.target.value))}
+                            onChange={(e) => { setDiaMes(Number(e.target.value)); setPreviewFechas([]); }}
                           />
                         </ContainerFuepagado>
                         <ContainerFuepagado>
                           <label>Inicio:</label>
                           <select
                             value={politica}
-                            onChange={(e) => setPolitica(e.target.value as 'este_mes' | 'proximo_mes')}
+                            onChange={(e) => { setPolitica(e.target.value as 'este_mes' | 'proximo_mes'); setPreviewFechas([]); }}
                           >
                             <option value="este_mes">Este mes</option>
                             <option value="proximo_mes">Próximo mes</option>
                           </select>
                         </ContainerFuepagado>
+                        <MensualHint>La fecha seleccionada arriba no afecta al modo mensual; las fechas se calculan desde el mes de inicio.</MensualHint>
                       </>
                     )}
 
                     <ContainerFuepagado>
-                      <label>Repeticiones:</label>
+                      <label>Repeticiones <small>(mín. 2)</small>:</label>
                       <input
                         type="number"
                         min={2}
                         max={60}
                         value={repeticiones}
-                        onChange={(e) => setRepeticiones(Number(e.target.value))}
+                        onChange={(e) => { setRepeticiones(Number(e.target.value)); setPreviewFechas([]); }}
                       />
                     </ContainerFuepagado>
 
@@ -771,4 +788,10 @@ const ContainerPreview = styled.div`
     padding: 2px 8px;
     font-size: 13px;
   }
+`;
+
+const MensualHint = styled.small`
+  color: ${({ theme }) => theme.text}99;
+  font-size: 12px;
+  display: block;
 `;

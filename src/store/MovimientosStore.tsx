@@ -234,13 +234,21 @@ export const useMovimientosStore = create<MovimientosState>()((set, get) => ({
 
   previewRecurrencia: (base: MovimientoInsert, config: ConfigRecurrencia): string[] => {
     if (config.modo === 'intervalo') {
+      if (config.intervaloDias == null) {
+        logger.error("ConfigRecurrencia.intervaloDias es requerido cuando modo es 'intervalo'", { config });
+        throw new Error("intervaloDias es requerido cuando el modo de recurrencia es 'intervalo'");
+      }
       const fechaBase = base.fecha || new Date().toISOString().slice(0, 10);
-      return generarFechasIntervalo(fechaBase, config.intervaloDias ?? 30, config.repeticiones);
+      return generarFechasIntervalo(fechaBase, config.intervaloDias, config.repeticiones);
+    }
+    if (config.diaMes == null || config.politica == null) {
+      logger.error('ConfigRecurrencia inválida: diaMes y politica son requeridos para modo mensual', { config });
+      throw new Error('diaMes y politica son requeridos cuando el modo de recurrencia es mensual');
     }
     return generarFechasMensual(
-      config.diaMes ?? 1,
+      config.diaMes,
       config.repeticiones,
-      config.politica ?? 'este_mes'
+      config.politica
     );
   },
 

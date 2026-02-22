@@ -4,7 +4,7 @@ import { logger } from '../utils/logger';
 import { showErrorMessage, showSuccessMessage } from '../utils/messages';
 import { z } from 'zod';
 
-export type MovimientoInsert = Database['public']['Tables']['movimientos']['Insert'];
+type MovimientoInsert = Database['public']['Tables']['movimientos']['Insert'];
 
 /**
  * Bulk-inserts multiple movimientos into Supabase.
@@ -15,7 +15,11 @@ export const InsertarMovimientosMasivo = async (
   items: MovimientoInsert[]
 ): Promise<void> => {
   try {
-    if (!items.length) return;
+    if (!items.length) {
+      logger.error('No se proporcionaron movimientos para la inserción masiva');
+      showErrorMessage('Es necesario registrar al menos un movimiento recurrente.');
+      throw new Error('No se proporcionaron movimientos para insertar.');
+    }
 
     // Validate every item before sending to Supabase
     const validados = items.map((item, idx) => {
@@ -40,18 +44,10 @@ export const InsertarMovimientosMasivo = async (
       `Se registraron ${items.length} movimiento(s) recurrente(s).`
     );
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      const errorMessage = error.issues.map((e) => e.message).join(', ');
-      logger.error('Error de validación al insertar movimientos masivos', {
-        error: errorMessage,
-      });
-      showErrorMessage(`Datos inválidos: ${errorMessage}`);
-    } else {
-      logger.error('Error al insertar movimientos masivos', { error });
-      showErrorMessage(
-        'No se pudieron registrar los movimientos. Por favor, intenta nuevamente.'
-      );
-    }
+    logger.error('Error al insertar movimientos masivos', { error });
+    showErrorMessage(
+      'No se pudieron registrar los movimientos. Por favor, intenta nuevamente.'
+    );
     throw error;
   }
 };
