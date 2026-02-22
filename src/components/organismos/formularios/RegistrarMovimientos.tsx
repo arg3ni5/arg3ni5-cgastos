@@ -39,6 +39,9 @@ interface FormInputs {
   fecha: string;
   descripcion: string;
   monto: number;
+  intervaloDias: number;
+  diaMes: number;
+  repeticiones: number;
 }
 
 const esPagado = (estado: unknown): boolean => {
@@ -62,6 +65,8 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
   const [stateCategorias, setStateCategorias] = useState<boolean>(false);
   const [stateCuenta, setStateCuenta] = useState<boolean>(false);
   const [stateTipo, setStateTipo] = useState<boolean>(false);
+  const [stateModoRecurrencia, setStateModoRecurrencia] = useState<boolean>(false);
+  const [statePoliticaRecurrencia, setStatePoliticaRecurrencia] = useState<boolean>(false);
 
   // Recurrence state
   const [esRecurrente, setEsRecurrente] = useState<boolean>(false);
@@ -71,6 +76,16 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
   const [repeticiones, setRepeticiones] = useState<number>(3);
   const [politica, setPolitica] = useState<'este_mes' | 'proximo_mes'>('este_mes');
   const [previewFechas, setPreviewFechas] = useState<string[]>([]);
+
+  const opcionesModoRecurrencia = [
+    { icono: "", descripcion: "Cada N días", value: "intervalo" as const },
+    { icono: "", descripcion: "Día X de cada mes", value: "mensual" as const },
+  ];
+
+  const opcionesPoliticaRecurrencia = [
+    { icono: "", descripcion: "Este mes", value: "este_mes" as const },
+    { icono: "", descripcion: "Próximo mes", value: "proximo_mes" as const },
+  ];
 
   const tipoInicial = dataSelect?.tipo || (selectTipoMovimiento?.tipo !== "b" ? selectTipoMovimiento?.tipo : undefined);
   const [tipoMovimiento, setTipoMovimiento] = useState<Tipo>(
@@ -106,11 +121,41 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
         monto: dataSelect.valor || 0,
         descripcion: dataSelect.descripcion || "",
         fecha: dataSelect.fecha || fechaactual.toISOString().slice(0, 10),
+        intervaloDias: 30,
+        diaMes: 1,
+        repeticiones: 3,
       },
     }
   );
 
   const fechaActualForm = watch('fecha');
+  const intervaloDiasForm = watch('intervaloDias');
+  const diaMesForm = watch('diaMes');
+  const repeticionesForm = watch('repeticiones');
+
+  useEffect(() => {
+    const value = Number(intervaloDiasForm);
+    if (Number.isNaN(value)) return;
+    const clamped = Math.min(Math.max(value, 1), 365);
+    setIntervaloDias(clamped);
+    setPreviewFechas([]);
+  }, [intervaloDiasForm]);
+
+  useEffect(() => {
+    const value = Number(diaMesForm);
+    if (Number.isNaN(value)) return;
+    const clamped = Math.min(Math.max(value, 1), 31);
+    setDiaMes(clamped);
+    setPreviewFechas([]);
+  }, [diaMesForm]);
+
+  useEffect(() => {
+    const value = Number(repeticionesForm);
+    if (Number.isNaN(value)) return;
+    const clamped = Math.min(Math.max(value, 2), 60);
+    setRepeticiones(clamped);
+    setPreviewFechas([]);
+  }, [repeticionesForm]);
 
   const insertar = async (formData: FormInputs): Promise<void> => {
     if (categoriaItemSelect == null) {
@@ -392,96 +437,131 @@ export const RegistrarMovimientos = ({ setState, dataSelect = {} as Movimiento, 
 
             {accion === "Nuevo" && (
               <ContainerRecurrencia>
-                <ContainerFuepagado>
-                  <label>Recurrente:</label>
-                  <Switch
-                    checked={esRecurrente}
-                    onChange={(e) => {
-                      setEsRecurrente(e.target.checked);
-                      if (!e.target.checked) setPreviewFechas([]);
-                    }}
-                    color="warning"
-                  />
-                </ContainerFuepagado>
-
-                {esRecurrente && (
-                  <ContainerRecurrenciaOpciones>
-                    <ContainerFuepagado>
-                      <label>Modo:</label>
-                      <select
-                        value={modoRecurrencia}
-                        onChange={(e) => {
-                          setModoRecurrencia(e.target.value as 'intervalo' | 'mensual');
-                          setPreviewFechas([]);
-                        }}
-                      >
-                        <option value="intervalo">Cada N días</option>
-                        <option value="mensual">Día X de cada mes</option>
-                      </select>
-                    </ContainerFuepagado>
-
-                    {modoRecurrencia === 'intervalo' && (
-                      <ContainerFuepagado>
-                        <label>Cada (días):</label>
-                        <input
-                          type="number"
-                          min={1}
-                          max={365}
-                          value={intervaloDias}
-                          onChange={(e) => {
-                            const value = Number(e.target.value);
-                            const clamped = Math.min(Math.max(Number.isNaN(value) ? 1 : value, 1), 365);
-                            setIntervaloDias(clamped);
-                            setPreviewFechas([]);
-                          }}
-                        />
-                      </ContainerFuepagado>
-                    )}
-
-                    {modoRecurrencia === 'mensual' && (
-                      <>
-                        <ContainerFuepagado>
-                          <label>Día del mes:</label>
-                          <input
-                            type="number"
-                            min={1}
-                            max={31}
-                            value={diaMes}
-                            onChange={(e) => { setDiaMes(Number(e.target.value)); setPreviewFechas([]); }}
-                          />
-                        </ContainerFuepagado>
-                        <ContainerFuepagado>
-                          <label>Inicio:</label>
-                          <select
-                            value={politica}
-                            onChange={(e) => { setPolitica(e.target.value as 'este_mes' | 'proximo_mes'); setPreviewFechas([]); }}
-                          >
-                            <option value="este_mes">Este mes</option>
-                            <option value="proximo_mes">Próximo mes</option>
-                          </select>
-                        </ContainerFuepagado>
-                        <MensualHint>La fecha seleccionada arriba no afecta al modo mensual; las fechas se calculan desde el mes de inicio.</MensualHint>
-                      </>
-                    )}
-
-                    <ContainerFuepagado>
-                      <label>Repeticiones <small>(mín. 2)</small>:</label>
-                      <input
-                        type="number"
-                        min={2}
-                        max={60}
-                        value={repeticiones}
-                        onChange={(e) => { setRepeticiones(Number(e.target.value)); setPreviewFechas([]); }}
-                      />
-                    </ContainerFuepagado>
-
+                <FilaRecurrencia>
+                  <ContainerFuepagado>
+                    <label>Recurrente:</label>
+                    <Switch
+                      checked={esRecurrente}
+                      onChange={(e) => {
+                        setEsRecurrente(e.target.checked);
+                        if (!e.target.checked) setPreviewFechas([]);
+                      }}
+                      color="warning"
+                    />
+                  </ContainerFuepagado>
+                  {esRecurrente && (
                     <BtnPreview
                       type="button"
                       onClick={() => actualizarPreview()}
                     >
                       Ver previsualización
                     </BtnPreview>
+                  )}
+                </FilaRecurrencia>
 
+                {esRecurrente && (
+                  <ContainerRecurrenciaOpciones>
+                    <ContenedorDropdown>
+                      <label>Modo:</label>
+                      <Selector
+                        color="#e14e19"
+                        texto2={modoRecurrencia === 'intervalo' ? 'Cada N días' : 'Día X de cada mes'}
+                        funcion={() => setStateModoRecurrencia(!stateModoRecurrencia)}
+                        state={stateModoRecurrencia}
+                      />
+                      {stateModoRecurrencia && (
+                        <ListaGenerica
+                          top="100%"
+                          scroll="hidden"
+                          btnClose={false}
+                          setState={() => setStateModoRecurrencia(!stateModoRecurrencia)}
+                          data={opcionesModoRecurrencia}
+                          funcion={(item) => {
+                            setModoRecurrencia(item.value);
+                            setPreviewFechas([]);
+                          }}
+                        />
+                      )}
+                    </ContenedorDropdown>
+
+                    {modoRecurrencia === 'intervalo' && (
+                      <FilaCamposRecurrencia>
+                        <ContainerMonto>
+                          <label>Cada (días):</label>
+                          <InputText
+                            type="number"
+                            name="intervaloDias"
+                            defaultValue={intervaloDias}
+                            register={register}
+                            errors={errors}
+                            placeholder="1 - 365"
+                          />
+                        </ContainerMonto>
+                        <ContainerMonto>
+                          <label>Repeticiones <small>(mín. 2)</small>:</label>
+                          <InputText
+                            type="number"
+                            name="repeticiones"
+                            defaultValue={repeticiones}
+                            register={register}
+                            errors={errors}
+                            placeholder="2 - 60"
+                          />
+                        </ContainerMonto>
+                      </FilaCamposRecurrencia>
+                    )}
+
+                    {modoRecurrencia === 'mensual' && (
+                      <>
+                        <FilaCamposRecurrencia>
+                          <ContainerMonto>
+                            <label>Día del mes:</label>
+                            <InputText
+                              type="number"
+                              name="diaMes"
+                              defaultValue={diaMes}
+                              register={register}
+                              errors={errors}
+                              placeholder="1 - 31"
+                            />
+                          </ContainerMonto>
+                          <ContainerMonto>
+                            <label>Repeticiones <small>(mín. 2)</small>:</label>
+                            <InputText
+                              type="number"
+                              name="repeticiones"
+                              defaultValue={repeticiones}
+                              register={register}
+                              errors={errors}
+                              placeholder="2 - 60"
+                            />
+                          </ContainerMonto>
+                        </FilaCamposRecurrencia>
+                        <ContenedorDropdown>
+                          <label>Inicio:</label>
+                          <Selector
+                            color="#e14e19"
+                            texto2={politica === 'este_mes' ? 'Este mes' : 'Próximo mes'}
+                            funcion={() => setStatePoliticaRecurrencia(!statePoliticaRecurrencia)}
+                            state={statePoliticaRecurrencia}
+                          />
+                          {statePoliticaRecurrencia && (
+                            <ListaGenerica
+                              top="100%"
+                              scroll="hidden"
+                              btnClose={false}
+                              setState={() => setStatePoliticaRecurrencia(!statePoliticaRecurrencia)}
+                              data={opcionesPoliticaRecurrencia}
+                              funcion={(item) => {
+                                setPolitica(item.value);
+                                setPreviewFechas([]);
+                              }}
+                            />
+                          )}
+                        </ContenedorDropdown>
+                        <MensualHint>La fecha seleccionada arriba no afecta al modo mensual; las fechas se calculan desde el mes de inicio.</MensualHint>
+                      </>
+                    )}
                     {previewFechas.length > 0 && (
                       <ContainerPreview>
                         <label>Fechas a generar ({previewFechas.length}):</label>
@@ -730,20 +810,27 @@ const ContainerRecurrencia = styled.div`
   padding-top: 10px;
 `;
 
+const FilaRecurrencia = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+`;
+
 const ContainerRecurrenciaOpciones = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
+`;
 
-  select, input[type="number"] {
-    background: ${({ theme }) => theme.bgtotal};
-    color: ${({ theme }) => theme.text};
-    border: 1px solid ${({ theme }) => theme.text}55;
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 15px;
-    width: 100%;
-    cursor: pointer;
+const FilaCamposRecurrencia = styled.div`
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+
+  > * {
+    flex: 1;
+    min-width: 0;
   }
 `;
 
